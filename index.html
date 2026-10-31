@@ -4,1001 +4,892 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fares Elzouhiry</title>
-<meta name="description" content="فارس الزهيري — مطوّر مواقع وتطبيقات ويب، ومستندات احترافية.">
+<meta name="description" content="فارس الزهيري — مطوّر واجهات ويب: مواقع وتطبيقات ومستندات احترافية.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;600;700&family=Alexandria:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
-/* Layout: one dark stage. Hero = a WebGL ring of real project screens; each project is a full-width case study
-   with its own gallery; the page light shifts to the colour of the project on screen. */
-@property --tint { syntax: "<color>"; inherits: true; initial-value: #7b83ff; }
+/* Layout: a bright 3D world fills the screen behind the page. Each section is one stop on a camera tour:
+   the camera flies to that project's screens while a glass card tells its story. Without WebGL the page
+   falls back to a normal stacked layout with the same cards and images. */
 :root {
-  --base: #0b0b0e;
-  --raise: #141419;
-  --ink: #f0eee9;
-  --dim: #a09ea8;
-  --faint: #66656e;
-  --line: rgb(255 255 255 / .09);
-  --glass: rgb(255 255 255 / .045);
-  --paper: #f7f6f2;
-  --paper-ink: #22232a;
-  --ok: #2fd27a;
-  --tint: #7b83ff;
+  --sky-top: #dfe4ff;
+  --sky-mid: #f7f5ff;
+  --sky-low: #fbf7f3;
+  --ink: #151826;
+  --ink-2: #4a4f63;
+  --ink-3: #7c8196;
+  --line: rgb(21 24 38 / .1);
+  --card: rgb(255 255 255 / .7);
+  --card-edge: rgb(255 255 255 / .95);
+  --tint: #5b6cff;
 
-  --display: "Reem Kufi", "Alexandria", system-ui, sans-serif;
-  --body: "Alexandria", system-ui, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --display: "Readex Pro", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --body: "IBM Plex Sans Arabic", "Readex Pro", system-ui, sans-serif;
 
-  --s1: 1.2rem;
-  --s2: clamp(1.5rem, 2.6vw, 2.1rem);
-  --s3: clamp(2.3rem, 5.4vw, 4rem);
-  --s4: clamp(3.4rem, 9.5vw, 8.4rem);
-  color-scheme: dark;
+  --t-hero: clamp(3.2rem, 8vw, 6.6rem);
+  --t-h2: clamp(2.1rem, 4.4vw, 3.4rem);
+  --t-lead: clamp(1.05rem, 1.5vw, 1.2rem);
+  color-scheme: light;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; }
-html { scroll-behavior: smooth; background: var(--base); overflow-x: clip; }
+html { background: var(--sky-mid); }
 body {
-  --tint: #7b83ff;
-  transition: --tint 1s ease;
-  background: radial-gradient(1200px 700px at 50% -10%, color-mix(in oklab, var(--tint) 14%, transparent), transparent 70%), color-mix(in oklab, var(--tint) 6%, var(--base));
-  background-attachment: fixed;
+  min-height: 100svh;
+  background: linear-gradient(180deg, var(--sky-top), var(--sky-mid) 55%, var(--sky-low)) fixed;
   color: var(--ink);
-  font: 300 1rem/1.75 var(--body);
+  font: 400 1rem/1.8 var(--body);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
-}
-body::after {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50; opacity: .035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 html[data-lang="ar"] .en, html[data-lang="en"] .ar { display: none !important; }
 html[data-lang="en"] body { line-height: 1.65; }
 a { color: inherit; }
-:focus-visible { outline: 2px solid var(--tint); outline-offset: 4px; border-radius: 6px; }
-h1, h2, h3, h4 { font-family: var(--display); font-weight: 700; line-height: 1.05; margin: 0; text-wrap: balance; }
-p { margin: 0; }
 img { display: block; max-width: 100%; }
 button { font: inherit; color: inherit; }
-.wrap {
-  max-width: 1240px; margin-inline: auto;
-  padding-left: max(20px, env(safe-area-inset-left, 0px));
-  padding-right: max(20px, env(safe-area-inset-right, 0px));
-}
-.kicker { font: 500 .78rem/1.4 var(--mono); color: var(--tint); letter-spacing: .08em; text-transform: uppercase; transition: color 1s; }
+:focus-visible { outline: 2px solid var(--tint); outline-offset: 3px; border-radius: 8px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.12; text-wrap: balance; }
+p { margin: 0; }
 .ltr { direction: ltr; unicode-bidi: isolate; }
 
+#world { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; opacity: 0; transition: opacity 1.4s ease; }
+html.ready #world { opacity: 1; }
+
 /* ---------- nav ---------- */
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: var(--base); }
-.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; backdrop-filter: blur(16px) saturate(1.3); background: color-mix(in oklab, var(--base) 65%, transparent); border-bottom: 1px solid var(--line); }
-.nav .wrap { display: flex; align-items: center; gap: 22px; padding-block: 12px; }
-.mark { display: flex; align-items: center; gap: 12px; text-decoration: none; margin-inline-end: auto; font: 600 1rem/1 var(--display); }
-.glyph { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; background: var(--tint); color: var(--base); font: 700 1.3rem/1 var(--display); transition: background 1s; box-shadow: 0 0 30px -6px var(--tint); }
-.links { display: flex; gap: 26px; font-size: .9rem; color: var(--dim); }
-.links a { text-decoration: none; transition: color .2s; }
-.links a:hover { color: var(--ink); }
-.pill { font: 500 .82rem/1 var(--mono); background: var(--glass); border: 1px solid var(--line); border-radius: 999px; padding: 10px 14px; cursor: pointer; text-decoration: none; transition: border-color .2s; }
-.pill:hover { border-color: var(--tint); }
-.pill.solid { background: var(--ink); color: var(--base); border-color: var(--ink); font-family: var(--body); font-weight: 500; }
-@media (max-width: 860px) { .links { display: none; } }
-@media (max-width: 420px) { .mark > span:not(.glyph) { display: none !important; } }
-
-/* ---------- hero ---------- */
-.hero { position: relative; isolation: isolate; overflow: clip; }
-.hero::before {
-  content: ""; position: absolute; inset: 0; z-index: -2;
-  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 72px 72px;
-  -webkit-mask-image: radial-gradient(ellipse 65% 75% at 50% 45%, #000 5%, transparent 75%); mask-image: radial-gradient(ellipse 65% 75% at 50% 45%, #000 5%, transparent 75%);
+.nav {
+  position: fixed; z-index: 20; top: 0; left: 0; right: 0;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) max(20px, env(safe-area-inset-right, 0px)) 14px max(20px, env(safe-area-inset-left, 0px));
+  display: flex; align-items: center; gap: 18px; pointer-events: none;
 }
-.glow { position: absolute; z-index: -1; width: 620px; height: 620px; left: var(--gx, 30%); top: var(--gy, 40%); transform: translate(-50%, -50%); background: radial-gradient(circle, color-mix(in oklab, var(--tint) 24%, transparent), transparent 65%); pointer-events: none; transition: left .6s ease-out, top .6s ease-out; }
-.hero .wrap { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 24px; align-items: center; min-height: min(820px, calc(100svh - 64px)); padding-block: 40px; }
-.hero-text { display: grid; gap: 24px; position: relative; z-index: 2; }
-.avail { display: inline-flex; align-items: center; gap: 10px; width: fit-content; padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--glass); font-size: .85rem; color: var(--dim); backdrop-filter: blur(6px); }
-.avail i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); animation: ping 2.2s infinite; }
-@keyframes ping { 0% { box-shadow: 0 0 0 0 rgb(47 210 122 / .55); } 70%, 100% { box-shadow: 0 0 0 10px rgb(47 210 122 / 0); } }
-.name { font-size: var(--s4); letter-spacing: -.01em; line-height: .98; }
-.name .l2 { display: block; font-size: .56em; background: linear-gradient(100deg, var(--tint), color-mix(in oklab, var(--tint) 40%, #fff)); -webkit-background-clip: text; background-clip: text; color: transparent; padding-block: .06em; }
-html[data-lang="en"] .name { letter-spacing: -.035em; }
-.does { font: 500 var(--s2)/1.3 var(--display); color: var(--dim); display: flex; flex-wrap: wrap; gap: 0 .35em; align-items: baseline; }
-.rot { display: inline-grid; color: var(--ink); position: relative; }
-.rot > span { grid-area: 1 / 1; transform: translateY(.5em) rotateX(-40deg); opacity: 0; transition: transform .55s cubic-bezier(.2,.8,.2,1), opacity .35s; white-space: nowrap; }
-.rot > span.on { transform: none; opacity: 1; }
-.rot::after { content: ""; position: absolute; inset-inline: 0; bottom: -.28em; height: 3px; border-radius: 3px; background: var(--tint); transition: background 1s; }
-.lead { color: var(--dim); max-width: 32em; font-size: 1.08rem; }
-.lead b { color: var(--ink); font-weight: 500; }
-.for { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.for > span { font-size: .82rem; color: var(--faint); margin-inline-end: 4px; }
-.chip { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-size: .86rem; padding: 7px 13px 7px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--glass); transition: border-color .2s, transform .2s; }
-.chip:hover { border-color: var(--c); transform: translateY(-2px); }
-.chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
-.cta { display: flex; flex-wrap: wrap; gap: 12px; }
-.btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 500 1rem/1 var(--body); padding: 16px 24px; border-radius: 14px; border: 1px solid var(--line); background: var(--glass); transition: transform .2s ease, border-color .2s, background 1s, box-shadow 1s; }
-.btn:hover { transform: translateY(-2px); border-color: var(--tint); }
-.btn.go { background: var(--tint); border-color: transparent; color: #0b0b0e; font-weight: 600; box-shadow: 0 14px 40px -12px var(--tint); }
-.btn svg { width: 18px; height: 18px; }
+.nav > * { pointer-events: auto; }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; margin-inline-end: auto; font: 600 1.02rem/1 var(--display); padding: 6px 14px 6px 6px; border-radius: 16px; background: var(--card); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--card-edge); }
+html[dir="rtl"] .brand { padding: 6px 6px 6px 14px; }
+.logo { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--ink); color: #fff; font: 700 1.15rem/1 var(--display); }
+.nav-links { display: flex; gap: 4px; padding: 5px; border-radius: 16px; background: var(--card); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--card-edge); }
+.nav-links a, .nav-links button { text-decoration: none; border: 0; background: none; cursor: pointer; font: 500 .9rem/1 var(--display); padding: 10px 14px; border-radius: 11px; color: var(--ink-2); transition: background .2s, color .2s; }
+.nav-links a:hover, .nav-links button:hover { background: rgb(255 255 255 / .9); color: var(--ink); }
+.nav-links .cta { background: var(--ink); color: #fff; }
+.nav-links .cta:hover { background: var(--ink); color: #fff; opacity: .9; }
+@media (max-width: 760px) { .nav-links .opt { display: none; } .brand-name { display: none; } html[dir] .brand { padding: 6px; } }
 
-.stage { position: relative; height: clamp(380px, 52vw, 680px); }
-.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.2s ease; cursor: grab; }
-.stage.ready canvas { opacity: 1; }
-.stage.ready .fallback { opacity: 0; }
-.stage .fallback { position: absolute; inset: 8% 6%; transition: opacity .8s; }
-.fallback img { position: absolute; width: 74%; border-radius: 12px; border: 1px solid rgb(255 255 255 / .12); box-shadow: 0 30px 60px -20px #000; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
-.fallback img:nth-child(1) { left: 0; top: 4%; transform: rotate(-7deg); }
-.fallback img:nth-child(2) { right: 0; top: 28%; transform: rotate(5deg); }
-.fallback img:nth-child(3) { left: 14%; bottom: 0; transform: rotate(-2deg); }
-.stage-hint { position: absolute; inset: auto 0 6px; text-align: center; font: 400 .72rem/1 var(--mono); color: var(--faint); pointer-events: none; }
-.stage:not(.ready) .stage-hint { display: none; }
-.scroll-cue { position: absolute; inset: auto 0 18px; display: flex; justify-content: center; pointer-events: none; }
-.scroll-cue i { width: 22px; height: 36px; border: 1.5px solid var(--faint); border-radius: 12px; position: relative; }
-.scroll-cue i::after { content: ""; position: absolute; left: 50%; top: 7px; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: var(--ink); animation: cue 1.8s infinite; }
-@keyframes cue { 0% { transform: translateY(0); opacity: 1; } 80%, 100% { transform: translateY(12px); opacity: 0; } }
-@media (max-width: 960px) {
-  .hero .wrap { grid-template-columns: 1fr; min-height: 0; padding-block: 28px 64px; gap: 8px; }
-  .stage { height: clamp(320px, 80vw, 480px); order: -1; margin-inline: -20px; }
-  .scroll-cue { display: none; }
+/* ---------- tour rail ---------- */
+.rail { position: fixed; z-index: 15; top: 50%; transform: translateY(-50%); inset-inline-end: max(18px, env(safe-area-inset-left, 0px)); display: none; flex-direction: column; gap: 6px; }
+html.gl .rail { display: flex; }
+.rail button { position: relative; width: 26px; height: 26px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.rail button i { width: 8px; height: 8px; border-radius: 50%; background: rgb(21 24 38 / .22); transition: background .3s, transform .3s; }
+.rail button.on i { background: var(--tint); transform: scale(1.6); box-shadow: 0 0 0 5px color-mix(in srgb, var(--tint) 18%, transparent); }
+.rail button span { position: absolute; inset-inline-end: 32px; white-space: nowrap; font: 500 .8rem/1 var(--display); padding: 7px 11px; border-radius: 9px; background: var(--card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--card-edge); opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .2s; pointer-events: none; }
+html[dir="rtl"] .rail button span { transform: translateX(-6px); }
+.rail button:hover span, .rail button:focus-visible span { opacity: 1; transform: none; }
+@media (max-width: 760px) { html.gl .rail { display: none; } }
+
+/* ---------- sections / stops ---------- */
+main { position: relative; z-index: 1; }
+.st { position: relative; }
+.stop { min-height: 100svh; display: flex; align-items: center; padding: 110px max(20px, env(safe-area-inset-right, 0px)) 60px max(20px, env(safe-area-inset-left, 0px)); }
+.stop-in { width: 100%; max-width: 1280px; margin-inline: auto; display: flex; }
+
+/* In 3D mode each section is a long scroll with the card held in place while the camera visits */
+html.gl .st { height: 175svh; pointer-events: none; }
+html.gl .st:last-child { height: 100svh; }
+html.gl .stop { position: sticky; top: 0; height: 100svh; min-height: 0; }
+html.gl .st .card, html.gl .st a, html.gl .st button { pointer-events: auto; }
+html.gl .fb { display: none; }
+html.gl .st { --o: 1; }
+html.gl .stop-in { opacity: var(--o); transform: translateY(calc((1 - var(--o)) * 26px)); }
+
+.card {
+  width: min(470px, 100%);
+  background: var(--card);
+  backdrop-filter: blur(22px) saturate(1.5); -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid var(--card-edge);
+  border-radius: 28px;
+  padding: clamp(22px, 3vw, 34px);
+  box-shadow: 0 30px 80px -30px rgb(40 44 90 / .35), 0 2px 6px rgb(40 44 90 / .06);
+  display: grid; gap: 18px;
 }
+.type { display: inline-flex; align-items: center; gap: 10px; width: fit-content; font: 500 .86rem/1.4 var(--display); color: var(--ink-2); }
+.type i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 18%, transparent); flex: none; }
+.card h2 { font-size: var(--t-h2); font-weight: 700; letter-spacing: -.01em; }
+.card h2 small { display: block; font: 400 var(--t-lead)/1.5 var(--body); color: var(--ink-2); margin-top: 10px; letter-spacing: 0; }
+.card > p { color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; padding-top: 16px; border-top: 1px solid var(--line); }
+.facts dt { font-size: .76rem; color: var(--ink-3); }
+.facts dd { margin: 2px 0 0; font: 700 1.55rem/1.1 var(--display); color: var(--c); }
+.flow { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.flow li { font: 500 .8rem/1 var(--display); padding: 9px 12px; border-radius: 10px; background: rgb(255 255 255 / .8); border: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
+.flow li b { width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; background: var(--c); color: #fff; font-size: .72rem; }
+.links { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; font: 500 .95rem/1 var(--display); padding: 14px 20px; border-radius: 14px; border: 1px solid var(--line); background: rgb(255 255 255 / .85); cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -12px rgb(40 44 90 / .4); }
+.btn.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+.btn svg { width: 17px; height: 17px; flex: none; }
+html[dir="rtl"] .btn svg.dir { transform: scaleX(-1); }
+.note { font-size: .82rem; color: var(--ink-3); }
+.fb { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.fb img { border-radius: 14px; border: 1px solid var(--line); aspect-ratio: 16 / 10; object-fit: cover; object-position: top; width: 100%; }
+.fb img.tall { aspect-ratio: 1 / 1.4; }
 
-/* ---------- ribbon ---------- */
-.ribbon { border-block: 1px solid var(--line); overflow: hidden; direction: ltr; background: color-mix(in oklab, var(--base) 60%, transparent); }
-.ribbon-track { display: flex; width: max-content; animation: slide 38s linear infinite; }
-.ribbon span { font: 600 clamp(1rem, 2vw, 1.35rem)/1 var(--display); padding: 22px 28px; white-space: nowrap; color: var(--dim); display: flex; align-items: center; gap: 28px; }
-.ribbon span::after { content: "✦"; color: var(--tint); font-size: .8em; transition: color 1s; }
-@keyframes slide { to { transform: translateX(-50%); } }
+/* hero */
+.hero .stop-in { flex-direction: column; align-items: flex-start; gap: 26px; }
+.hero-copy { display: grid; gap: 22px; max-width: 620px; }
+.avail { display: inline-flex; align-items: center; gap: 10px; width: fit-content; padding: 8px 16px; border-radius: 999px; background: var(--card); border: 1px solid var(--card-edge); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font: 500 .86rem/1.3 var(--display); color: var(--ink-2); }
+.avail i { width: 8px; height: 8px; border-radius: 50%; background: #18b26b; animation: ping 2.2s infinite; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgb(24 178 107 / .5); } 70%, 100% { box-shadow: 0 0 0 10px rgb(24 178 107 / 0); } }
+.hero h1 { font-size: var(--t-hero); font-weight: 700; letter-spacing: -.02em; line-height: 1.02; }
+.hero h1 span.grad { display: block; background: linear-gradient(90deg, #4d5dff, #b04cff 55%, #ff6a7a); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .06em; }
+html[data-lang="en"] .hero h1 { letter-spacing: -.035em; }
+.hero .lead { font-size: var(--t-lead); color: var(--ink-2); max-width: 34em; }
+.hero .lead b { color: var(--ink); font-weight: 600; }
+.clients { display: flex; flex-wrap: wrap; gap: 8px; }
+.clients a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 13px; border-radius: 12px; background: var(--card); border: 1px solid var(--card-edge); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); font: 500 .86rem/1.2 var(--display); transition: transform .2s; }
+.clients a:hover { transform: translateY(-2px); }
+.clients i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.scroll-hint { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); left: 0; right: 0; display: none; justify-content: center; }
+html.gl .scroll-hint { display: flex; }
+.scroll-hint span { display: inline-flex; align-items: center; gap: 10px; font: 500 .82rem/1 var(--display); color: var(--ink-2); padding: 10px 16px; border-radius: 999px; background: var(--card); border: 1px solid var(--card-edge); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.scroll-hint svg { width: 16px; height: 16px; animation: nudge 1.6s ease-in-out infinite; }
+@keyframes nudge { 50% { transform: translateY(4px); } }
 
-/* ---------- numbers ---------- */
-.nums .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
-.num { padding: 34px 0; display: grid; gap: 4px; min-width: 0; }
-.num + .num { border-inline-start: 1px solid var(--line); padding-inline-start: 28px; }
-.num strong { font: 700 var(--s3)/1 var(--display); font-variant-numeric: tabular-nums; }
-.num strong sup { font-size: .42em; color: var(--tint); vertical-align: super; }
-.num span { color: var(--dim); font-size: .88rem; }
+/* documents card extras */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
+.chips li { font: 500 .84rem/1 var(--display); padding: 10px 13px; border-radius: 11px; background: rgb(255 255 255 / .85); border: 1px solid var(--line); }
+
+/* contact */
+.contact .stop-in { justify-content: center; }
+.contact .card { width: min(640px, 100%); text-align: center; justify-items: center; }
+.contact h2 { font-size: clamp(2.6rem, 6vw, 4.6rem); }
+.mail { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; padding: 8px; padding-inline-start: 18px; border-radius: 16px; background: rgb(255 255 255 / .85); border: 1px solid var(--line); max-width: 100%; }
+.mail span { font: 500 clamp(1rem, 2.6vw, 1.25rem)/1.3 var(--display); direction: ltr; user-select: all; overflow-wrap: anywhere; min-width: 0; }
+.skills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; list-style: none; padding: 0; margin: 0; }
+.skills li { font: 500 .8rem/1 var(--display); padding: 9px 12px; border-radius: 10px; background: rgb(255 255 255 / .7); border: 1px solid var(--line); color: var(--ink-2); }
+
+/* card placement: projects sit on the reading side, the 3D scene fills the other */
+html.gl .st:not(.hero):not(.contact) .stop-in { justify-content: flex-start; }
+
+/* phones: the card sits at the bottom, the scene above it */
 @media (max-width: 760px) {
-  .nums .wrap { grid-template-columns: 1fr 1fr; }
-  .num:nth-child(3) { border-inline-start: 0; padding-inline-start: 0; }
-  .num:nth-child(n+3) { border-top: 1px solid var(--line); }
+  html.gl .stop { align-items: flex-end; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); }
+  html.gl .card { max-height: 54svh; overflow-y: auto; padding: 20px; gap: 14px; }
+  html.gl .st:not(.hero):not(.contact) .card > p { font-size: .92rem; }
+  .card h2 { font-size: 2rem; }
+  html.gl .hero .stop { align-items: flex-end; }
+  html.gl .hero .stop-in { gap: 16px; }
+  html.gl .hero .lead { font-size: 1rem; }
+  html.gl .scroll-hint { display: none; }
+  .fb { grid-template-columns: 1fr; }
 }
 
-/* ---------- section heads ---------- */
-.head { display: grid; gap: 16px; max-width: 50rem; padding-block: 120px 40px; }
-.head h2 { font-size: var(--s3); }
-.head p { color: var(--dim); font-size: var(--s1); }
-
-/* ---------- case studies ---------- */
-.case { padding-block: 72px; scroll-margin-top: 60px; overflow-x: clip; }
-.case-top { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px 64px; align-items: end; margin-bottom: 36px; }
-.type { display: inline-flex; align-items: center; gap: 10px; width: fit-content; padding: 8px 14px 8px 12px; border-radius: 12px; background: color-mix(in oklab, var(--tint) 16%, transparent); border: 1px solid color-mix(in oklab, var(--tint) 40%, transparent); color: var(--ink); font-size: .92rem; font-weight: 500; transition: background 1s, border-color 1s; }
-.type svg { width: 20px; height: 20px; color: var(--tint); transition: color 1s; flex: none; }
-.case-title { display: grid; gap: 16px; }
-.case h3 { font-size: clamp(2.4rem, 6.5vw, 5rem); letter-spacing: -.015em; }
-.case h3 small { display: block; font: 500 var(--s1)/1.4 var(--body); color: var(--dim); letter-spacing: 0; margin-top: 10px; }
-.case-desc { display: grid; gap: 18px; }
-.case-desc > p { color: var(--dim); }
-.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border-top: 1px solid var(--line); }
-.facts div { padding-top: 14px; display: grid; gap: 2px; }
-.facts dt { font-size: .76rem; color: var(--faint); }
-.facts dd { margin: 0; font: 700 1.6rem/1.15 var(--display); }
-.case-links { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; }
-.more { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--tint); padding-bottom: 4px; transition: gap .2s, border-color 1s; }
-.more:hover { gap: 16px; }
-.more svg { width: 16px; height: 16px; }
-html[dir="rtl"] .more svg { transform: scaleX(-1); }
-.tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
-.tags li { font: 400 .72rem/1 var(--mono); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); color: var(--dim); }
-.soon { font-size: .88rem; color: var(--faint); }
-@media (max-width: 900px) { .case-top { grid-template-columns: 1fr; align-items: start; } }
-
-/* browser frame + gallery */
-.browser { border-radius: 18px; overflow: hidden; background: #131318; border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 60px 120px -50px color-mix(in oklab, var(--tint) 60%, transparent), 0 40px 80px -40px #000; transition: box-shadow 1s; }
-.bar { display: flex; align-items: center; gap: 7px; padding: 12px 16px; border-bottom: 1px solid rgb(255 255 255 / .07); background: #17171d; }
-.bar i { width: 11px; height: 11px; border-radius: 50%; background: #2d2d35; flex: none; }
-.bar i:nth-child(1) { background: #ff5f57; } .bar i:nth-child(2) { background: #febc2e; } .bar i:nth-child(3) { background: #28c840; }
-.bar .url { flex: 1; min-width: 0; margin-inline: 12px 60px; padding: 4px 12px; border-radius: 8px; background: #0e0e12; color: #8e8d97; font: 400 .74rem/1.6 var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; direction: ltr; }
-.screen { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #0e0e12; }
-.screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: opacity .25s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
-.screen img.out { opacity: 0; transform: scale(1.015); }
-.thumbs { display: flex; gap: 12px; margin-top: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
-.thumbs button { flex: none; width: 150px; display: grid; gap: 8px; padding: 0; border: 0; background: none; cursor: pointer; text-align: start; }
-.thumbs button img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; border-radius: 10px; border: 2px solid transparent; opacity: .55; transition: opacity .2s, border-color .2s; }
-.thumbs button span { font-size: .78rem; color: var(--faint); transition: color .2s; }
-.thumbs button:hover img { opacity: .9; }
-.thumbs button.on img { opacity: 1; border-color: var(--tint); }
-.thumbs button.on span { color: var(--ink); }
-.lang-switch { display: inline-flex; padding: 4px; gap: 4px; border-radius: 12px; background: var(--glass); border: 1px solid var(--line); margin-bottom: 14px; }
-.lang-switch button { border: 0; background: none; padding: 8px 14px; border-radius: 9px; cursor: pointer; font: 500 .82rem/1 var(--mono); color: var(--dim); }
-.lang-switch button.on { background: var(--tint); color: #0b0b0e; }
-.try { font-size: .82rem; color: var(--faint); margin-inline-start: 10px; }
-
-/* Uni-app: phones + doctor */
-.uni-media { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 32px; align-items: center; }
-.phones { position: relative; height: clamp(420px, 46vw, 600px); }
-.phone { position: absolute; width: 42%; aspect-ratio: 1 / 2.05; padding: 7px; border-radius: 34px; background: #050507; border: 1px solid rgb(255 255 255 / .14); box-shadow: 0 40px 80px -30px #000, 0 0 0 1px #000; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
-.phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 27px; }
-.phone::before { content: ""; position: absolute; top: 14px; left: 50%; width: 28%; height: 14px; margin-left: -14%; border-radius: 10px; background: #050507; z-index: 1; }
-.phone.p1 { left: 29%; top: 0; z-index: 3; }
-.phone.p2 { left: 0; top: 12%; transform: rotate(-8deg) scale(.88); z-index: 2; }
-.phone.p3 { right: 0; top: 12%; transform: rotate(8deg) scale(.88); z-index: 1; }
-.phones:hover .p2 { transform: rotate(-12deg) scale(.9) translateX(-6%); }
-.phones:hover .p3 { transform: rotate(12deg) scale(.9) translateX(6%); }
-.phone-label { position: absolute; inset: auto 0 -30px; text-align: center; font-size: .8rem; color: var(--faint); }
-.doc-dash .screen { aspect-ratio: 1260 / 1000; }
-.doc-tabs { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-.doc-tabs button { border: 1px solid var(--line); background: var(--glass); border-radius: 10px; padding: 9px 14px; cursor: pointer; font-size: .85rem; color: var(--dim); }
-.doc-tabs button.on { border-color: var(--tint); color: var(--ink); }
-.media-cap { font-size: .8rem; color: var(--faint); margin-top: 10px; }
-@media (max-width: 900px) { .uni-media { grid-template-columns: 1fr; gap: 56px; } .phones { height: clamp(380px, 110vw, 560px); } }
-
-/* attendance system */
-.att { margin-top: 72px; border: 1px solid var(--line); border-radius: 28px; background: linear-gradient(160deg, color-mix(in oklab, var(--tint) 10%, var(--raise)), var(--raise) 55%); padding: clamp(24px, 4vw, 48px); display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 40px; align-items: start; }
-.att h4 { font-size: var(--s2); }
-.att > div > p { color: var(--dim); margin-top: 10px; }
-.steps { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 0; counter-reset: s; }
-.steps li { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 4px 16px; padding-bottom: 24px; counter-increment: s; }
-.steps li::before { content: counter(s); grid-row: span 2; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: var(--base); border: 1px solid color-mix(in oklab, var(--tint) 50%, transparent); font: 700 1.1rem/1 var(--display); color: var(--tint); }
-.steps li:not(:last-child)::after { content: ""; position: absolute; inset-inline-start: 21px; top: 48px; bottom: 4px; width: 2px; background: linear-gradient(var(--tint), transparent); opacity: .5; }
-.steps b { font: 600 1.08rem/1.4 var(--display); padding-top: 2px; }
-.steps span { color: var(--dim); font-size: .92rem; }
-.sim { background: #0d0d11; border: 1px solid rgb(255 255 255 / .1); border-radius: 22px; padding: 20px; display: grid; gap: 16px; font-family: "Alexandria", system-ui, sans-serif; direction: ltr; text-align: left; box-shadow: 0 30px 60px -30px #000; }
-.sim-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.sim-head b { font-weight: 600; font-size: .95rem; }
-.sim-head small { display: block; color: var(--faint); font-size: .72rem; }
-.live { display: inline-flex; align-items: center; gap: 7px; font-size: .74rem; font-weight: 600; color: var(--ok); border: 1.5px solid var(--ok); border-radius: 999px; padding: 4px 10px; }
-.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); animation: blink 1.2s infinite; }
-@keyframes blink { 50% { opacity: .25; } }
-.sim-mid { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: center; }
-.qr { width: 112px; height: 112px; border-radius: 12px; background: #fff; padding: 8px; }
-.qr canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
-.sim-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.sim-stats div { background: #1b1b21; border-radius: 14px; padding: 12px 6px; text-align: center; }
-.sim-stats b { display: block; font: 700 1.7rem/1.1 "Alexandria", sans-serif; font-variant-numeric: tabular-nums; }
-.sim-stats span { font-size: .68rem; color: var(--faint); }
-.sim-stats .p b { color: var(--ok); } .sim-stats .a b { color: #ff4d5e; }
-.feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; height: 214px; overflow: hidden; }
-.feed li { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: #1b1b21; border-radius: 12px; padding: 9px 12px; font-size: .84rem; }
-.feed li small { color: var(--faint); font-size: .72rem; }
-.feed li.new { animation: pop 1.6s ease-out; }
-@keyframes pop { 0% { background: rgb(47 210 122 / .35); transform: translateY(-6px); } 100% { background: #1b1b21; transform: none; } }
-.sim-note { font-size: .74rem; color: var(--faint); text-align: center; }
-@media (max-width: 900px) { .att { grid-template-columns: 1fr; } }
-
-/* BBQ deck viewer */
-.deck16 { position: relative; }
-.deck16 .screen { aspect-ratio: 16 / 9; }
-.deck16 .screen img { position: absolute; inset: 0; opacity: 0; transition: opacity .6s ease, transform 1.2s cubic-bezier(.2,.8,.2,1); transform: scale(1.03); }
-.deck16 .screen img.on { opacity: 1; transform: none; }
-.deck-ui { display: flex; align-items: center; gap: 14px; margin-top: 16px; direction: ltr; }
-.deck-ui button { width: 46px; height: 46px; border-radius: 14px; border: 1px solid var(--line); background: var(--glass); cursor: pointer; display: grid; place-items: center; transition: border-color .2s; }
-.deck-ui button:hover { border-color: var(--tint); }
-.deck-ui svg { width: 18px; height: 18px; }
-.deck-count { font: 500 .9rem/1 var(--mono); color: var(--ink); min-width: 4.5em; }
-.deck-count small { color: var(--faint); }
-.deck-label { font: 400 .8rem/1.3 var(--mono); color: var(--dim); flex: 1; min-width: 0; text-align: right; }
-.deck-bar { height: 3px; background: var(--line); border-radius: 3px; margin-top: 14px; overflow: hidden; direction: ltr; }
-.deck-bar i { display: block; height: 100%; width: 0; background: var(--tint); transition: width .6s ease; }
-
-/* reveal on scroll (content stays visible; it only slides into place) */
-.rv { transform: translateY(28px); transition: transform 1s cubic-bezier(.2,.8,.2,1); }
-.rv.in { transform: none; }
-
-/* ---------- documents ---------- */
-.docs-stage { display: flex; justify-content: center; align-items: flex-end; padding: 30px 0 40px; perspective: 1200px; }
-.paper { flex: none; width: 230px; margin-inline: -20px; transform: rotate(var(--r)) translateY(var(--y, 0)); transition: transform .5s cubic-bezier(.2,.8,.2,1); display: grid; gap: 16px; justify-items: center; }
-.paper:hover { transform: rotate(0deg) translateY(-24px) scale(1.04); z-index: 3; }
-.sheet { width: 100%; background: var(--paper); color: var(--paper-ink); border-radius: 6px; overflow: hidden; box-shadow: 0 34px 60px -24px #000; padding: 16px; display: grid; gap: 7px; align-content: start; font-family: var(--body); }
-.a4 { aspect-ratio: 1 / 1.414; } .wide { aspect-ratio: 16 / 10; }
-.paper figcaption { font: 600 1rem/1.3 var(--display); text-align: center; }
-.paper figcaption small { display: block; font: 400 .72rem/1.6 var(--mono); color: var(--faint); }
-.ln { display: block; height: 5px; border-radius: 3px; background: #d9d8de; }
-.cv-top { display: flex; gap: 10px; align-items: center; padding-bottom: 8px; border-bottom: 2px solid var(--tint); transition: border-color 1s; }
-.cv-top i { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #cfd0d8, #a9abb8); flex: none; }
-.cv-top b { display: block; font: 700 .84rem/1.2 var(--display); }
-.cv-top small { font-size: .6rem; color: #7a7b85; }
-.sheet h6 { margin: 4px 0 0; font: 600 .58rem/1 var(--body); color: color-mix(in oklab, var(--tint) 70%, #222); letter-spacing: .04em; }
-.chips { display: flex; gap: 4px; } .chips i { height: 9px; flex: 1; border-radius: 9px; background: color-mix(in oklab, var(--tint) 25%, #eee); }
-.cover-band { margin: -16px -16px 10px; height: 36%; background: linear-gradient(160deg, #1d2030, color-mix(in oklab, var(--tint) 50%, #1d2030)); display: flex; align-items: flex-end; padding: 12px 16px; color: #fff; font: 700 .92rem/1.2 var(--display); }
-.sheet > small { font-size: .6rem; color: #7a7b85; }
-.slide { background: #15161d; color: #fff; padding: 14px; gap: 8px; }
-.slide b { font: 700 .8rem/1.2 var(--display); }
-.bars { display: flex; align-items: flex-end; gap: 6px; height: 60px; padding-top: 6px; border-bottom: 1px solid rgb(255 255 255 / .15); }
-.bars i { flex: 1; border-radius: 3px 3px 0 0; background: var(--tint); transition: background 1s; }
-.grid-sheet { padding: 0; gap: 0; grid-template-columns: 22px repeat(3, 1fr); font: 400 .58rem/1 var(--mono); }
-.grid-sheet span { padding: 5px 4px; border-right: 1px solid #e2e1e6; border-bottom: 1px solid #e2e1e6; white-space: nowrap; overflow: hidden; }
-.grid-sheet .h { background: #1f7a4d; color: #fff; font-weight: 500; }
-.grid-sheet .rn { background: #efeef2; color: #888; text-align: center; }
-.grid-sheet .t { font-weight: 500; background: #e7f3ec; }
-@media (max-width: 760px) { .docs-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 16px; align-items: start; } .paper { width: auto; margin: 0; --r: 0deg !important; --y: 0 !important; } }
-
-.svc { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; padding-top: 40px; }
-.svc h3 { font-size: var(--s2); padding-bottom: 14px; border-bottom: 1px solid var(--ink); display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.svc h3 small { font: 400 .74rem/1 var(--mono); color: var(--faint); }
-.svc ul { list-style: none; margin: 0 0 40px; padding: 0; }
-.svc li { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; padding: 18px 0; border-bottom: 1px solid var(--line); }
-.svc li strong { font: 600 1.12rem/1.3 var(--display); }
-.svc li span { grid-column: 1; color: var(--dim); font-size: .92rem; }
-.svc li em { grid-column: 2; grid-row: 1 / span 2; align-self: center; font: normal 400 .72rem/1 var(--mono); color: var(--tint); direction: ltr; transition: color 1s; }
-@media (max-width: 820px) { .svc { grid-template-columns: 1fr; } }
-
-/* ---------- skills ---------- */
-.skills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.skill { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; padding: 26px; background: var(--raise); display: grid; gap: 10px; align-content: start; isolation: isolate; }
-.skill::before { content: ""; position: absolute; z-index: -1; width: 240px; height: 240px; left: var(--mx, 50%); top: var(--my, 50%); transform: translate(-50%, -50%); background: radial-gradient(circle, color-mix(in oklab, var(--tint) 30%, transparent), transparent 70%); opacity: 0; transition: opacity .3s; }
-.skill:hover::before { opacity: 1; }
-.skill svg { width: 30px; height: 30px; color: var(--tint); transition: color 1s; }
-.skill h4 { font-size: 1.35rem; }
-.skill p { color: var(--dim); font-size: .92rem; }
-.skill .used { font: 400 .72rem/1.5 var(--mono); color: var(--faint); direction: ltr; text-align: start; }
-@media (max-width: 900px) { .skills { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 560px) { .skills { grid-template-columns: 1fr; } }
-
-/* ---------- contact ---------- */
-.contact { padding-block: 140px 110px; text-align: center; position: relative; isolation: isolate; }
-.contact::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 55%; width: min(900px, 120vw); height: 500px; transform: translate(-50%, -50%); background: radial-gradient(ellipse, color-mix(in oklab, var(--tint) 22%, transparent), transparent 70%); }
-.contact .wrap { display: grid; gap: 28px; justify-items: center; }
-.contact h2 { font-size: var(--s4); letter-spacing: -.01em; }
-.contact h2 em { font-style: normal; color: var(--tint); transition: color 1s; }
-.contact p { color: var(--dim); font-size: var(--s1); max-width: 30em; }
-.mail { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 14px; padding: 10px; padding-inline-start: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--glass); max-width: 100%; backdrop-filter: blur(6px); }
-.mail span { font: 400 clamp(1rem, 3.4vw, 1.5rem)/1.3 var(--mono); direction: ltr; user-select: all; overflow-wrap: anywhere; min-width: 0; }
-.mail button { font-weight: 600; font-size: .9rem; padding: 14px 20px; border-radius: 12px; border: 0; background: var(--ink); color: var(--base); cursor: pointer; }
-footer { border-top: 1px solid var(--line); }
-footer .wrap { padding-block: 26px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; color: var(--faint); font-size: .82rem; }
+/* lightbox */
+.lb { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: max(20px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); background: rgb(240 241 250 / .72); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.lb[hidden] { display: none; }
+.lb img { max-width: min(1200px, 100%); max-height: 86svh; border-radius: 18px; box-shadow: 0 40px 100px -30px rgb(40 44 90 / .5); }
+.lb button { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 18px); inset-inline-end: max(18px, env(safe-area-inset-right, 0px)); width: 46px; height: 46px; border-radius: 14px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-size: 1.4rem; line-height: 1; }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition-duration: .01s !important; }
-  .rv { transform: none; }
 }
 </style>
-
 </head>
 <body>
+<canvas id="world" aria-hidden="true"></canvas>
+
 <header class="nav">
-  <div class="wrap">
-    <a class="mark" href="#top"><span class="glyph">ف</span><span class="ar">فارس الزهيري</span><span class="en">Fares Elzouhiry</span></a>
-    <nav class="links" aria-label="Sections">
-      <a href="#work"><span class="ar">الشغل</span><span class="en">Work</span></a>
-      <a href="#uni"><span class="ar">نظام الغياب</span><span class="en">Attendance</span></a>
-      <a href="#docs"><span class="ar">المستندات</span><span class="en">Documents</span></a>
-      <a href="#skills"><span class="ar">المهارات</span><span class="en">Skills</span></a>
-    </nav>
-    <button class="pill" id="lang-toggle" type="button" aria-label="Switch language"><span class="ar">EN</span><span class="en">ع</span></button>
-    <a class="pill solid" href="#contact"><span class="ar">كلّمني</span><span class="en">Contact</span></a>
-  </div>
+  <a class="brand" href="#top" data-go="0"><span class="logo">ف</span><span class="brand-name"><span class="ar">فارس الزهيري</span><span class="en">Fares Elzouhiry</span></span></a>
+  <nav class="nav-links" aria-label="Sections">
+    <a class="opt" href="#uni" data-go="1"><span class="ar">المشاريع</span><span class="en">Work</span></a>
+    <a class="opt" href="#docs" data-go="6"><span class="ar">المستندات</span><span class="en">Documents</span></a>
+    <button type="button" id="lang-toggle" aria-label="Switch language"><span class="ar">EN</span><span class="en">عربي</span></button>
+    <a class="cta" href="#contact" data-go="7"><span class="ar">تواصل معي</span><span class="en">Contact</span></a>
+  </nav>
 </header>
 
+<nav class="rail" aria-label="Tour stops">
+  <button type="button" data-go="0"><i></i><span><span class="ar">البداية</span><span class="en">Start</span></span></button>
+  <button type="button" data-go="1"><i></i><span>Juster</span></button>
+  <button type="button" data-go="2"><i></i><span>Alliance</span></button>
+  <button type="button" data-go="3"><i></i><span>Sport Barbecue</span></button>
+  <button type="button" data-go="4"><i></i><span><span class="ar">ايرتك جاهز</span><span class="en">AirTech</span></span></button>
+  <button type="button" data-go="5"><i></i><span><span class="ar">مدرسة الفرسان</span><span class="en">El-Fersan</span></span></button>
+  <button type="button" data-go="6"><i></i><span><span class="ar">المستندات</span><span class="en">Documents</span></span></button>
+  <button type="button" data-go="7"><i></i><span><span class="ar">تواصل</span><span class="en">Contact</span></span></button>
+</nav>
+
 <main id="top">
-  <section class="hero" data-tint="#7b83ff">
-    <div class="glow" id="glow"></div>
-    <div class="wrap">
-      <div class="hero-text">
-        <span class="avail"><i></i><span class="ar">متاح لمشاريع جديدة</span><span class="en">Available for new projects</span></span>
-        <h1 class="name">
-          <span class="ar">فارس<span class="l2">الزهيري</span></span>
-          <span class="en">Fares<span class="l2">Elzouhiry</span></span>
-        </h1>
-        <p class="does">
-          <span class="ar">بعمل</span><span class="en">I make</span>
-          <span class="rot ar" data-rot><span class="on">مواقع شركات</span><span>تطبيقات جامعات</span><span>أنظمة حضور وغياب</span><span>Presentations تفاعلية</span><span>سي في احترافي</span></span>
-          <span class="rot en" data-rot><span class="on">company websites</span><span>university apps</span><span>attendance systems</span><span>interactive decks</span><span>sharp CVs</span></span>
-        </p>
-        <p class="lead">
-          <span class="ar">مطوّر ويب من مصر. اشتغلت لـ <b>جامعة</b> و<b>شركات</b> و<b>مدرسة</b>، من الإسكندرية للرياض: تطبيق طلاب بنظام غياب للدكتور، وموقع بـ <b>6 لغات</b>، وعرض تقديمي معمول كموقع.</span>
-          <span class="en">Web developer from Egypt. I've built for a <b>university</b>, <b>companies</b> and a <b>school</b>, from Alexandria to Riyadh: a student app with a doctor attendance system, a site in <b>six languages</b>, and a presentation built as a website.</span>
-        </p>
-        <div class="for">
-          <span class="ar">اشتغلت لـ</span><span class="en">Built for</span>
-          <a class="chip" href="#uni" style="--c:#ef3b55"><i></i><span class="ar">جامعة</span><span class="en">University</span></a>
-          <a class="chip" href="#alliance" style="--c:#d4ad62"><i></i><span class="ar">شركة استثمار</span><span class="en">Investment firm</span></a>
-          <a class="chip" href="#bbq" style="--c:#ff7a1a"><i></i><span class="ar">فعالية</span><span class="en">Event</span></a>
-          <a class="chip" href="#airtech" style="--c:#4a8af0"><i></i><span class="ar">شركة قطع غيار</span><span class="en">Parts company</span></a>
-          <a class="chip" href="#school" style="--c:#e0475b"><i></i><span class="ar">مدرسة</span><span class="en">School</span></a>
-        </div>
-        <div class="cta">
-          <a class="btn go" href="#work"><span class="ar">شوف الشغل</span><span class="en">See the work</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
-          <a class="btn" href="#contact"><span class="ar">ابدأ مشروعك</span><span class="en">Start a project</span></a>
-        </div>
-      </div>
-
-      <div class="stage" id="stage">
-        <div class="fallback" aria-hidden="true">
-          <img src="img/alliance-hero.jpg" alt="">
-          <img src="img/bbq-s1.jpg" alt="">
-          <img src="img/fersan-hero.jpg" alt="">
-        </div>
-        <p class="stage-hint"><span class="ar">اسحب أو اضغط على أي شاشة</span><span class="en">Drag, or click any screen</span></p>
-      </div>
-    </div>
-    <div class="scroll-cue" aria-hidden="true"><i></i></div>
-  </section>
-
-  <div class="ribbon" aria-hidden="true">
-    <div class="ribbon-track">
-      <span>University App</span><span>Attendance System</span><span>Company Website</span><span>Web Presentation</span><span>Online Store</span><span>School Website</span><span>CV · Reports · Slides</span>
-      <span>University App</span><span>Attendance System</span><span>Company Website</span><span>Web Presentation</span><span>Online Store</span><span>School Website</span><span>CV · Reports · Slides</span>
-    </div>
-  </div>
-
-  <div class="nums">
-    <div class="wrap">
-      <div class="num"><strong>5</strong><span class="ar">مشاريع حقيقية شغالة</span><span class="en">real, working projects</span></div>
-      <div class="num"><strong>130<sup>+</sup></strong><span class="ar">commit على GitHub</span><span class="en">commits on GitHub</span></div>
-      <div class="num"><strong>6</strong><span class="ar">لغات في موقع واحد</span><span class="en">languages on one site</span></div>
-      <div class="num"><strong>3</strong><span class="ar">جامعة · شركات · مدرسة</span><span class="en">university · companies · school</span></div>
-    </div>
-  </div>
-
-  <div id="work" class="wrap">
-    <div class="head rv">
-      <p class="kicker"><span class="ar">الشغل</span><span class="en">Selected work</span></p>
-      <h2><span class="ar">كل مشروع ليه شخصيته.</span><span class="en">Every project gets its own identity.</span></h2>
-      <p><span class="ar">لاحظ لون الصفحة وانت نازل: بيتغير على لون كل مشروع. اضغط على الصور الصغيرة تحت كل مشروع علشان تشوف صفحات تانية منه.</span><span class="en">Watch the page as you scroll: it takes on each project's colour. Click the thumbnails under each project to see more of it.</span></p>
-    </div>
-  </div>
-
-  <!-- ===== University ===== -->
-  <article class="case" id="uni" data-tint="#ef3b55">
-    <div class="wrap">
-      <div class="case-top rv">
-        <div class="case-title">
-          <span class="type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/></svg><span class="ar">للجامعة · تطبيق طلاب + نظام غياب للدكتور</span><span class="en">For a university · student app + doctor attendance</span></span>
-          <h3>Juster<small><span class="ar">بوابة الجامعة على موبايل كل طالب</span><span class="en">The university portal on every student's phone</span></small></h3>
-        </div>
-        <div class="case-desc">
-          <p><span class="ar">تطبيق للطلاب فيه جدول المحاضرات لحظة بلحظة، والدرجات، والمهام، وغرف مذاكرة بمؤقت. وللدكتور لوحة غياب كاملة: يبدأ المحاضرة، يعرض QR، والحضور بيتسجل لايف مع التأكد من مكان الطالب. بيتثبت على الموبايل وبيشتغل من غير نت.</span><span class="en">A student app with a live class schedule, grades, tasks and study rooms with a timer. Doctors get a full attendance dashboard: start a lecture, show a QR, and check-ins arrive live with the student's location verified. Installs on the phone and works offline.</span></p>
-          <dl class="facts">
-            <div><dt>commits</dt><dd>112</dd></div>
-            <div><dt><span class="ar">لوحات تحكم</span><span class="en">dashboards</span></dt><dd>3</dd></div>
-            <div><dt><span class="ar">من غير نت</span><span class="en">offline</span></dt><dd>✓</dd></div>
-          </dl>
-          <div class="case-links">
-            <a class="more" href="https://github.com/FaresElzouhiry/Uni-app" target="_blank" rel="noopener"><span class="ar">الكود على GitHub</span><span class="en">Code on GitHub</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-            <ul class="tags"><li>PWA</li><li>Service Worker</li><li>Geolocation</li><li>QR</li></ul>
+  <!-- 0 · hero -->
+  <section class="st hero">
+    <div class="stop">
+      <div class="stop-in">
+        <div class="hero-copy">
+          <span class="avail"><i></i><span class="ar">متاح لمشاريع جديدة</span><span class="en">Available for new projects</span></span>
+          <h1>
+            <span class="ar">فارس<span class="grad">الزهيري</span></span>
+            <span class="en">Fares<span class="grad">Elzouhiry</span></span>
+          </h1>
+          <p class="lead">
+            <span class="ar">مطوّر واجهات ويب. أحوّل الأفكار إلى مواقع وتطبيقات سريعة وأنيقة بالعربية والإنجليزية، وعملت مع <b>جامعة</b> و<b>شركات</b> و<b>مدرسة</b> من الإسكندرية إلى الرياض.</span>
+            <span class="en">Front-end web developer. I turn ideas into fast, polished websites and apps in Arabic and English, and I've worked with a <b>university</b>, <b>companies</b> and a <b>school</b> from Alexandria to Riyadh.</span>
+          </p>
+          <div class="clients">
+            <a href="#uni" data-go="1" style="--c:#e5364f"><i></i><span class="ar">جامعة</span><span class="en">University</span></a>
+            <a href="#alliance" data-go="2" style="--c:#c4922f"><i></i><span class="ar">شركة استثمار</span><span class="en">Investment firm</span></a>
+            <a href="#bbq" data-go="3" style="--c:#f0661a"><i></i><span class="ar">فعالية</span><span class="en">Event</span></a>
+            <a href="#airtech" data-go="4" style="--c:#2f6fe0"><i></i><span class="ar">متجر</span><span class="en">Store</span></a>
+            <a href="#school" data-go="5" style="--c:#c62a42"><i></i><span class="ar">مدرسة</span><span class="en">School</span></a>
+          </div>
+          <div class="links">
+            <a class="btn dark" href="#uni" data-go="1"><span class="ar">ابدأ الجولة</span><span class="en">Start the tour</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
+            <a class="btn" href="#contact" data-go="7"><span class="ar">تواصل معي</span><span class="en">Get in touch</span></a>
           </div>
         </div>
       </div>
-
-      <div class="uni-media rv">
-        <div class="phones">
-          <div class="phone p2"><img src="img/uni-schedule.jpg" alt="Juster weekly schedule timeline" loading="lazy"></div>
-          <div class="phone p3"><img src="img/uni-study.jpg" alt="Juster study room timer" loading="lazy"></div>
-          <div class="phone p1"><img src="img/uni-home.jpg" alt="Juster home: class happening now" loading="lazy"></div>
-          <p class="phone-label"><span class="ar">تطبيق الطالب: الرئيسية · الجدول · غرف المذاكرة</span><span class="en">Student app: home · schedule · study rooms</span></p>
-        </div>
-        <div class="doc-dash" data-gal>
-          <div class="browser">
-            <div class="bar"><i></i><i></i><i></i><span class="url" data-url>juster · teacher dashboard</span></div>
-            <div class="screen"><img class="gal-img" src="img/doctor-live.jpg" alt="Doctor dashboard: live attendance feed" loading="lazy"></div>
-          </div>
-          <div class="doc-tabs">
-            <button type="button" class="on" data-src="img/doctor-live.jpg" data-alt="Doctor dashboard: live attendance feed"><span class="ar">الحضور لايف</span><span class="en">Live check-ins</span></button>
-            <button type="button" data-src="img/doctor-abs.jpg" data-alt="Doctor dashboard: absent students"><span class="ar">الغايبين</span><span class="en">Absent list</span></button>
-          </div>
-          <p class="media-cap"><span class="ar">لوحة الدكتور، معروضة ببيانات تجريبية.</span><span class="en">Doctor dashboard, shown with sample data.</span></p>
-        </div>
-      </div>
-
-      <div class="att rv">
-        <div>
-          <p class="kicker"><span class="ar">نظام الغياب للدكتور</span><span class="en">Doctor attendance system</span></p>
-          <h4><span class="ar">الغياب بياخد ثواني بدل ربع ساعة.</span><span class="en">Attendance in seconds, not fifteen minutes.</span></h4>
-          <p><span class="ar">مفيش ورقة بتلف على المدرج، ومفيش حد يمضي لصاحبه.</span><span class="en">No sheet going round the hall, and no signing in for a friend.</span></p>
-          <ol class="steps">
-            <li><b><span class="ar">الدكتور يبدأ المحاضرة</span><span class="en">The doctor starts the lecture</span></b><span><span class="ar">يختار المادة والجروب، ويحدد المسافة المسموحة من القاعة.</span><span class="en">Picks the subject and group, and sets the allowed distance from the hall.</span></span></li>
-            <li><b><span class="ar">QR على الشاشة</span><span class="en">A QR on the screen</span></b><span><span class="ar">الطلاب بيعملوا scan من موبايلاتهم.</span><span class="en">Students scan it with their phones.</span></span></li>
-            <li><b><span class="ar">التأكد من المكان</span><span class="en">Location check</span></b><span><span class="ar">السيستم بيتأكد بالـ GPS إن الطالب جوه القاعة فعلًا.</span><span class="en">GPS confirms the student is actually in the hall.</span></span></li>
-            <li><b><span class="ar">الحضور لايف</span><span class="en">Live attendance</span></b><span><span class="ar">الأسماء بتظهر أول بأول، والغايبين بضغطة واحدة.</span><span class="en">Names appear as they arrive; the absent list is one tap away.</span></span></li>
-          </ol>
-        </div>
-        <div class="sim" aria-label="Attendance simulation">
-          <div class="sim-head"><div><b>Engineering Drawing · Group 1</b><small>Location check: within 150 m</small></div><span class="live">Live</span></div>
-          <div class="sim-mid">
-            <div class="qr"><canvas id="qr" width="29" height="29"></canvas></div>
-            <div class="sim-stats">
-              <div><b>52</b><span>Total</span></div>
-              <div class="p"><b id="sim-in">41</b><span>Checked in</span></div>
-              <div class="a"><b id="sim-abs">11</b><span>Absent</span></div>
-            </div>
-          </div>
-          <ul class="feed" id="feed">
-            <li><span>Omar Khaled<br><small>ID 21045 · 12 m away</small></span><small>09:14:52</small></li>
-            <li><span>Mariam Adel<br><small>ID 21012 · 8 m away</small></span><small>09:14:31</small></li>
-            <li><span>Youssef Samir<br><small>ID 21077 · 23 m away</small></span><small>09:14:09</small></li>
-            <li><span>Nour Hassan<br><small>ID 21031 · 15 m away</small></span><small>09:13:47</small></li>
-          </ul>
-          <p class="sim-note"><span class="ar">محاكاة توضيحية لطريقة الشغل</span><span class="en">Illustrative simulation</span></p>
-        </div>
-      </div>
-    </div>
-  </article>
-
-  <!-- ===== Alliance ===== -->
-  <article class="case" id="alliance" data-tint="#d4ad62">
-    <div class="wrap">
-      <div class="case-top rv">
-        <div class="case-title">
-          <span class="type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M15 10h.01"/></svg><span class="ar">لشركة · موقع شركة استثمار في الرياض</span><span class="en">For a company · investment firm in Riyadh</span></span>
-          <h3>Alliance Investment<small><span class="ar">موقع واحد بـ 6 لغات</span><span class="en">One site, six languages</span></small></h3>
-        </div>
-        <div class="case-desc">
-          <p><span class="ar">عربي وإنجليزي وإسباني وياباني وصيني وكوري. فيه كرة أرضية 3D بتلفها بالماوس، ومجهّز لجوجل، وبيفتح بسرعة حتى من غير نت. اتبنى من الصفر بدل نسخة WordPress القديمة.</span><span class="en">Arabic, English, Spanish, Japanese, Chinese and Korean. A 3D globe you can drag, set up for search engines, and fast even offline. Rebuilt from scratch to replace the old WordPress site.</span></p>
-          <dl class="facts">
-            <div><dt><span class="ar">لغات</span><span class="en">languages</span></dt><dd>6</dd></div>
-            <div><dt><span class="ar">صفحة</span><span class="en">pages</span></dt><dd>24</dd></div>
-            <div><dt>WordPress</dt><dd>0</dd></div>
-          </dl>
-          <div class="case-links">
-            <a class="more" href="https://github.com/FaresElzouhiry/Alliance" target="_blank" rel="noopener"><span class="ar">الكود على GitHub</span><span class="en">Code on GitHub</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-            <ul class="tags"><li>i18n</li><li>SEO</li><li>3D globe</li></ul>
-          </div>
-        </div>
-      </div>
-      <div class="rv" data-gal>
-        <div class="lang-switch" role="group" aria-label="Site language">
-          <button type="button" class="on" data-src="img/alliance-hero.jpg" data-url="alliance.sa/en" data-alt="Alliance homepage in English">EN</button>
-          <button type="button" data-src="img/alliance-ar.jpg" data-url="alliance.sa/ar" data-alt="Alliance homepage in Arabic">عربي</button>
-        </div><span class="try"><span class="ar">← جرّب تغيّر لغة الموقع</span><span class="en">← try switching the site's language</span></span>
-        <div class="browser">
-          <div class="bar"><i></i><i></i><i></i><span class="url" data-url>alliance.sa/en</span></div>
-          <div class="screen"><img class="gal-img" src="img/alliance-hero.jpg" alt="Alliance homepage in English" loading="lazy"></div>
-        </div>
-        <div class="thumbs">
-          <button type="button" data-src="img/alliance-sectors.jpg" data-url="alliance.sa/#sectors" data-alt="Alliance sectors"><img src="img/alliance-sectors.jpg" alt="" loading="lazy"><span><span class="ar">القطاعات</span><span class="en">Sectors</span></span></button>
-          <button type="button" data-src="img/alliance-model.jpg" data-url="alliance.sa/business-model" data-alt="Alliance business model"><img src="img/alliance-model.jpg" alt="" loading="lazy"><span><span class="ar">نموذج العمل</span><span class="en">Business model</span></span></button>
-          <button type="button" data-src="img/alliance-team.jpg" data-url="alliance.sa/about-us" data-alt="Alliance about us"><img src="img/alliance-team.jpg" alt="" loading="lazy"><span><span class="ar">عن الشركة</span><span class="en">About us</span></span></button>
-        </div>
-      </div>
-    </div>
-  </article>
-
-  <!-- ===== BBQ presentation ===== -->
-  <article class="case" id="bbq" data-tint="#ff7a1a">
-    <div class="wrap">
-      <div class="case-top rv">
-        <div class="case-title">
-          <span class="type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v4M8 20h8M8 12l3-3 2 2 3-3"/></svg><span class="ar">Presentation على شكل موقع · فعالية في الرياض</span><span class="en">A presentation built as a website · Riyadh event</span></span>
-          <h3>Sport Barbecue<small><span class="ar">عرض رعاة لفعالية الرياض 2027</span><span class="en">Sponsor pitch for Riyadh 2027</span></small></h3>
-        </div>
-        <div class="case-desc">
-          <p><span class="ar">بدل ملف PowerPoint بيتبعت ويتنسي، عرض الشراكة بقى لينك بيتفتح على أي جهاز: 15 شريحة بتتنقل بينها بالكيبورد أو بالسكرول، فيها أرقام الفعالية، وخريطة المكان، والباقات، والعائد للرعاة.</span><span class="en">Instead of a PowerPoint that gets emailed and forgotten, the sponsorship pitch is a link that opens on any device: 15 slides you move through by keyboard or scroll, with the event numbers, venue map, packages and sponsor return.</span></p>
-          <dl class="facts">
-            <div><dt><span class="ar">شريحة</span><span class="en">slides</span></dt><dd>15</dd></div>
-            <div><dt><span class="ar">أيام</span><span class="en">days</span></dt><dd>5</dd></div>
-            <div><dt><span class="ar">زيارة مستهدفة</span><span class="en">target visits</span></dt><dd>25K</dd></div>
-          </dl>
-          <div class="case-links">
-            <a class="more" href="https://github.com/FaresElzouhiry/web" target="_blank" rel="noopener"><span class="ar">الكود على GitHub</span><span class="en">Code on GitHub</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-            <ul class="tags"><li>Web deck</li><li>Keyboard nav</li><li>Motion</li></ul>
-          </div>
-        </div>
-      </div>
-      <div class="deck16 rv" data-deck tabindex="0" aria-label="Sport Barbecue slides">
-        <div class="browser">
-          <div class="bar"><i></i><i></i><i></i><span class="url">sport barbecue — riyadh 2027 · presentation</span></div>
-          <div class="screen">
-            <img class="on" src="img/bbq-s1.jpg" alt="Slide 1: cover" data-n="01" data-label="Cover">
-            <img src="img/bbq-s2.jpg" alt="Slide 2: the event in numbers" data-n="02" data-label="The event in numbers" loading="lazy">
-            <img src="img/bbq-s3.jpg" alt="Slide 3: the concept" data-n="03" data-label="The concept" loading="lazy">
-            <img src="img/bbq-s8.jpg" alt="Slide 8: venue map" data-n="08" data-label="Venue map" loading="lazy">
-            <img src="img/bbq-s10.jpg" alt="Slide 10: signature experiences" data-n="10" data-label="Signature experiences" loading="lazy">
-            <img src="img/bbq-s11.jpg" alt="Slide 11: protein packages" data-n="11" data-label="Protein packages" loading="lazy">
-            <img src="img/bbq-s13.jpg" alt="Slide 13: measuring return" data-n="13" data-label="Measuring return" loading="lazy">
-          </div>
-        </div>
-        <div class="deck-ui">
-          <button type="button" data-prev aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
-          <button type="button" data-next aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
-          <span class="deck-count"><span data-n>01</span> <small>/ 15</small></span>
-          <span class="deck-label" data-label>Cover</span>
-        </div>
-        <div class="deck-bar"><i data-bar></i></div>
-      </div>
-    </div>
-  </article>
-
-  <!-- ===== AirTech ===== -->
-  <article class="case" id="airtech" data-tint="#4a8af0">
-    <div class="wrap">
-      <div class="case-top rv">
-        <div class="case-title">
-          <span class="type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.5 11h10.5l2-8H6.5"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg><span class="ar">لشركة · متجر قطع غيار في السعودية</span><span class="en">For a company · spare-parts store in KSA</span></span>
-          <h3><span class="ar">ايرتك جاهز</span><span class="en">AirTech Jahiz</span><small><span class="ar">متجر قطع غيار أنظمة الهواء المضغوط</span><span class="en">Compressed-air parts, online</span></small></h3>
-        </div>
-        <div class="case-desc">
-          <p><span class="ar">كتالوج منتجات مقسّم لأقسام، مع بحث بالاسم أو الموديل، وسلة مشتريات. التصميم كله عربي ومن اليمين للشمال، ومناسب للموبايل.</span><span class="en">A product catalogue in categories, search by name or model, and a shopping cart. Fully Arabic, right-to-left, and mobile-friendly.</span></p>
-          <dl class="facts">
-            <div><dt><span class="ar">منتج</span><span class="en">products</span></dt><dd>64</dd></div>
-            <div><dt><span class="ar">أقسام</span><span class="en">categories</span></dt><dd>5</dd></div>
-            <div><dt><span class="ar">سلة</span><span class="en">cart</span></dt><dd>✓</dd></div>
-          </dl>
-          <div class="case-links">
-            <a class="more" href="https://github.com/FaresElzouhiry/Airtech" target="_blank" rel="noopener"><span class="ar">الكود على GitHub</span><span class="en">Code on GitHub</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-            <ul class="tags"><li>RTL</li><li>Search</li><li>Cart</li></ul>
-          </div>
-        </div>
-      </div>
-      <div class="rv" data-gal>
-        <div class="browser">
-          <div class="bar"><i></i><i></i><i></i><span class="url" data-url>airtech jahiz · home</span></div>
-          <div class="screen"><img class="gal-img" src="img/airtech-home.jpg" alt="AirTech Jahiz home" loading="lazy"></div>
-        </div>
-        <div class="thumbs">
-          <button type="button" class="on" data-src="img/airtech-home.jpg" data-url="airtech jahiz · home" data-alt="AirTech Jahiz home"><img src="img/airtech-home.jpg" alt="" loading="lazy"><span><span class="ar">الرئيسية</span><span class="en">Home</span></span></button>
-          <button type="button" data-src="img/airtech-products.jpg" data-url="airtech jahiz · #/products" data-alt="AirTech Jahiz products"><img src="img/airtech-products.jpg" alt="" loading="lazy"><span><span class="ar">كل المنتجات</span><span class="en">All products</span></span></button>
-        </div>
-      </div>
-    </div>
-  </article>
-
-  <!-- ===== School ===== -->
-  <article class="case" id="school" data-tint="#e0475b">
-    <div class="wrap">
-      <div class="case-top rv">
-        <div class="case-title">
-          <span class="type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10l8-5 8 5v10M2 20h20M10 20v-5h4v5M12 5V2l3 1.5-3 1.5"/></svg><span class="ar">لمدرسة · مدرسة خاصة في الإسكندرية</span><span class="en">For a school · private school in Alexandria</span></span>
-          <h3><span class="ar">مدرسة الفرسان</span><span class="en">El-Fersan School</span><small><span class="ar">موقع واضح لولي الأمر من الموبايل</span><span class="en">A clear site for parents on their phones</span></small></h3>
-        </div>
-        <div class="case-desc">
-          <p><span class="ar">عن المدرسة، والمراحل من رياض الأطفال للثانوي، والحياة المدرسية، وحجز زيارة. بسيط وسريع ومن اليمين للشمال.</span><span class="en">About the school, stages from kindergarten to secondary, school life, and booking a visit. Simple, fast and right-to-left.</span></p>
-          <dl class="facts">
-            <div><dt><span class="ar">مراحل</span><span class="en">stages</span></dt><dd>4</dd></div>
-            <div><dt><span class="ar">حجز زيارة</span><span class="en">book a visit</span></dt><dd>✓</dd></div>
-            <div><dt>RTL</dt><dd>✓</dd></div>
-          </dl>
-          <div class="case-links"><p class="soon"><span class="ar">لسه مش مرفوع على GitHub.</span><span class="en">Not on GitHub yet.</span></p></div>
-        </div>
-      </div>
-      <div class="rv" data-gal>
-        <div class="browser">
-          <div class="bar"><i></i><i></i><i></i><span class="url" data-url>el-fersan school · home</span></div>
-          <div class="screen"><img class="gal-img" src="img/fersan-hero.jpg" alt="El-Fersan school home" loading="lazy"></div>
-        </div>
-        <div class="thumbs">
-          <button type="button" class="on" data-src="img/fersan-hero.jpg" data-url="el-fersan school · home" data-alt="El-Fersan school home"><img src="img/fersan-hero.jpg" alt="" loading="lazy"><span><span class="ar">الرئيسية</span><span class="en">Home</span></span></button>
-          <button type="button" data-src="img/fersan-about.jpg" data-url="el-fersan school · #about" data-alt="About the school"><img src="img/fersan-about.jpg" alt="" loading="lazy"><span><span class="ar">عن المدرسة</span><span class="en">About</span></span></button>
-        </div>
-      </div>
-    </div>
-  </article>
-
-  <!-- ===== Documents & services ===== -->
-  <section id="docs" data-tint="#7b83ff">
-    <div class="wrap">
-      <div class="head rv">
-        <p class="kicker"><span class="ar">مش مواقع بس</span><span class="en">Not just websites</span></p>
-        <h2><span class="ar">ومستندات شكلها يشرّف.</span><span class="en">And documents that look the part.</span></h2>
-        <p><span class="ar">سي في، تقرير، عرض تقديمي، أو شيت Excel. نفس الاهتمام بالتفاصيل اللي في المواقع، بس على ورق.</span><span class="en">A CV, a report, a slide deck or an Excel sheet. The same care for detail as the websites, on paper.</span></p>
-      </div>
-      <div class="docs-stage rv" aria-label="Sample documents">
-        <figure class="paper" style="--r:-8deg; --y:10px">
-          <div class="sheet a4">
-            <div class="cv-top"><i></i><div><b><span class="ar">اسمك هنا</span><span class="en">Your Name</span></b><small><span class="ar">مهندس برمجيات</span><span class="en">Software Engineer</span></small></div></div>
-            <h6><span class="ar">الخبرات</span><span class="en">EXPERIENCE</span></h6>
-            <span class="ln" style="width:92%"></span><span class="ln" style="width:70%"></span><span class="ln" style="width:84%"></span>
-            <h6><span class="ar">التعليم</span><span class="en">EDUCATION</span></h6>
-            <span class="ln" style="width:64%"></span><span class="ln" style="width:78%"></span>
-            <h6><span class="ar">المهارات</span><span class="en">SKILLS</span></h6>
-            <div class="chips"><i></i><i></i><i></i><i></i></div>
-            <span class="ln" style="width:55%"></span>
-          </div>
-          <figcaption><span class="ar">سي في</span><span class="en">CV / Resume</span><small>PDF · Word</small></figcaption>
-        </figure>
-        <figure class="paper" style="--r:-2deg">
-          <div class="sheet a4">
-            <div class="cover-band"><span class="ar">تقرير مشروع التخرج</span><span class="en">Graduation Project Report</span></div>
-            <small><span class="ar">كلية الهندسة · 2026</span><span class="en">Faculty of Engineering · 2026</span></small>
-            <span class="ln" style="width:88%"></span><span class="ln" style="width:94%"></span><span class="ln" style="width:72%"></span><span class="ln" style="width:90%"></span><span class="ln" style="width:60%"></span>
-          </div>
-          <figcaption><span class="ar">تقارير وأبحاث</span><span class="en">Reports &amp; research</span><small>Word · PDF</small></figcaption>
-        </figure>
-        <figure class="paper" style="--r:4deg; --y:-6px">
-          <div class="sheet wide slide">
-            <b><span class="ar">نتائج الربع الثالث</span><span class="en">Q3 results</span></b>
-            <div class="bars"><i style="height:40%"></i><i style="height:62%"></i><i style="height:51%"></i><i style="height:86%"></i><i style="height:100%"></i></div>
-          </div>
-          <figcaption><span class="ar">عروض تقديمية</span><span class="en">Presentations</span><small>PowerPoint</small></figcaption>
-        </figure>
-        <figure class="paper" style="--r:9deg; --y:12px">
-          <div class="sheet wide grid-sheet" dir="ltr">
-            <span class="rn"></span><span class="h">Item</span><span class="h">Qty</span><span class="h">Total</span>
-            <span class="rn">1</span><span>Rent</span><span>1</span><span>4,500</span>
-            <span class="rn">2</span><span>Bills</span><span>3</span><span>1,260</span>
-            <span class="rn">3</span><span>Food</span><span>30</span><span>3,000</span>
-            <span class="rn">4</span><span class="t">Sum</span><span class="t"></span><span class="t">8,760</span>
-          </div>
-          <figcaption><span class="ar">شيتات Excel</span><span class="en">Excel sheets</span><small>Excel</small></figcaption>
-        </figure>
-      </div>
-      <div class="svc rv">
-        <div>
-          <h3><span class="ar">مواقع وتطبيقات</span><span class="en">Websites &amp; apps</span><small>WEB</small></h3>
-          <ul>
-            <li><strong><span class="ar">موقع شركة أو مدرسة</span><span class="en">Company or school website</span></strong><span><span class="ar">بلغة أو أكتر، ومجهّز لجوجل.</span><span class="en">In one language or more, set up for search.</span></span><em>SEO · i18n</em></li>
-            <li><strong><span class="ar">تطبيق أو نظام داخلي</span><span class="en">App or internal system</span></strong><span><span class="ar">زي نظام الحضور والغياب، يشتغل على الموبايل.</span><span class="en">Like the attendance system, running on phones.</span></span><em>PWA</em></li>
-            <li><strong><span class="ar">متجر أو كتالوج</span><span class="en">Store or catalogue</span></strong><span><span class="ar">أقسام، وبحث، وسلة، وطلب على واتساب.</span><span class="en">Categories, search, a cart, and orders via WhatsApp.</span></span><em>Cart</em></li>
-            <li><strong><span class="ar">Presentation على شكل موقع</span><span class="en">Presentation as a website</span></strong><span><span class="ar">لعرض على رعاة أو مستثمرين، بيتفتح بلينك.</span><span class="en">For sponsors or investors, opened with a link.</span></span><em>Web deck</em></li>
-          </ul>
-        </div>
-        <div>
-          <h3><span class="ar">مستندات وملفات</span><span class="en">Documents &amp; files</span><small>DOCS</small></h3>
-          <ul>
-            <li><strong><span class="ar">سي في وخطاب تقديم</span><span class="en">CV &amp; cover letter</span></strong><span><span class="ar">بالعربي أو الإنجليزي، مرتب ومناسب لأنظمة التوظيف.</span><span class="en">Arabic or English, tidy and readable by hiring systems.</span></span><em>PDF · DOCX</em></li>
-            <li><strong><span class="ar">تقارير وأبحاث</span><span class="en">Reports &amp; research</span></strong><span><span class="ar">بتنسيق، وفهرس، ومراجع، وأشكال.</span><span class="en">Formatted, with contents, references and figures.</span></span><em>DOCX · PDF</em></li>
-            <li><strong><span class="ar">عروض تقديمية</span><span class="en">Presentations</span></strong><span><span class="ar">لمشروع تخرج، أو اجتماع، أو عرض شركة.</span><span class="en">For a graduation project, a meeting, or a pitch.</span></span><em>PPTX</em></li>
-            <li><strong><span class="ar">شيتات وترجمة</span><span class="en">Sheets &amp; translation</span></strong><span><span class="ar">Excel بمعادلات جاهزة، وترجمة عربي ⇄ إنجليزي.</span><span class="en">Excel with ready formulas, and Arabic ⇄ English.</span></span><em>XLSX · AR/EN</em></li>
-          </ul>
-        </div>
-      </div>
+      <div class="scroll-hint"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg><span class="ar">مرّر للأسفل لتتجوّل بين المشاريع</span><span class="en">Scroll to fly through the projects</span></span></div>
     </div>
   </section>
 
-  <!-- ===== Skills ===== -->
-  <section id="skills" data-tint="#7b83ff">
-    <div class="wrap">
-      <div class="head rv">
-        <p class="kicker"><span class="ar">المهارات</span><span class="en">Skills</span></p>
-        <h2><span class="ar">بعرف أعمل إيه، وفين تشوفه.</span><span class="en">What I can do, and where to see it.</span></h2>
-      </div>
-      <div class="skills rv">
-        <div class="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg><h4>HTML · CSS · JS</h4><p><span class="ar">مواقع سريعة من غير frameworks تقيلة، تشتغل على أي استضافة.</span><span class="en">Fast sites without heavy frameworks, on any host.</span></p><span class="used">all 5 projects</span></div>
-        <div class="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg><h4><span class="ar">تطبيقات PWA</span><span class="en">PWA apps</span></h4><p><span class="ar">تتثبت على الموبايل وتشتغل من غير نت، من غير ستور.</span><span class="en">Install on the phone and run offline, no app store.</span></p><span class="used">Juster · Alliance</span></div>
-        <div class="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><h4><span class="ar">GPS و QR</span><span class="en">GPS &amp; QR</span></h4><p><span class="ar">التأكد من مكان المستخدم، وتسجيل بالـ QR.</span><span class="en">Verifying a user's location, and QR check-in.</span></p><span class="used">Juster attendance</span></div>
-        <div class="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><h4><span class="ar">عربي وتعدد لغات</span><span class="en">Arabic &amp; multilingual</span></h4><p><span class="ar">يمين لشمال مظبوط، ومواقع بأكتر من لغة.</span><span class="en">Proper right-to-left and multi-language sites.</span></p><span class="used">Alliance · 6 languages</span></div>
-        <div class="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg><h4><span class="ar">موشن و 3D</span><span class="en">Motion &amp; 3D</span></h4><p><span class="ar">كرة أرضية تفاعلية، وشاشات 3D، وانتقالات ناعمة.</span><span class="en">An interactive globe, 3D screens, smooth transitions.</span></p><span class="used">Alliance · this site</span></div>
-        <div class="skill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="8" r="2.5"/><path d="M6 8.5v7M18 10.5c0 4-6 3-11 6"/></svg><h4>Git · GitHub</h4><p><span class="ar">فروع و pull requests، وكل مشروع ليه تاريخه.</span><span class="en">Branches and pull requests, full history per project.</span></p><span class="used">130+ commits</span></div>
-      </div>
-    </div>
+  <!-- 1 · Juster -->
+  <section class="st" id="uni">
+    <div class="stop"><div class="stop-in">
+      <article class="card" style="--c:#e5364f">
+        <span class="type"><i></i><span class="ar">مشروع جامعي · تطبيق للطلاب ونظام حضور للأساتذة</span><span class="en">University · student app and attendance system</span></span>
+        <h2>Juster<small><span class="ar">بوابة الجامعة في جيب كل طالب</span><span class="en">The university portal in every student's pocket</span></small></h2>
+        <p><span class="ar">جدول المحاضرات لحظة بلحظة، والدرجات، والمهام، وغرف مذاكرة بمؤقت. وللأستاذ لوحة حضور متكاملة يُسجَّل فيها الحضور مباشرةً بعد التحقق من وجود الطالب داخل القاعة. يُثبَّت على الهاتف ويعمل دون إنترنت.</span><span class="en">A live class schedule, grades, tasks and study rooms with a timer. Teachers get a full attendance dashboard where check-ins arrive live once the student's presence in the hall is verified. Installs on the phone and works offline.</span></p>
+        <ol class="flow">
+          <li><b>1</b><span class="ar">يبدأ المحاضرة</span><span class="en">Start lecture</span></li>
+          <li><b>2</b><span class="ar">يعرض رمز QR</span><span class="en">Show QR</span></li>
+          <li><b>3</b><span class="ar">تحقّق بالـ GPS</span><span class="en">GPS check</span></li>
+          <li><b>4</b><span class="ar">حضور مباشر</span><span class="en">Live list</span></li>
+        </ol>
+        <dl class="facts">
+          <div><dt>commits</dt><dd>112</dd></div>
+          <div><dt><span class="ar">لوحات تحكم</span><span class="en">dashboards</span></dt><dd>3</dd></div>
+          <div><dt><span class="ar">دون إنترنت</span><span class="en">offline</span></dt><dd>✓</dd></div>
+        </dl>
+        <div class="fb"><img class="tall" src="img/uni-home.jpg" alt="Juster home screen" loading="lazy"><img class="tall" src="img/doctor-live.jpg" alt="Teacher attendance dashboard" loading="lazy"></div>
+        <div class="links">
+          <a class="btn" href="https://github.com/FaresElzouhiry/Uni-app" target="_blank" rel="noopener"><span class="ar">الكود على GitHub</span><span class="en">Code on GitHub</span><svg class="dir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <span class="note"><span class="ar">الشاشة الحيّة محاكاة توضيحية، ولوحة الأستاذ ببيانات تجريبية.</span><span class="en">The live screen is a simulation; the teacher dashboard uses sample data.</span></span>
+        </div>
+      </article>
+    </div></div>
   </section>
 
-  <section class="contact" id="contact" data-tint="#7b83ff">
-    <div class="wrap">
-      <p class="kicker"><span class="ar">تواصل</span><span class="en">Contact</span></p>
-      <h2><span class="ar">يلا <em>نبدأ؟</em></span><span class="en">Let's <em>build</em>.</span></h2>
-      <p><span class="ar">قولي محتاج إيه، موقع أو نظام أو سي في أو تقرير، وأرد عليك بالتفاصيل والوقت.</span><span class="en">Tell me what you need, whether a site, a system, a CV or a report, and I'll reply with details and timing.</span></p>
-      <div class="mail">
-        <span id="email">fa872328@gmail.com</span>
-        <button type="button" id="copy-email"><span class="ar">انسخ الإيميل</span><span class="en">Copy email</span></button>
-      </div>
-      <a class="pill" href="https://github.com/FaresElzouhiry" target="_blank" rel="noopener">github.com/FaresElzouhiry</a>
-    </div>
+  <!-- 2 · Alliance -->
+  <section class="st" id="alliance">
+    <div class="stop"><div class="stop-in">
+      <article class="card" style="--c:#b8862a">
+        <span class="type"><i></i><span class="ar">موقع شركة · شركة استثمار في الرياض</span><span class="en">Company website · investment firm in Riyadh</span></span>
+        <h2>Alliance Investment<small><span class="ar">موقع واحد بست لغات</span><span class="en">One site, six languages</span></small></h2>
+        <p><span class="ar">العربية والإنجليزية والإسبانية واليابانية والصينية والكورية. كرة أرضية ثلاثية الأبعاد تتفاعل مع الفأرة، وتهيئة كاملة لمحركات البحث، وتحميل سريع حتى دون اتصال. بُني من الصفر بديلًا عن موقع WordPress القديم.</span><span class="en">Arabic, English, Spanish, Japanese, Chinese and Korean. A 3D globe that responds to the mouse, full search-engine setup, and fast loading even offline. Rebuilt from scratch to replace the old WordPress site.</span></p>
+        <dl class="facts">
+          <div><dt><span class="ar">لغات</span><span class="en">languages</span></dt><dd>6</dd></div>
+          <div><dt><span class="ar">صفحة</span><span class="en">pages</span></dt><dd>24</dd></div>
+          <div><dt>WordPress</dt><dd>0</dd></div>
+        </dl>
+        <div class="fb"><img src="img/alliance-hero.jpg" alt="Alliance homepage in English" loading="lazy"><img src="img/alliance-ar.jpg" alt="Alliance homepage in Arabic" loading="lazy"></div>
+        <div class="links"><a class="btn" href="https://github.com/FaresElzouhiry/Alliance" target="_blank" rel="noopener"><span class="ar">الكود على GitHub</span><span class="en">Code on GitHub</span><svg class="dir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+      </article>
+    </div></div>
+  </section>
+
+  <!-- 3 · Sport Barbecue -->
+  <section class="st" id="bbq">
+    <div class="stop"><div class="stop-in">
+      <article class="card" style="--c:#f0661a">
+        <span class="type"><i></i><span class="ar">عرض تقديمي على هيئة موقع · فعالية في الرياض</span><span class="en">A presentation built as a website · Riyadh event</span></span>
+        <h2>Sport Barbecue<small><span class="ar">عرض الرعاة لفعالية الرياض 2027</span><span class="en">Sponsor pitch for Riyadh 2027</span></small></h2>
+        <p><span class="ar">بدل ملف PowerPoint يُرسَل ثم يُنسى، أصبح عرض الشراكة رابطًا يُفتح على أي جهاز: خمس عشرة شريحة يُتنقَّل بينها بلوحة المفاتيح أو التمرير، تضم أرقام الفعالية وخريطة الموقع والباقات والعائد المتوقع للرعاة.</span><span class="en">Instead of a PowerPoint that gets emailed and forgotten, the pitch is a link that opens on any device: fifteen slides you move through by keyboard or scroll, with the event numbers, venue map, packages and expected sponsor return.</span></p>
+        <dl class="facts">
+          <div><dt><span class="ar">شريحة</span><span class="en">slides</span></dt><dd>15</dd></div>
+          <div><dt><span class="ar">أيام</span><span class="en">days</span></dt><dd>5</dd></div>
+          <div><dt><span class="ar">زيارة مستهدفة</span><span class="en">target visits</span></dt><dd>25K</dd></div>
+        </dl>
+        <div class="fb"><img src="img/bbq-s1.jpg" alt="Sport Barbecue cover slide" loading="lazy"><img src="img/bbq-s2.jpg" alt="Sport Barbecue numbers slide" loading="lazy"></div>
+        <div class="links"><a class="btn" href="https://github.com/FaresElzouhiry/web" target="_blank" rel="noopener"><span class="ar">الكود على GitHub</span><span class="en">Code on GitHub</span><svg class="dir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+      </article>
+    </div></div>
+  </section>
+
+  <!-- 4 · AirTech -->
+  <section class="st" id="airtech">
+    <div class="stop"><div class="stop-in">
+      <article class="card" style="--c:#2f6fe0">
+        <span class="type"><i></i><span class="ar">متجر إلكتروني · شركة قطع غيار في السعودية</span><span class="en">Online store · spare-parts company in KSA</span></span>
+        <h2><span class="ar">ايرتك جاهز</span><span class="en">AirTech Jahiz</span><small><span class="ar">قطع غيار أنظمة الهواء المضغوط</span><span class="en">Compressed-air system parts</span></small></h2>
+        <p><span class="ar">كتالوج منظّم في أقسام، وبحث بالاسم أو رقم الموديل، وسلة مشتريات. واجهة عربية بالكامل من اليمين إلى اليسار، ومهيّأة للهاتف.</span><span class="en">A catalogue organised in categories, search by name or model number, and a shopping cart. Fully Arabic, right-to-left, and ready for phones.</span></p>
+        <dl class="facts">
+          <div><dt><span class="ar">منتجًا</span><span class="en">products</span></dt><dd>64</dd></div>
+          <div><dt><span class="ar">أقسام</span><span class="en">categories</span></dt><dd>5</dd></div>
+          <div><dt><span class="ar">سلة</span><span class="en">cart</span></dt><dd>✓</dd></div>
+        </dl>
+        <div class="fb"><img src="img/airtech-home.jpg" alt="AirTech Jahiz home" loading="lazy"><img src="img/airtech-products.jpg" alt="AirTech Jahiz products" loading="lazy"></div>
+        <div class="links"><a class="btn" href="https://github.com/FaresElzouhiry/Airtech" target="_blank" rel="noopener"><span class="ar">الكود على GitHub</span><span class="en">Code on GitHub</span><svg class="dir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+      </article>
+    </div></div>
+  </section>
+
+  <!-- 5 · School -->
+  <section class="st" id="school">
+    <div class="stop"><div class="stop-in">
+      <article class="card" style="--c:#c62a42">
+        <span class="type"><i></i><span class="ar">موقع مدرسة · مدرسة خاصة في الإسكندرية</span><span class="en">School website · private school in Alexandria</span></span>
+        <h2><span class="ar">مدرسة الفرسان الخاصة</span><span class="en">El-Fersan Private School</span><small><span class="ar">موقع واضح لأولياء الأمور</span><span class="en">A clear site for parents</span></small></h2>
+        <p><span class="ar">تعريف بالمدرسة، والمراحل الدراسية من رياض الأطفال حتى الثانوية، والحياة المدرسية، وحجز زيارة. بسيط وسريع ومناسب للهاتف.</span><span class="en">About the school, the stages from kindergarten to secondary, school life, and booking a visit. Simple, fast and phone-friendly.</span></p>
+        <dl class="facts">
+          <div><dt><span class="ar">مراحل</span><span class="en">stages</span></dt><dd>4</dd></div>
+          <div><dt><span class="ar">حجز زيارة</span><span class="en">book a visit</span></dt><dd>✓</dd></div>
+          <div><dt><span class="ar">من اليمين لليسار</span><span class="en">right-to-left</span></dt><dd>✓</dd></div>
+        </dl>
+        <div class="fb"><img src="img/fersan-hero.jpg" alt="El-Fersan school home" loading="lazy"><img src="img/fersan-about.jpg" alt="About El-Fersan school" loading="lazy"></div>
+        <p class="note"><span class="ar">لم يُنشر على GitHub بعد.</span><span class="en">Not on GitHub yet.</span></p>
+      </article>
+    </div></div>
+  </section>
+
+  <!-- 6 · Documents -->
+  <section class="st" id="docs">
+    <div class="stop"><div class="stop-in">
+      <article class="card" style="--c:#4b5cff">
+        <span class="type"><i></i><span class="ar">ليس مواقع فقط</span><span class="en">Not just websites</span></span>
+        <h2><span class="ar">ومستندات بمستوى احترافي</span><span class="en">And documents that look the part</span><small><span class="ar">بنفس العناية بالتفاصيل</span><span class="en">With the same care for detail</span></small></h2>
+        <p><span class="ar">سيرة ذاتية تلفت الانتباه، وتقارير وأبحاث منسّقة بفهرس ومراجع، وعروض تقديمية، وجداول Excel بمعادلات جاهزة، وترجمة بين العربية والإنجليزية.</span><span class="en">A CV that stands out, reports and research formatted with contents and references, presentations, Excel sheets with ready formulas, and Arabic–English translation.</span></p>
+        <ul class="chips">
+          <li><span class="ar">سيرة ذاتية</span><span class="en">CV / Resume</span></li>
+          <li><span class="ar">خطاب تقديم</span><span class="en">Cover letter</span></li>
+          <li><span class="ar">تقارير وأبحاث</span><span class="en">Reports</span></li>
+          <li><span class="ar">عروض PowerPoint</span><span class="en">PowerPoint decks</span></li>
+          <li><span class="ar">جداول Excel</span><span class="en">Excel sheets</span></li>
+          <li><span class="ar">ترجمة</span><span class="en">Translation</span></li>
+        </ul>
+      </article>
+    </div></div>
+  </section>
+
+  <!-- 7 · Contact -->
+  <section class="st contact" id="contact">
+    <div class="stop"><div class="stop-in">
+      <article class="card" style="--c:#5b6cff">
+        <span class="type"><i></i><span class="ar">كل الأعمال من حولك</span><span class="en">All the work, all around you</span></span>
+        <h2><span class="ar">لنبنِ مشروعك القادم</span><span class="en">Let's build your next project</span></h2>
+        <p><span class="ar">أخبرني بما تحتاجه، موقعًا أو نظامًا أو سيرة ذاتية أو تقريرًا، وسأرد عليك بالتفاصيل والمدة.</span><span class="en">Tell me what you need, whether a website, a system, a CV or a report, and I'll reply with the details and timing.</span></p>
+        <div class="mail"><span id="email">fa872328@gmail.com</span><button class="btn dark" type="button" id="copy-email"><span class="ar">انسخ البريد</span><span class="en">Copy email</span></button></div>
+        <a class="btn" href="https://github.com/FaresElzouhiry" target="_blank" rel="noopener"><span class="ltr">github.com/FaresElzouhiry</span></a>
+        <ul class="skills">
+          <li>HTML · CSS · JavaScript</li><li>PWA</li><li>WebGL · 3D</li><li>GPS · QR</li><li><span class="ar">تعدد اللغات</span><span class="en">Multilingual</span></li><li>SEO</li><li>Git · GitHub</li>
+        </ul>
+      </article>
+    </div></div>
   </section>
 </main>
 
-<footer>
-  <div class="wrap">
-    <span><span class="ar">© 2026 فارس الزهيري</span><span class="en">© 2026 Fares Elzouhiry</span></span>
-    <span style="font-family:var(--mono)">HTML · CSS · JavaScript · WebGL</span>
-  </div>
-</footer>
+<div class="lb" id="lb" hidden><img alt=""><button type="button" aria-label="Close">×</button></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function () {
   var root = document.documentElement, body = document.body;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var fine = matchMedia('(pointer: fine)').matches;
+  var secs = [].slice.call(document.querySelectorAll('.st'));
+  var N = secs.length;
 
-  /* language */
+  /* ---------- language ---------- */
+  var onLang = [];
   function setLang(l) {
     root.dataset.lang = l; root.lang = l; root.dir = l === 'ar' ? 'rtl' : 'ltr';
     try { localStorage.setItem('fares-lang', l); } catch (e) {}
+    onLang.forEach(function (f) { f(); });
   }
   var saved = null;
   try { saved = localStorage.getItem('fares-lang'); } catch (e) {}
   setLang(saved === 'en' ? 'en' : 'ar');
   document.getElementById('lang-toggle').addEventListener('click', function () { setLang(root.dataset.lang === 'ar' ? 'en' : 'ar'); });
 
-  /* rotating words */
-  var rots = [].slice.call(document.querySelectorAll('[data-rot]')), ri = 0;
-  setInterval(function () {
-    ri++;
-    rots.forEach(function (r) { [].forEach.call(r.children, function (s, k) { s.classList.toggle('on', k === ri % r.children.length); }); });
-  }, 2400);
-
-  /* page colour follows the section in the middle of the screen; reveal-on-scroll */
-  if ('IntersectionObserver' in window) {
-    var tio = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) body.style.setProperty('--tint', e.target.dataset.tint); }); }, { rootMargin: '-45% 0px -45% 0px' });
-    document.querySelectorAll('[data-tint]').forEach(function (s) { tio.observe(s); });
-    var rio = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); rio.unobserve(e.target); } }); }, { rootMargin: '0px 0px -10% 0px' });
-    document.querySelectorAll('.rv').forEach(function (el) { rio.observe(el); });
-  } else {
-    document.querySelectorAll('.rv').forEach(function (el) { el.classList.add('in'); });
-  }
-
-  /* hero glow follows the pointer */
-  var hero = document.querySelector('.hero'), glow = document.getElementById('glow');
-  if (fine && !reduce) hero.addEventListener('pointermove', function (e) {
-    var r = hero.getBoundingClientRect();
-    glow.style.setProperty('--gx', (e.clientX - r.left) + 'px'); glow.style.setProperty('--gy', (e.clientY - r.top) + 'px');
-  });
-
-  /* galleries: thumbnails / tabs swap the main screen */
-  document.querySelectorAll('[data-gal]').forEach(function (g) {
-    var img = g.querySelector('.gal-img'), url = g.querySelector('[data-url]');
-    var btns = [].slice.call(g.querySelectorAll('button[data-src]'));
-    btns.forEach(function (b) {
-      b.addEventListener('click', function () {
-        if (b.classList.contains('on')) return;
-        btns.forEach(function (x) { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-        img.classList.add('out');
-        var pre = new Image();
-        pre.onload = pre.onerror = function () {
-          setTimeout(function () { img.src = b.dataset.src; img.alt = b.dataset.alt || ''; img.classList.remove('out'); if (url && b.dataset.url) url.textContent = b.dataset.url; }, 160);
-        };
-        pre.src = b.dataset.src;
-      });
+  /* ---------- jump links: in 3D mode a stop is the top of its section ---------- */
+  function sectionH() { return secs[1] ? secs[1].offsetTop - secs[0].offsetTop : innerHeight; }
+  document.querySelectorAll('[data-go]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var k = +a.dataset.go;
+      var y = root.classList.contains('gl') ? Math.round(k * sectionH()) : secs[k].offsetTop - 70;
+      scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
     });
   });
 
-  /* BBQ slide viewer */
-  document.querySelectorAll('[data-deck]').forEach(function (d) {
-    var slides = [].slice.call(d.querySelectorAll('.screen img')), i = 0, timer = null, seen = false;
-    var nEl = d.querySelector('[data-n]'), lEl = d.querySelector('[data-label]'), bar = d.querySelector('[data-bar]');
-    function go(k) {
-      i = (k + slides.length) % slides.length;
-      slides.forEach(function (s, j) { s.classList.toggle('on', j === i); if (j === i) s.loading = 'eager'; });
-      nEl.textContent = slides[i].dataset.n; lEl.textContent = slides[i].dataset.label;
-      bar.style.width = (+slides[i].dataset.n / 15 * 100) + '%';
-    }
-    function stop() { clearInterval(timer); timer = null; }
-    d.querySelector('[data-prev]').addEventListener('click', function () { stop(); go(i - 1); });
-    d.querySelector('[data-next]').addEventListener('click', function () { stop(); go(i + 1); });
-    d.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); stop(); go(i + 1); }
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); stop(); go(i - 1); }
-    });
-    go(0);
-    if (!reduce && 'IntersectionObserver' in window) new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        if (e.isIntersecting && !seen) { seen = true; timer = setInterval(function () { go(i + 1); }, 3200); }
-        if (!e.isIntersecting && timer) stop();
-      });
-    }, { threshold: .5 }).observe(d);
-  });
-
-  /* attendance simulation */
-  (function () {
-    var c = document.getElementById('qr'), x = c.getContext('2d'), N = 29, seed = 7;
-    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
-    x.fillStyle = '#fff'; x.fillRect(0, 0, N, N); x.fillStyle = '#0b0b0e';
-    for (var yy = 0; yy < N; yy++) for (var xx = 0; xx < N; xx++) if (rnd() > .52) x.fillRect(xx, yy, 1, 1);
-    [[0, 0], [N - 7, 0], [0, N - 7]].forEach(function (p) {
-      x.fillStyle = '#fff'; x.fillRect(p[0] - (p[0] ? 1 : 0), p[1] - (p[1] ? 1 : 0), 8, 8);
-      x.fillStyle = '#0b0b0e'; x.fillRect(p[0], p[1], 7, 7); x.fillStyle = '#fff'; x.fillRect(p[0] + 1, p[1] + 1, 5, 5); x.fillStyle = '#0b0b0e'; x.fillRect(p[0] + 2, p[1] + 2, 3, 3);
-    });
-    var names = ['Ahmed Tarek', 'Salma Ibrahim', 'Karim Mostafa', 'Hana Mahmoud', 'Ziad Ashraf', 'Farida Hany', 'Mohamed Saad', 'Jana Walid', 'Adham Fouad', 'Malak Essam', 'Seif Amr', 'Rana Khaled'];
-    var feed = document.getElementById('feed'), inEl = document.getElementById('sim-in'), abEl = document.getElementById('sim-abs');
-    var count = 41, k = 0, t = new Date(2026, 10, 1, 9, 14, 52);
-    function tick() {
-      if (count >= 50) { count = 41; }
-      count++; t = new Date(t.getTime() + 9000 + Math.floor(Math.random() * 14000));
-      var li = document.createElement('li'); li.className = 'new';
-      var nm = names[k++ % names.length], id = 21000 + Math.floor(Math.random() * 90), m = 5 + Math.floor(Math.random() * 30);
-      li.innerHTML = '<span>' + nm + '<br><small>ID ' + id + ' · ' + m + ' m away</small></span><small>' + t.toTimeString().slice(0, 8) + '</small>';
-      feed.insertBefore(li, feed.firstChild);
-      while (feed.children.length > 5) feed.removeChild(feed.lastChild);
-      inEl.textContent = count; abEl.textContent = 52 - count;
-    }
-    if (!reduce) {
-      var simT = null;
-      new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !simT) simT = setInterval(tick, 1700); if (!e.isIntersecting && simT) { clearInterval(simT); simT = null; } }); }).observe(feed);
-    }
-  })();
-
-  /* skill cards: light follows the pointer */
-  document.querySelectorAll('.skill').forEach(function (s) {
-    s.addEventListener('pointermove', function (e) { var r = s.getBoundingClientRect(); s.style.setProperty('--mx', (e.clientX - r.left) + 'px'); s.style.setProperty('--my', (e.clientY - r.top) + 'px'); });
-  });
-
-  /* copy email */
+  /* ---------- copy email ---------- */
   var cb = document.getElementById('copy-email');
   cb.addEventListener('click', function () {
     var el = document.getElementById('email'), label = cb.innerHTML;
-    function done() { cb.innerHTML = '<span class="ar">اتنسخ ✓</span><span class="en">Copied ✓</span>'; setTimeout(function () { cb.innerHTML = label; }, 1600); }
+    function done() { cb.innerHTML = '<span class="ar">تم النسخ ✓</span><span class="en">Copied ✓</span>'; setTimeout(function () { cb.innerHTML = label; }, 1600); }
     function fallback() { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
     try { navigator.clipboard.writeText(el.textContent).then(done, fallback); } catch (e) { fallback(); }
   });
 
-  /* ---------- WebGL hero: a ring of real project screens ---------- */
-  (function () {
-    var stage = document.getElementById('stage');
-    if (!window.THREE) return;
-    var canvas = document.createElement('canvas'), renderer;
-    try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); } catch (e) { return; }
-    if (!renderer.getContext()) return;
-    stage.insertBefore(canvas, stage.firstChild);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.outputEncoding = THREE.sRGBEncoding;
-    var scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x0b0b0e, 12, 30);
-    var camera = new THREE.PerspectiveCamera(36, 1, .1, 100);
-    var ring = new THREE.Group(); ring.rotation.set(.16, 0, -.07); scene.add(ring);
+  /* ---------- lightbox ---------- */
+  var lb = document.getElementById('lb'), lbImg = lb.querySelector('img');
+  function openLb(src, alt) { lbImg.src = src; lbImg.alt = alt || ''; lb.hidden = false; }
+  function closeLb() { lb.hidden = true; }
+  lb.addEventListener('click', closeLb);
+  addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLb(); });
 
-    var items = [
-      { src: 'img/alliance-hero.jpg', r: 1.6, go: 'alliance' },
-      { src: 'img/doctor-live.jpg', r: 1260 / 1350, go: 'uni' },
-      { src: 'img/bbq-s1.jpg', r: 16 / 9, go: 'bbq' },
-      { src: 'img/uni-home.jpg', r: .5, go: 'uni', phone: true },
-      { src: 'img/airtech-home.jpg', r: 1.6, go: 'airtech' },
-      { src: 'img/fersan-hero.jpg', r: 1.6, go: 'school' },
-      { src: 'img/bbq-s2.jpg', r: 16 / 9, go: 'bbq' },
-      { src: 'img/alliance-ar.jpg', r: 1.6, go: 'alliance' },
-      { src: 'img/uni-schedule.jpg', r: .5, go: 'uni', phone: true }
+  /* ---------- the 3D world ---------- */
+  var canGL = !!window.THREE && location.protocol !== 'file:' && (function () { try { var c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } })();
+  if (!canGL) return;
+  root.classList.add('gl');
+
+  var V = function (x, y, z) { return new THREE.Vector3(x, y, z); };
+  var canvas = document.getElementById('world');
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: 'high-performance' }); }
+  catch (e) { root.classList.remove('gl'); return; }
+  var mobileGPU = Math.min(innerWidth, innerHeight) < 700;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobileGPU ? 1.5 : 2));
+
+  var scene = new THREE.Scene();
+  var FOG = new THREE.Color('#f5f3fd');
+  scene.fog = new THREE.Fog(FOG, 26, 80);
+  var camera = new THREE.PerspectiveCamera(38, 1, .1, 1200);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xf3e6dc, 1.05));
+  var sun = new THREE.DirectionalLight(0xffffff, .75); sun.position.set(12, 24, 14); scene.add(sun);
+
+  // sky dome: a soft vertical gradient whose top takes each stop's colour
+  var skyU = { uTop: { value: new THREE.Color('#dfe4ff') }, uMid: { value: FOG.clone() }, uLow: { value: new THREE.Color('#fbf6f1') } };
+  var sky = new THREE.Mesh(new THREE.SphereGeometry(600, 32, 16), new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false, fog: false, uniforms: skyU,
+    vertexShader: 'varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform vec3 uTop; uniform vec3 uMid; uniform vec3 uLow; varying vec3 vP; void main(){ float h = vP.y; vec3 c = h > 0.0 ? mix(uMid, uTop, smoothstep(0.0, 0.55, h)) : mix(uMid, uLow, smoothstep(0.0, 0.2, -h)); gl_FragColor = vec4(c, 1.0); }'
+  }));
+  sky.renderOrder = -1; scene.add(sky);
+
+  // floor with a fine grid that melts into the horizon
+  var FLOOR_Y = -3.4;
+  var floorU = { uBase: { value: new THREE.Color('#f2f0fa') }, uLine: { value: new THREE.Color('#d4d3e8') }, uFog: { value: FOG }, uNear: { value: 26 }, uFar: { value: 80 }, uCam: { value: V(0, 0, 0) } };
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(1400, 1400), new THREE.ShaderMaterial({
+    uniforms: floorU, extensions: { derivatives: true },
+    vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: 'uniform vec3 uBase; uniform vec3 uLine; uniform vec3 uFog; uniform float uNear; uniform float uFar; uniform vec3 uCam; varying vec3 vW;' +
+      'float grid(vec2 p, float s){ vec2 q = p / s; vec2 g = abs(fract(q - 0.5) - 0.5) / fwidth(q); return 1.0 - min(min(g.x, g.y), 1.0); }' +
+      'void main(){ float l = max(grid(vW.xz, 2.0) * 0.55, grid(vW.xz, 10.0)); vec3 c = mix(uBase, uLine, l); float f = smoothstep(uNear, uFar, distance(uCam, vW)); gl_FragColor = vec4(mix(c, uFog, f), 1.0); }'
+  }));
+  floor.rotation.x = -Math.PI / 2; floor.position.set(0, FLOOR_Y, -70); scene.add(floor);
+
+  /* ---------- tour stops ---------- */
+  var STOPS = [
+    { pos: V(0, 0, 0), tint: '#5b6cff', sky: '#dde3ff' },
+    { pos: V(-17, 0, -26), tint: '#e5364f', sky: '#ffdfe5' },
+    { pos: V(17, 0, -52), tint: '#b8862a', sky: '#ffeccc' },
+    { pos: V(-17, 0, -78), tint: '#f0661a', sky: '#ffe2cd' },
+    { pos: V(17, 0, -104), tint: '#2f6fe0', sky: '#d8e6ff' },
+    { pos: V(-17, 0, -128), tint: '#c62a42', sky: '#ffdce3' },
+    { pos: V(15, 0, -152), tint: '#4b5cff', sky: '#e1e4ff' },
+    { pos: V(0, 0, -182), tint: '#5b6cff', sky: '#e7e4ff', ring: true }
+  ];
+  STOPS.forEach(function (s) { s.skyC = new THREE.Color(s.sky); s.base = s.pos.clone(); });
+
+  /* ---------- canvas helpers ---------- */
+  function mk(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+  function rr(x, X, Y, W, H, R) { x.beginPath(); x.moveTo(X + R, Y); x.arcTo(X + W, Y, X + W, Y + H, R); x.arcTo(X + W, Y + H, X, Y + H, R); x.arcTo(X, Y + H, X, Y, R); x.arcTo(X, Y, X + W, Y, R); x.closePath(); }
+  function loadImg(src) { return new Promise(function (ok, bad) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = bad; i.src = src; }); }
+  var TEXW = mobileGPU ? 768 : 1024;
+
+  function browserCanvas(img, url) {
+    var W = TEXW, bar = Math.round(W * .055), ih = Math.round(img.naturalHeight * W / img.naturalWidth), c = mk(W, ih + bar), x = c.getContext('2d');
+    rr(x, 0, 0, W, ih + bar, W * .026); x.save(); x.clip();
+    x.fillStyle = '#f4f5f9'; x.fillRect(0, 0, W, bar);
+    ['#ff5f57', '#febc2e', '#28c840'].forEach(function (col, k) { x.fillStyle = col; x.beginPath(); x.arc(bar * .55 + k * bar * .42, bar / 2, bar * .13, 0, 7); x.fill(); });
+    x.fillStyle = '#e6e7ee'; rr(x, W * .3, bar * .22, W * .4, bar * .56, bar * .28); x.fill();
+    x.fillStyle = '#7c8196'; x.font = '500 ' + Math.round(bar * .3) + 'px "IBM Plex Sans Arabic", sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.direction = 'ltr';
+    x.fillText(url, W / 2, bar / 2 + 1);
+    x.drawImage(img, 0, bar, W, ih); x.restore();
+    return c;
+  }
+  function phoneCanvas(img) {
+    var W = mobileGPU ? 400 : 520, H = Math.round(W * 2.04), b = W * .035, c = mk(W, H), x = c.getContext('2d');
+    rr(x, 0, 0, W, H, W * .15); x.fillStyle = '#0b0b0f'; x.fill();
+    x.save(); rr(x, b, b, W - 2 * b, H - 2 * b, W * .12); x.clip();
+    var s = Math.max((W - 2 * b) / img.naturalWidth, (H - 2 * b) / img.naturalHeight);
+    x.drawImage(img, b, b, img.naturalWidth * s, img.naturalHeight * s); x.restore();
+    x.fillStyle = '#0b0b0f'; rr(x, W * .36, b + W * .02, W * .28, W * .055, W * .03); x.fill();
+    return c;
+  }
+  function slideCanvas(img, w) {
+    var W = w || 512, H = Math.round(img.naturalHeight * W / img.naturalWidth), c = mk(W, H), x = c.getContext('2d');
+    rr(x, 0, 0, W, H, W * .03); x.save(); x.clip(); x.drawImage(img, 0, 0, W, H); x.restore();
+    return c;
+  }
+  function tex(c) { var t = new THREE.CanvasTexture(c); t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); t.minFilter = THREE.LinearMipmapLinearFilter; return t; }
+  // one GPU texture per picture, however many screens show it
+  var texCache = new Map();
+  function texFor(c) { if (!texCache.has(c)) texCache.set(c, tex(c)); return texCache.get(c); }
+
+  // a white rounded "back" so screens look like real objects when seen from the side
+  var backTex = (function () { var c = mk(128, 128), x = c.getContext('2d'); rr(x, 0, 0, 128, 128, 10); x.fillStyle = '#fff'; x.fill(); return new THREE.CanvasTexture(c); })();
+  var shadowTex = (function () { var c = mk(128, 128), x = c.getContext('2d'), g = x.createRadialGradient(64, 64, 4, 64, 64, 64); g.addColorStop(0, 'rgba(60,62,110,.28)'); g.addColorStop(1, 'rgba(60,62,110,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+
+  var pickables = [], floaters = [], stopGroups = [];
+  function addScreen(group, canvasEl, opt) {
+    var aspect = canvasEl.width / canvasEl.height;
+    var w = opt.w || opt.h * aspect, h = opt.h || opt.w / aspect;
+    var holder = new THREE.Group();
+    var t = opt.own ? tex(canvasEl) : texFor(canvasEl);
+    var front = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, transparent: true }));
+    var back = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ alphaMap: backTex, transparent: true, color: 0xeceef6, roughness: .6 }));
+    back.rotation.y = Math.PI; back.position.z = -.025;
+    holder.add(front); holder.add(back);
+    holder.position.copy(opt.pos); holder.rotation.set(opt.rx || 0, opt.ry || 0, opt.rz || 0);
+    holder.userData = { base: opt.pos.clone(), phase: Math.random() * 6.28, lift: 0 };
+    front.userData = { src: opt.src, alt: opt.alt, holder: holder, texture: t };
+    group.add(holder);
+    if (opt.src) pickables.push(front);
+    floaters.push(holder);
+    return front;
+  }
+  function addShadow(group, w, d) {
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
+    m.rotation.x = -Math.PI / 2; m.position.y = FLOOR_Y + .01; group.add(m);
+  }
+  // pastel floating shapes around each stop
+  var seed = 11; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var GEOS = [new THREE.SphereGeometry(1, 40, 24), new THREE.TorusGeometry(.8, .3, 24, 60), new THREE.IcosahedronGeometry(1, 0), new THREE.ConeGeometry(.8, 1.5, 40), new THREE.TorusKnotGeometry(.6, .2, 100, 16)];
+  function addShapes(group, tint, count, spread) {
+    var base = new THREE.Color(tint), white = new THREE.Color('#ffffff');
+    for (var k = 0; k < count; k++) {
+      var col = base.clone().lerp(white, [0, .45, .8, .25][k % 4]);
+      var m = new THREE.Mesh(GEOS[Math.floor(rnd() * GEOS.length)], new THREE.MeshStandardMaterial({ color: col, roughness: .28, metalness: .05 }));
+      // around and behind the screens, never between them and the camera
+      if (k % 3 === 2) m.position.set((rnd() - .5) * spread, -1.2 + rnd() * 5, -3.5 - rnd() * 3);
+      else m.position.set((k % 2 ? -1 : 1) * (spread * .62 + rnd() * spread * .4), -2 + rnd() * 5.5, -2.8 + rnd() * 3.2);
+      var s = .28 + rnd() * .5; m.scale.setScalar(s);
+      m.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3);
+      m.userData = { base: m.position.clone(), phase: rnd() * 6.28, spin: (rnd() - .5) * .6, shape: true };
+      group.add(m); floaters.push(m);
+    }
+  }
+  // small shapes scattered along the whole route, so the flights between stops feel like moving through space
+  function addRouteDust() {
+    var g = new THREE.Group(), cols = ['#5b6cff', '#e5364f', '#c4922f', '#f0661a', '#2f6fe0', '#ffffff', '#b04cff'];
+    for (var k = 0; k < 70; k++) {
+      var m = new THREE.Mesh(GEOS[k % GEOS.length], new THREE.MeshStandardMaterial({ color: new THREE.Color(cols[k % cols.length]).lerp(new THREE.Color('#fff'), .25), roughness: .3 }));
+      var z = 6 - rnd() * 196, side = rnd() < .5 ? -1 : 1;
+      m.position.set(side * (4 + rnd() * 26), -2.6 + rnd() * 10, z);
+      m.scale.setScalar(.12 + rnd() * .3);
+      m.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3);
+      m.userData = { base: m.position.clone(), phase: rnd() * 6.28, spin: (rnd() - .5) * .8, shape: true };
+      g.add(m); floaters.push(m);
+    }
+    scene.add(g);
+  }
+
+  /* ---------- live attendance screen (a simulation drawn every tick) ---------- */
+  var live = { canvas: mk(760, 900), count: 41, feed: [
+    { n: 'Omar Khaled', id: 21045, d: 12, t: '09:14:52' }, { n: 'Mariam Adel', id: 21012, d: 8, t: '09:14:31' },
+    { n: 'Youssef Samir', id: 21077, d: 23, t: '09:14:09' }, { n: 'Nour Hassan', id: 21031, d: 15, t: '09:13:47' }, { n: 'Hana Mahmoud', id: 21029, d: 19, t: '09:13:20' }
+  ], names: ['Ahmed Tarek', 'Salma Ibrahim', 'Karim Mostafa', 'Ziad Ashraf', 'Farida Hany', 'Mohamed Saad', 'Jana Walid', 'Adham Fouad', 'Malak Essam', 'Seif Amr'], k: 0, sec: 9 * 3600 + 14 * 60 + 52, fresh: false, qr: [] };
+  (function () { var s = 7; for (var i = 0; i < 29 * 29; i++) { s = (s * 9301 + 49297) % 233280; live.qr.push(s / 233280 > .52); } })();
+  function drawLive() {
+    var c = live.canvas, x = c.getContext('2d'), W = c.width, H = c.height, F = '"IBM Plex Sans Arabic", sans-serif';
+    x.clearRect(0, 0, W, H); rr(x, 0, 0, W, H, 44); x.fillStyle = '#0e0e12'; x.fill();
+    x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.direction = 'ltr';
+    x.fillStyle = '#fff'; x.font = '600 34px ' + F; x.fillText('Engineering Drawing · Group 1', 40, 76);
+    x.fillStyle = '#7d7c86'; x.font = '400 24px ' + F; x.fillText('Location check: within 150 m', 40, 114);
+    x.strokeStyle = '#2fd27a'; x.lineWidth = 3; rr(x, W - 150, 46, 110, 44, 22); x.stroke();
+    x.fillStyle = '#2fd27a'; x.beginPath(); x.arc(W - 124, 68, 7, 0, 7); x.fill(); x.font = '600 24px ' + F; x.fillText('Live', W - 108, 77);
+    // QR
+    var q = 250, qx = 40, qy = 150; x.fillStyle = '#fff'; rr(x, qx, qy, q, q, 22); x.fill();
+    var cell = (q - 36) / 29; x.fillStyle = '#0e0e12';
+    for (var i = 0; i < 29; i++) for (var j = 0; j < 29; j++) {
+      var finder = (i < 7 && j < 7) || (i > 21 && j < 7) || (i < 7 && j > 21);
+      if (finder) { var fi = i > 21 ? i - 22 : i, fj = j > 21 ? j - 22 : j; var ring = fi === 0 || fi === 6 || fj === 0 || fj === 6 || (fi > 1 && fi < 5 && fj > 1 && fj < 5); if (!ring) continue; }
+      else if (!live.qr[i * 29 + j]) continue;
+      x.fillRect(qx + 18 + i * cell, qy + 18 + j * cell, cell + .5, cell + .5);
+    }
+    // stats
+    var sx = 316, sw = (W - sx - 40 - 20) / 3, vals = [['52', 'Total', '#fff'], [String(live.count), 'Checked in', '#2fd27a'], [String(52 - live.count), 'Absent', '#ff4d5e']];
+    vals.forEach(function (v, k) { var bx = sx + k * (sw + 10); x.fillStyle = '#1b1b21'; rr(x, bx, qy, sw, q, 24); x.fill(); x.textAlign = 'center'; x.fillStyle = v[2]; x.font = '700 64px ' + F; x.fillText(v[0], bx + sw / 2, qy + 140); x.fillStyle = '#7d7c86'; x.font = '400 22px ' + F; x.fillText(v[1], bx + sw / 2, qy + 186); });
+    // feed
+    x.textAlign = 'left';
+    live.feed.slice(0, 5).forEach(function (r, k) {
+      var y = 436 + k * 90; x.fillStyle = (k === 0 && live.fresh) ? '#164a31' : '#1b1b21'; rr(x, 40, y, W - 80, 78, 18); x.fill();
+      x.fillStyle = '#fff'; x.font = '600 27px ' + F; x.fillText(r.n, 64, y + 34);
+      x.fillStyle = '#7d7c86'; x.font = '400 21px ' + F; x.fillText('ID ' + r.id + ' · ' + r.d + ' m away', 64, y + 62);
+      x.textAlign = 'right'; x.fillText(r.t, W - 64, y + 46); x.textAlign = 'left';
+    });
+  }
+  function tickLive() {
+    if (live.count >= 50) live.count = 41;
+    live.count++; live.sec += 9 + Math.floor(Math.random() * 14);
+    var h = Math.floor(live.sec / 3600), m = Math.floor(live.sec / 60) % 60, s = live.sec % 60, p = function (n) { return (n < 10 ? '0' : '') + n; };
+    live.feed.unshift({ n: live.names[live.k++ % live.names.length], id: 21000 + Math.floor(Math.random() * 90), d: 5 + Math.floor(Math.random() * 30), t: p(h) + ':' + p(m) + ':' + p(s) });
+    live.feed.length = 5; live.fresh = true; drawLive(); live.mesh.userData.texture.needsUpdate = true;
+  }
+
+  /* ---------- documents, drawn as paper ---------- */
+  var docs = { cv: mk(700, 990), report: mk(700, 990), slide: mk(960, 600), sheet: mk(960, 600) };
+  function drawDocs() {
+    var ar = root.dataset.lang === 'ar', D = '"Readex Pro", sans-serif', B = '"IBM Plex Sans Arabic", sans-serif';
+    function page(c, bg) { var x = c.getContext('2d'); x.clearRect(0, 0, c.width, c.height); rr(x, 0, 0, c.width, c.height, 14); x.fillStyle = bg || '#ffffff'; x.fill(); x.save(); x.clip(); return x; }
+    function bars(x, X, Y, ws, H, col) { ws.forEach(function (w, k) { x.fillStyle = col || '#dfe0e8'; rr(x, X(w), Y + k * (H + 16), w, H, H / 2); x.fill(); }); }
+    var side = ar ? function (w) { return 700 - 60 - w; } : function () { return 60; };
+    // CV
+    var x = docs.cv.getContext('2d'); x = page(docs.cv);
+    x.direction = ar ? 'rtl' : 'ltr'; x.textAlign = ar ? 'right' : 'left';
+    var tx = ar ? 640 : 60, av = ar ? 560 : 140;
+    x.fillStyle = '#c9cbe0'; x.beginPath(); x.arc(av, 130, 70, 0, 7); x.fill();
+    x.fillStyle = '#151826'; x.font = '700 46px ' + D; x.fillText(ar ? 'اسمك هنا' : 'Your Name', ar ? 460 : 240, 125);
+    x.fillStyle = '#4b5cff'; x.font = '500 26px ' + B; x.fillText(ar ? 'مهندس برمجيات' : 'Software Engineer', ar ? 460 : 240, 168);
+    x.fillStyle = '#4b5cff'; x.fillRect(60, 232, 580, 5);
+    [[ar ? 'الخبرات' : 'EXPERIENCE', 280, [560, 470, 520]], [ar ? 'التعليم' : 'EDUCATION', 520, [420, 500]], [ar ? 'المهارات' : 'SKILLS', 710, [380]]].forEach(function (s) {
+      x.fillStyle = '#151826'; x.font = '700 28px ' + D; x.fillText(s[0], tx, s[1]); bars(x, side, s[1] + 26, s[2], 14);
+    });
+    ['#4b5cff', '#7d8bff', '#a9b2ff', '#cfd4ff'].forEach(function (col, k) { x.fillStyle = col; rr(x, ar ? 640 - (k + 1) * 140 + 20 : 60 + k * 140, 800, 120, 34, 17); x.fill(); });
+    bars(x, side, 880, [460, 300], 14); x.restore();
+    // report cover
+    x = page(docs.report);
+    var g = x.createLinearGradient(0, 0, 700, 380); g.addColorStop(0, '#1d2140'); g.addColorStop(1, '#4b5cff'); x.fillStyle = g; x.fillRect(0, 0, 700, 380);
+    x.direction = ar ? 'rtl' : 'ltr'; x.textAlign = ar ? 'right' : 'left'; x.fillStyle = '#fff'; x.font = '700 50px ' + D;
+    x.fillText(ar ? 'تقرير مشروع' : 'Graduation', tx, 270); x.fillText(ar ? 'التخرج' : 'Project Report', tx, 335);
+    x.fillStyle = '#7c8196'; x.font = '500 26px ' + B; x.fillText(ar ? 'كلية الهندسة · 2026' : 'Faculty of Engineering · 2026', tx, 440);
+    bars(x, side, 500, [580, 520, 560, 400, 540, 480, 300], 14); x.restore();
+    // slide
+    x = page(docs.slide, '#15161f');
+    x.direction = ar ? 'rtl' : 'ltr'; x.textAlign = ar ? 'right' : 'left'; x.fillStyle = '#fff'; x.font = '700 48px ' + D;
+    x.fillText(ar ? 'نتائج الربع الثالث' : 'Q3 results', ar ? 900 : 60, 100);
+    x.fillStyle = '#8d90a8'; x.font = '400 24px ' + B; x.fillText(ar ? 'نمو المبيعات حسب الشهر' : 'Sales growth by month', ar ? 900 : 60, 145);
+    [.38, .55, .47, .78, 1].forEach(function (v, k) { var bh = v * 300; x.fillStyle = k === 4 ? '#7b8cff' : '#4b5cff'; rr(x, 90 + k * 165, 540 - bh, 110, bh, 10); x.fill(); });
+    x.fillStyle = '#2a2c3a'; x.fillRect(60, 542, 840, 3); x.restore();
+    // sheet
+    x = page(docs.sheet);
+    var cols = [70, 330, 230, 270], heads = ['', 'Item', 'Qty', 'Total'], rows = [['1', 'Rent', '1', '4,500'], ['2', 'Bills', '3', '1,260'], ['3', 'Food', '30', '3,000'], ['4', 'Transport', '22', '880'], ['5', 'Sum', '', '9,640']];
+    x.direction = 'ltr'; x.textAlign = 'left'; x.font = '500 26px ' + B;
+    var cx = [0]; cols.forEach(function (w, k) { cx.push(cx[k] + w); });
+    x.fillStyle = '#1f7a4d'; x.fillRect(0, 0, 960, 90);
+    heads.forEach(function (h, k) { x.fillStyle = '#fff'; x.fillText(h, cx[k] + 22, 56); });
+    rows.forEach(function (r, i) {
+      var y = 90 + i * 102; x.fillStyle = i === 4 ? '#e3f2e9' : (i % 2 ? '#fafafd' : '#fff'); x.fillRect(0, y, 960, 102);
+      x.fillStyle = '#f0f0f4'; x.fillRect(0, y, 70, 102);
+      r.forEach(function (v, k) { x.fillStyle = k === 0 ? '#9a9cab' : '#22242f'; x.font = (i === 4 ? '700 ' : '400 ') + '28px ' + B; x.fillText(v, cx[k] + 22, y + 62); });
+      x.fillStyle = '#e4e4ec'; x.fillRect(0, y + 101, 960, 1);
+    });
+    for (var k = 1; k < cx.length - 1; k++) { x.fillStyle = '#e4e4ec'; x.fillRect(cx[k], 0, 1, 600); }
+    x.restore();
+    Object.keys(docs).forEach(function (k) { if (docs[k].mesh) docs[k].mesh.userData.texture.needsUpdate = true; });
+  }
+
+  /* ---------- build the stops ---------- */
+  var bbq = { slides: [], i: 0, mesh: null };
+  function G(stopIndex) { var g = new THREE.Group(); g.position.copy(STOPS[stopIndex].pos); scene.add(g); stopGroups[stopIndex] = g; return g; }
+
+  var finale = null;
+  function build(I) {
+    var g;
+    // every picture becomes one framed canvas, shared by all the screens that show it
+    var C = {
+      allianceEn: browserCanvas(I['alliance-hero'], 'alliance.sa/en'), allianceAr: browserCanvas(I['alliance-ar'], 'alliance.sa/ar'),
+      sectors: browserCanvas(I['alliance-sectors'], 'alliance.sa/#sectors'), model: browserCanvas(I['alliance-model'], 'alliance.sa/business-model'), team: browserCanvas(I['alliance-team'], 'alliance.sa/about-us'),
+      airHome: browserCanvas(I['airtech-home'], 'airtech jahiz · home'), airProducts: browserCanvas(I['airtech-products'], 'airtech jahiz · products'),
+      schoolHome: browserCanvas(I['fersan-hero'], 'el-fersan school · home'), schoolAbout: browserCanvas(I['fersan-about'], 'el-fersan school · about'),
+      doctor: browserCanvas(I['doctor-live'], 'juster · teacher dashboard'),
+      uniHome: phoneCanvas(I['uni-home']), uniSchedule: phoneCanvas(I['uni-schedule']), uniStudy: phoneCanvas(I['uni-study'])
+    };
+    var keys = ['bbq-s1', 'bbq-s2', 'bbq-s3', 'bbq-s8', 'bbq-s10', 'bbq-s11', 'bbq-s13'];
+    keys.forEach(function (k) { bbq.slides.push(browserCanvas(I[k], 'sport barbecue · presentation')); });
+
+    // 0 · hero: one screen from every project, hanging together
+    g = G(0);
+    addScreen(g, C.allianceEn, { w: 3.7, pos: V(-2.3, 1.15, -1.2), ry: .2, rz: .02, src: 'img/alliance-hero.jpg', alt: 'Alliance Investment' });
+    addScreen(g, bbq.slides[0], { w: 3.5, pos: V(2.2, 1.0, -1.6), ry: -.22, rz: -.02, src: 'img/bbq-s1.jpg', alt: 'Sport Barbecue' });
+    addScreen(g, C.schoolHome, { w: 3.2, pos: V(-2.1, -1.35, .1), ry: .14, src: 'img/fersan-hero.jpg', alt: 'El-Fersan School' });
+    addScreen(g, C.airHome, { w: 3.2, pos: V(2.3, -1.25, .2), ry: -.12, src: 'img/airtech-home.jpg', alt: 'AirTech Jahiz' });
+    addScreen(g, C.uniHome, { h: 3.5, pos: V(.05, .05, 1.3), src: 'img/uni-home.jpg', alt: 'Juster' });
+    addShadow(g, 10, 5); addShapes(g, '#5b6cff', 7, 6.5);
+
+    // 1 · Juster: three phones, the teacher dashboard, and a live attendance screen
+    g = G(1);
+    addScreen(g, C.uniSchedule, { h: 3.0, pos: V(-3.2, -.25, .1), ry: .32, src: 'img/uni-schedule.jpg', alt: 'Juster schedule' });
+    addScreen(g, C.uniHome, { h: 3.3, pos: V(-1.75, .05, .85), ry: .12, src: 'img/uni-home.jpg', alt: 'Juster home' });
+    addScreen(g, C.uniStudy, { h: 2.9, pos: V(-.35, -.35, 1.45), ry: -.06, src: 'img/uni-study.jpg', alt: 'Juster study rooms' });
+    addScreen(g, C.doctor, { w: 3.1, pos: V(1.65, .55, -.6), ry: -.1, src: 'img/doctor-live.jpg', alt: 'Teacher attendance dashboard' });
+    drawLive();
+    live.mesh = addScreen(g, live.canvas, { w: 2.0, pos: V(3.75, -.55, .55), ry: -.32, own: true });
+    addShadow(g, 11, 5); addShapes(g, '#e5364f', 6, 6.5);
+
+    // 2 · Alliance: English and Arabic side by side, three pages below
+    g = G(2);
+    addScreen(g, C.allianceEn, { w: 4.0, pos: V(-1.55, .75, 0), ry: .16, src: 'img/alliance-hero.jpg', alt: 'Alliance in English' });
+    addScreen(g, C.allianceAr, { w: 3.8, pos: V(1.75, 1.05, -1.4), ry: -.16, src: 'img/alliance-ar.jpg', alt: 'Alliance in Arabic' });
+    addScreen(g, C.sectors, { w: 1.9, pos: V(-2.6, -1.75, 1.3), ry: .2, src: 'img/alliance-sectors.jpg', alt: 'Alliance sectors' });
+    addScreen(g, C.model, { w: 1.9, pos: V(-.4, -1.95, 1.75), src: 'img/alliance-model.jpg', alt: 'Alliance business model' });
+    addScreen(g, C.team, { w: 1.9, pos: V(1.8, -1.75, 1.3), ry: -.2, src: 'img/alliance-team.jpg', alt: 'Alliance about us' });
+    addShadow(g, 11, 5); addShapes(g, '#c4922f', 6, 6.5);
+
+    // 3 · Sport Barbecue: the deck plays on a big screen, every slide in a row beneath
+    g = G(3);
+    bbq.mesh = addScreen(g, bbq.slides[0], { w: 5.0, pos: V(0, .85, 0), src: 'img/bbq-s1.jpg', alt: 'Sport Barbecue slide', own: true });
+    bbq.textures = bbq.slides.map(texFor);
+    keys.slice(1).forEach(function (k, j) {
+      var xx = -3.1 + j * 1.24;
+      addScreen(g, slideCanvas(I[k], 384), { w: 1.15, pos: V(xx, -1.75, 1.2 - Math.abs(xx) * .22), ry: -xx * .1, src: 'img/' + k + '.jpg', alt: 'Sport Barbecue slide' });
+    });
+    addShadow(g, 10, 5); addShapes(g, '#f0661a', 6, 6.5);
+
+    // 4 · AirTech
+    g = G(4);
+    addScreen(g, C.airHome, { w: 4.6, pos: V(-.7, .45, 0), ry: .1, src: 'img/airtech-home.jpg', alt: 'AirTech Jahiz home' });
+    addScreen(g, C.airProducts, { w: 3.4, pos: V(2.5, -.85, -1.5), ry: -.24, src: 'img/airtech-products.jpg', alt: 'AirTech Jahiz products' });
+    addShadow(g, 10, 5); addShapes(g, '#2f6fe0', 6, 6.5);
+
+    // 5 · School
+    g = G(5);
+    addScreen(g, C.schoolHome, { w: 4.6, pos: V(-.7, .45, 0), ry: .1, src: 'img/fersan-hero.jpg', alt: 'El-Fersan school home' });
+    addScreen(g, C.schoolAbout, { w: 3.4, pos: V(2.5, -.85, -1.5), ry: -.24, src: 'img/fersan-about.jpg', alt: 'About El-Fersan school' });
+    addShadow(g, 10, 5); addShapes(g, '#c62a42', 6, 6.5);
+
+    // 6 · Documents
+    g = G(6);
+    drawDocs();
+    docs.cv.mesh = addScreen(g, docs.cv, { h: 3.2, pos: V(-2.5, .3, .2), ry: .18, rz: .06, own: true });
+    docs.report.mesh = addScreen(g, docs.report, { h: 3.2, pos: V(-.3, .55, -.5), rz: -.03, own: true });
+    docs.slide.mesh = addScreen(g, docs.slide, { w: 2.9, pos: V(2.2, 1.0, .3), ry: -.18, rz: -.05, own: true });
+    docs.sheet.mesh = addScreen(g, docs.sheet, { w: 2.7, pos: V(1.3, -1.45, 1.3), ry: -.1, rz: .04, own: true });
+    addShadow(g, 10, 5); addShapes(g, '#4b5cff', 7, 6.5);
+
+    // 7 · finale: every project in a slowly turning ring around the camera
+    g = G(7); finale = new THREE.Group(); g.add(finale);
+    var ring = [
+      [C.allianceEn, 'img/alliance-hero.jpg', 3.4], [C.uniHome, 'img/uni-home.jpg', 0, 3.0], [bbq.slides[0], 'img/bbq-s1.jpg', 3.6], [C.doctor, 'img/doctor-live.jpg', 2.4],
+      [C.airHome, 'img/airtech-home.jpg', 3.4], [C.allianceAr, 'img/alliance-ar.jpg', 3.4], [C.uniSchedule, 'img/uni-schedule.jpg', 0, 3.0], [bbq.slides[1], 'img/bbq-s2.jpg', 3.6],
+      [C.schoolHome, 'img/fersan-hero.jpg', 3.4], [C.airProducts, 'img/airtech-products.jpg', 3.4], [bbq.slides[4], 'img/bbq-s10.jpg', 3.6], [C.uniStudy, 'img/uni-study.jpg', 0, 3.0]
     ];
-    var R = 4.3, loader = new THREE.TextureLoader(), pickables = [], loaded = 0;
-    items.forEach(function (it, i) {
-      var a = i / items.length * Math.PI * 2;
-      var H = it.phone ? 2.3 : (it.r < 1.2 ? 2.05 : 1.62), W = H * it.r;
-      var grp = new THREE.Group();
-      var frame = new THREE.Mesh(new THREE.PlaneGeometry(W + .07, H + .07), new THREE.MeshBasicMaterial({ color: 0x24242c }));
-      var mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, side: THREE.DoubleSide });
-      var pic = new THREE.Mesh(new THREE.PlaneGeometry(W, H), mat);
-      pic.position.z = .012; pic.userData = it;
-      loader.load(it.src, function (t) {
-        t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        mat.map = t; mat.needsUpdate = true; mat.opacity = 1;
-        if (++loaded === 3) stage.classList.add("ready");
-      });
-      grp.add(frame); grp.add(pic);
-      var y = (i % 3 - 1) * .42;
-      grp.position.set(Math.sin(a) * R, y, Math.cos(a) * R);
-      grp.lookAt(Math.sin(a) * R * 3, y, Math.cos(a) * R * 3);
-      ring.add(grp); pickables.push(pic);
+    ring.forEach(function (r, k) {
+      var a = k / ring.length * Math.PI * 2, R = 8.6;
+      var o = { pos: V(Math.sin(a) * R, (k % 2 ? -.5 : .7), Math.cos(a) * R), ry: a + Math.PI, src: r[1], alt: 'Project screen' };
+      if (r[2]) o.w = r[2]; else o.h = r[3];
+      addScreen(finale, r[0], o);
     });
+    addShadow(g, 22, 22); addShapes(g, '#5b6cff', 8, 11);
+    addRouteDust();
+  }
 
-    // dust
-    var pts = new THREE.BufferGeometry(), P = 900, pos = new Float32Array(P * 3);
-    for (var i = 0; i < P; i++) { var rr = 2.5 + Math.random() * 6, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1); pos[i * 3] = rr * Math.sin(ph) * Math.cos(th); pos[i * 3 + 1] = rr * Math.cos(ph) * .6; pos[i * 3 + 2] = rr * Math.sin(ph) * Math.sin(th); }
-    pts.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    var dustMat = new THREE.PointsMaterial({ color: 0xb8bcff, size: .035, transparent: true, opacity: .55, depthWrite: false });
-    var dust = new THREE.Points(pts, dustMat); scene.add(dust);
+  /* ---------- camera path ---------- */
+  var KF = [];
+  function layout() {
+    var w = innerWidth, h = innerHeight; renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    var mob = camera.aspect < .85, s = root.dir === 'rtl' ? 1 : -1;
+    // the route is mirrored for left-to-right reading, so screens always sit opposite the text
+    STOPS.forEach(function (st, k) { st.pos.set(st.base.x * s, st.base.y, st.base.z); if (stopGroups[k]) stopGroups[k].position.copy(st.pos); });
+    KF = STOPS.map(function (st, k) {
+      var p = st.pos;
+      if (st.ring) return { pos: p.clone().add(V(0, mob ? 1.2 : 1.0, mob ? 3 : 2.5)), tgt: p.clone().add(V(0, mob ? .4 : .7, -8)), far: 80, sc: 1 };
+      if (k === 0 && !mob) return { pos: p.clone().add(V(3.4 * s, .9, 17)), tgt: p.clone().add(V(3.2 * s, -.1, 0)), far: 80, sc: 1 };
+      if (mob) return { pos: p.clone().add(V(0, 1.6, 17)), tgt: p.clone().add(V(0, -3.0, 0)), far: 80, sc: .56 };
+      return { pos: p.clone().add(V(2.4 * s, 1.4, 12.5)), tgt: p.clone().add(V(2.2 * s, .2, 0)), far: 80, sc: 1 };
+    });
+    stopGroups.forEach(function (g, k) { if (!g) return; g.scale.setScalar(KF[k].sc); g.rotation.y = Math.atan2(KF[k].pos.x - STOPS[k].pos.x, 12) * .6; });
+  }
+  onLang.push(function () { if (KF.length) layout(); if (docs.cv.mesh && document.fonts) drawDocs(); });
 
-    var w = 0, h = 0;
-    function size() {
-      w = stage.clientWidth; h = stage.clientHeight; if (!w || !h) return;
-      renderer.setSize(w, h, false); camera.aspect = w / h;
-      camera.position.z = camera.aspect < 1 ? 15 : 11.5; camera.updateProjectionMatrix();
+  /* ---------- input ---------- */
+  var mx = 0, my = 0, ndc = new THREE.Vector2(-9, -9), hovered = null, downAt = null;
+  addEventListener('pointermove', function (e) {
+    mx = e.clientX / innerWidth * 2 - 1; my = e.clientY / innerHeight * 2 - 1;
+    var overUI = e.target.closest && e.target.closest('.card, .nav, .rail, .lb, .hero-copy, .scroll-hint');
+    ndc.set(overUI ? -9 : mx, overUI ? -9 : -my);
+  }, { passive: true });
+  addEventListener('pointerdown', function (e) { downAt = [e.clientX, e.clientY]; }, { passive: true });
+  addEventListener('click', function (e) {
+    if (!lb.hidden || !hovered || (e.target.closest && e.target.closest('a, button, .card'))) return;
+    if (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 8) return;
+    openLb(hovered.userData.src, hovered.userData.alt);
+  });
+
+  /* ---------- per-frame ---------- */
+  var ray = new THREE.Raycaster(), clock = new THREE.Clock();
+  var curPos = V(0, 0, 0), curTgt = V(0, 0, 0), wantPos = V(0, 0, 0), wantTgt = V(0, 0, 0), started = false;
+  var skyNow = new THREE.Color(), rail = [].slice.call(document.querySelectorAll('.rail button')), lastNear = -1;
+  var lastLive = 0, lastSlide = 0;
+  function smooth(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  function frame() {
+    requestAnimationFrame(frame);
+    var dt = Math.min(clock.getDelta(), .05), t = clock.elapsedTime;
+    var p = clamp(scrollY / (sectionH() || 1), 0, N - 1);
+    var i = Math.min(Math.floor(p), N - 2), f = p - i, e = smooth(clamp((f - .3) / .7, 0, 1));
+    var A = KF[i], B = KF[i + 1];
+    wantPos.lerpVectors(A.pos, B.pos, e); wantTgt.lerpVectors(A.tgt, B.tgt, e);
+    if (!B.far || B.far < 200) wantPos.y += Math.sin(e * Math.PI) * 3.2;
+    if (!started) { curPos.copy(wantPos); curTgt.copy(wantTgt); started = true; }
+    var k = 1 - Math.pow(.0015, dt);
+    curPos.lerp(wantPos, k); curTgt.lerp(wantTgt, k);
+    camera.position.copy(curPos); camera.position.x += mx * .45; camera.position.y -= my * .3;
+    camera.lookAt(curTgt);
+    sky.position.copy(camera.position);
+
+    scene.fog.far = A.far + (B.far - A.far) * e; scene.fog.near = 26 + (scene.fog.far - 80) * .35;
+    floorU.uNear.value = scene.fog.near; floorU.uFar.value = scene.fog.far; floorU.uCam.value.copy(camera.position);
+    skyNow.copy(STOPS[i].skyC).lerp(STOPS[i + 1].skyC, e); skyU.uTop.value.lerp(skyNow, .08);
+
+    var near = Math.round(p);
+    if (near !== lastNear) {
+      lastNear = near; body.style.setProperty('--tint', STOPS[near].tint); root.style.setProperty('--sky-top', STOPS[near].sky);
+      rail.forEach(function (b, j) { b.classList.toggle('on', j === near); });
     }
-    size(); if ('ResizeObserver' in window) new ResizeObserver(size).observe(stage); else addEventListener('resize', size);
-
-    var mx = 0, my = 0, spin = reduce ? 0 : .0028, drag = false, lastX = 0, vel = 0, hovered = null;
-    var ray = new THREE.Raycaster(), ndc = new THREE.Vector2(-9, -9);
-    stage.addEventListener('pointermove', function (e) {
-      var r = stage.getBoundingClientRect();
-      mx = (e.clientX - r.left) / r.width * 2 - 1; my = (e.clientY - r.top) / r.height * 2 - 1;
-      ndc.set(mx, -my);
-      if (drag) { vel = (e.clientX - lastX) * .0009; ring.rotation.y += vel * 4; lastX = e.clientX; }
-    });
-    stage.addEventListener('pointerleave', function () { ndc.set(-9, -9); mx = my = 0; drag = false; });
-    stage.addEventListener('pointerdown', function (e) { drag = true; lastX = e.clientX; vel = 0; canvas.style.cursor = 'grabbing'; downX = e.clientX; });
-    var downX = 0;
-    addEventListener('pointerup', function (e) {
-      if (!drag) return; drag = false; canvas.style.cursor = '';
-      if (Math.abs(e.clientX - downX) < 6 && hovered) { var t = document.getElementById(hovered.userData.go); if (t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); }
+    // cards: fully visible at their stop, fading as the camera leaves
+    secs.forEach(function (sct, j) {
+      var d = p - j, o = d < 0 ? clamp(1 + d * 3.2, 0, 1) : clamp(1 - (d - .2) * 4.2, 0, 1);
+      if (j === N - 1 && d >= 0) o = 1;
+      sct.style.setProperty('--o', o.toFixed(3));
     });
 
-    var running = true, clock = new THREE.Clock();
-    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { running = es[0].isIntersecting; if (running) loop(); }).observe(stage);
-    var tintColor = new THREE.Color();
-    function loop() {
-      if (!running) return;
-      requestAnimationFrame(loop);
-      var t = clock.getElapsedTime();
-      if (!drag) { vel *= .95; ring.rotation.y += spin + vel; }
-      camera.position.x += (mx * 1.1 - camera.position.x) * .04;
-      camera.position.y += (-my * .7 + .4 - camera.position.y) * .04;
-      camera.lookAt(0, 0, 0);
-      dust.rotation.y = t * .02;
-      ray.setFromCamera(ndc, camera);
-      var hit = ray.intersectObjects(pickables)[0];
-      hovered = hit ? hit.object : null;
-      canvas.style.cursor = drag ? 'grabbing' : (hovered ? 'pointer' : 'grab');
-      pickables.forEach(function (p) { var s = p === hovered ? 1.07 : 1; p.parent.scale.x += (s - p.parent.scale.x) * .12; p.parent.scale.y = p.parent.scale.x; });
-      var tc = getComputedStyle(body).getPropertyValue('--tint').trim();
-      if (tc) { try { tintColor.set(tc); dustMat.color.lerp(tintColor, .05); } catch (e) {} }
-      renderer.render(scene, camera);
+    // hover
+    ray.setFromCamera(ndc, camera);
+    var hit = ray.intersectObjects(pickables, false)[0];
+    hovered = hit ? hit.object : null;
+    body.style.cursor = hovered ? 'zoom-in' : '';
+
+    // float, bob and lift
+    floaters.forEach(function (o) {
+      var u = o.userData, bob = reduce ? 0 : Math.sin(t * .7 + u.phase) * (u.shape ? .25 : .07);
+      if (u.shape) { o.position.y = u.base.y + bob; if (!reduce) { o.rotation.x += u.spin * dt; o.rotation.y += u.spin * dt * .7; } return; }
+      var isHover = hovered && hovered.userData.holder === o;
+      u.lift += ((isHover ? 1 : 0) - u.lift) * .14;
+      o.position.set(u.base.x, u.base.y + bob, u.base.z + u.lift * .5);
+      o.scale.setScalar(1 + u.lift * .05);
+    });
+
+    if (finale && !reduce) finale.rotation.y += dt * .05;
+
+    // live screens tick only while they're in view
+    if (Math.abs(p - 1) < .8 && t - lastLive > 1.8 && !reduce) { lastLive = t; tickLive(); }
+    else if (live.fresh && t - lastLive > .9) { live.fresh = false; drawLive(); live.mesh.userData.texture.needsUpdate = true; }
+    if (Math.abs(p - 3) < .8 && t - lastSlide > 3 && !reduce) {
+      lastSlide = t; bbq.i = (bbq.i + 1) % bbq.textures.length;
+      bbq.mesh.material.map = bbq.textures[bbq.i]; bbq.mesh.material.needsUpdate = true;
+      bbq.mesh.userData.src = 'img/' + ['bbq-s1', 'bbq-s2', 'bbq-s3', 'bbq-s8', 'bbq-s10', 'bbq-s11', 'bbq-s13'][bbq.i] + '.jpg';
     }
-    loop();
-  })();
+
+    renderer.render(scene, camera);
+  }
+
+  /* ---------- load everything, then reveal ---------- */
+  var names = ['alliance-hero', 'alliance-ar', 'alliance-sectors', 'alliance-model', 'alliance-team', 'airtech-home', 'airtech-products', 'bbq-s1', 'bbq-s2', 'bbq-s3', 'bbq-s8', 'bbq-s10', 'bbq-s11', 'bbq-s13', 'fersan-hero', 'fersan-about', 'uni-home', 'uni-schedule', 'uni-study', 'doctor-live'];
+  var fontsReady = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('700 40px "Readex Pro"'), document.fonts.load('500 20px "IBM Plex Sans Arabic"')]).catch(function () {}) : Promise.resolve();
+  Promise.all([Promise.all(names.map(function (n) { return loadImg('img/' + n + '.jpg'); })), fontsReady]).then(function (r) {
+    var imgs = r[0], I = {};
+    names.forEach(function (n, k) { I[n] = imgs[k]; });
+    // a page opened straight from disk can't hand images to WebGL: keep the plain layout then
+    var probe = mk(2, 2).getContext('2d'); probe.drawImage(imgs[0], 0, 0, 2, 2);
+    try { probe.getImageData(0, 0, 1, 1); } catch (err) { throw err; }
+    build(I); layout();
+    addEventListener('resize', layout);
+    // a link like #alliance opens the tour at that project
+    var at = secs.map(function (s) { return s.id; }).indexOf(location.hash.slice(1));
+    if (at > 0) scrollTo(0, Math.round(at * sectionH()));
+    frame();
+    requestAnimationFrame(function () { root.classList.add('ready'); });
+  }).catch(function (err) { console.warn('3D world unavailable, showing the plain layout:', err); root.classList.remove('gl'); canvas.remove(); });
 })();
 </script>
 </body>
