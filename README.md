@@ -24,7 +24,7 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 
 ## لينكات لمشروع معيّن
 
-ممكن تبعت لينك يفتح على مشروع بعينه: `#uni` · `#alliance` · `#bbq` · `#airtech` · `#school` · `#docs` · `#contact`
+ممكن تبعت لينك يفتح على مشروع بعينه: `#uni` · `#alliance` · `#models` · `#bbq` · `#airtech` · `#school` · `#docs` · `#contact`
 
 ## ترفعه على النت (GitHub Pages)
 
