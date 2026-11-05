@@ -893,10 +893,10 @@ html.locked { overflow: hidden; }
     { n: 'ring', size: .0125, vari: 1, hard: 0, nom: [2.9, 2.9] },
     { n: 'ribbons', size: .0135, vari: 1, hard: 0, nom: [2.8, 3.0] },
     { n: 'planet', size: .012, vari: 1, hard: 0, nom: [5.3, 3.0] },
-    { n: 'alliance', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [233, 196, 106], p: 0 },
-    { n: 'doctor', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 77, 90], p: 1 },
-    { n: 'uni', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 107, 122], p: 2 },
-    { n: 'tsub', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [66, 211, 160], p: 3 }
+    { n: 'alliance', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [233, 196, 106] },
+    { n: 'doctor', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 77, 90] },
+    { n: 'uni', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 107, 122] },
+    { n: 'tsub', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [66, 211, 160] }
   ];
   var SCATTER = upload(shScatter()), SCAT = { size: .012, vari: 1, hard: 0 };
   [shTess, shGlobe, shQR, shRing, shRibbons, shPlanet].forEach(function (fn, i) { ST[i].t = upload(fn()); });
@@ -1002,9 +1002,9 @@ html.locked { overflow: hidden; }
     var m = mixNow(), left = (1 - m) * X.dur;
     if (left > .4) { X.dur = .4 / (1 - m); X.t0 = now - m * X.dur * 1000; }
   }
-  // A project first forms its emblem (the globe, the QR code, the focus timer, the ribbons), holds it for a
-  // moment, then turns into its real screens. phase 0 = emblem, 1 = screens; it starts again on every arrival.
-  var phase = 0, phaseSec = -1, heldFrom = 0, HOLD = 1800;
+  // A project plays a loop: its emblem (the globe, the QR code, the focus timer, the ribbons) for a moment, then
+  // its real screens for longer, then the emblem again. phase 0 = emblem, 1 = screens; it restarts on every arrival.
+  var phase = 0, phaseSec = -1, heldFrom = 0, HOLD = [2200, 5000]; // ms each phase holds once it has formed
   function sectionShape(i) { return i === 0 ? 0 : i === secs.length - 1 ? 5 : phase ? 5 + i : i; }
 
   /* ---- load the four project screens (wide ones for computers, portrait mockups for phones) ---- */
@@ -1055,10 +1055,10 @@ html.locked { overflow: hidden; }
     cursor();
     if (!ready) { draw(SCATTER, SCATTER, 0, null, null, SCAT, SCAT); return; }
 
-    // a project's emblem holds once it has formed (for as long as someone is turning it), then becomes the screens
+    // each phase holds once it has formed (and for as long as someone is turning the shape), then the other comes back
     if (k !== phaseSec) { phaseSec = k; phase = reduce ? 1 : 0; }
     if (spin.id !== null) heldFrom = now;
-    if (!phase && k > 0 && k < secs.length - 1 && X.done && X.a === k && X.ra === k && now - heldFrom > HOLD) phase = 1;
+    if (!reduce && k > 0 && k < secs.length - 1 && X.done && X.a === sectionShape(k) && X.ra === k && now - heldFrom > HOLD[phase]) phase = 1 - phase;
     goTo(sectionShape(k), k, 1.25);
     var m = mixNow();
     if (!X.done && m >= 1) { X.done = true; X.a = X.b; X.ra = X.rb; m = 0; heldFrom = now; if (queued) { var q = queued; queued = null; goTo(q[0], q[1], q[2]); m = mixNow(); } }
