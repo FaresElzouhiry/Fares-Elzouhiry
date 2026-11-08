@@ -33,10 +33,10 @@ Each project's emblem holds for about two seconds (and for as long as you're tur
 
 | Project | Links |
 |---|---|
-| **Alliance Investment** — a six-language website for an investment holding in Riyadh, opening on a live 3D globe of its 16-country network | [Live](https://fareselzouhiry.github.io/Alliance/) · [Code](https://github.com/FaresElzouhiry/Alliance) |
-| **Doctor Dashboard** (Juster) — students scan the doctor's QR code and appear live, only from inside the hall | [Code](https://github.com/FaresElzouhiry/Uni-app) |
-| **University App** (Juster) — the student app: live schedule, tasks, focus rooms; installable and offline | [Code](https://github.com/FaresElzouhiry/Uni-app) |
-| **TSUB Global Services** — a cinematic site linking Saudi Arabia and Bangladesh around a 3D globe and the logo's ribbons | [Live](https://fareselzouhiry.github.io/TSUB/) · [Code](https://github.com/FaresElzouhiry/TSUB) |
+| **Alliance Investment** — a six-language website for an investment holding in Riyadh, opening on a live 3D globe of its 16-country network | [Live](https://alliance.sa) |
+| **Doctor Dashboard** (Juster) — students scan the doctor's QR code and appear live, only from inside the hall | [Live](https://fareselzouhiry.github.io/Uni-app/Doctor.html) (asks for the teacher key) · [Code](https://github.com/FaresElzouhiry/Uni-app) |
+| **University App** (Juster) — the student app: live schedule, tasks, focus rooms; installable and offline | [Live](https://fareselzouhiry.github.io/Uni-app/) · [Code](https://github.com/FaresElzouhiry/Uni-app) |
+| **TSUB Global Services** — a cinematic site linking Saudi Arabia and Bangladesh around a 3D globe and the logo's ribbons | [Live](https://fareselzouhiry.github.io/TSUB/) |
 
 The dashboard screenshots use **sample data**: they were taken locally with the attendance API answered by a small script, so nothing reached the real server, and the QR code in them points to this portfolio.
 
