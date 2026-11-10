@@ -126,6 +126,14 @@ html[data-lang="ar"] .tags li { font-size: .78rem; }
 .acts .pri { background: var(--acc); border-color: var(--acc); color: #05060a; font-weight: 500; }
 .acts .pri:hover { background: var(--acc); filter: brightness(1.1); }
 .acts svg { width: 13px; height: 13px; }
+/* "Visit site" is the main call to action: bigger, a live dot, the arrow nudges on hover, and the address shown under the buttons */
+.acts .pri { padding: 13px 22px 13px 18px; font-size: 1rem; font-weight: 600; box-shadow: 0 12px 34px -12px var(--acc); }
+.acts .pri::before { content: ""; width: 8px; height: 8px; flex: none; border-radius: 50%; background: currentColor; animation: blink 2s ease-in-out infinite; }
+.acts .pri svg { width: 15px; height: 15px; transition: transform .25s var(--ease); }
+.acts .pri:hover svg, .acts .pri:focus-visible svg { transform: translate(2px, -2px); }
+.acts .url { order: 9; flex-basis: 100%; display: inline-flex; align-items: center; gap: 8px; padding: 2px 0 0; border: 0; border-radius: 0; background: none; font-size: .64rem; color: var(--fg3); text-decoration: none; }
+.acts .url:hover { background: none; color: var(--fg); }
+.acts .url i { width: 6px; height: 6px; flex: none; border-radius: 50%; background: #3df5a6; box-shadow: 0 0 8px #3df5a6; }
 /* a strip of the project's pages (for Alliance: the six designs for the CEO) */
 .strip { margin-top: 24px; }
 .strip p { color: var(--fg3); }
@@ -174,6 +182,8 @@ html.gl .on .fade:nth-child(6) { transition-delay: .3s; }
   .tags { display: none; }
   .acts { margin-top: 16px; gap: 8px; }
   .acts a, .acts button { padding: 10px 14px; font-size: .86rem; }
+  .acts .pri { flex: 1 1 100%; justify-content: center; padding: 13px 18px; font-size: .95rem; }
+  .acts .url { display: none; }
   .strip { margin-top: 16px; }
   .strip li { flex: 0 0 22%; }
   .strip ol.phones li { flex: 0 0 56px; }
@@ -241,7 +251,7 @@ html.locked { overflow: hidden; }
 @media (max-width: 700px) { .g-stage { padding: 0; } .g-nav { display: none; } .g-fig img { max-height: calc(100svh - 250px); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .grain, .live { animation: none; }
+  .grain, .live, .acts .pri::before { animation: none; }
   html.gl .fade { transition: opacity .3s; transform: none; }
 }
 </style>
@@ -293,7 +303,7 @@ html.locked { overflow: hidden; }
       <p class="desc fade"><span class="en">A six-language site that opens on a live 3D globe of a 16-country network.</span><span class="ar">موقع بست لغات يبدأ بكرة أرضية حيّة لشبكة من 16 دولة.</span></p>
       <ul class="tags mono fade"><li><span class="en">6 languages</span><span class="ar">6 لغات</span></li><li><span class="en">24 pages</span><span class="ar">24 صفحة</span></li><li><span class="en">WebGL globe</span><span class="ar">كرة WebGL</span></li></ul>
       <div class="acts fade">
-        <a class="pri" href="https://alliance.sa" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a class="pri" href="https://alliance.sa" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://alliance.sa" target="_blank" rel="noopener"><i></i><span class="ltr">alliance.sa</span></a>
         <button type="button" data-gal="alliance"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
       </div>
       <div class="strip fade">
@@ -318,7 +328,7 @@ html.locked { overflow: hidden; }
       <p class="desc fade"><span class="en">Students scan the doctor's QR code and appear in the list instantly — only from inside the hall.</span><span class="ar">يمسح الطلاب رمز QR الخاص بالدكتور فيظهرون في القائمة فورًا — من داخل القاعة فقط.</span></p>
       <ul class="tags mono fade"><li>QR</li><li><span class="en">GPS check</span><span class="ar">تحقق GPS</span></li><li><span class="en">Live feed</span><span class="ar">حضور مباشر</span></li></ul>
       <div class="acts fade">
-        <a class="pri" href="https://fareselzouhiry.github.io/Uni-app/Doctor.html" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a class="pri" href="https://fareselzouhiry.github.io/Uni-app/Doctor.html" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/Uni-app/Doctor.html" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/Uni-app</span> <span class="en">· teacher sign-in</span><span class="ar">· يحتاج تسجيل دخول</span></a>
         <button type="button" data-gal="doctor"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
         <a href="https://github.com/FaresElzouhiry/Uni-app" target="_blank" rel="noopener">GitHub</a>
       </div>
@@ -342,7 +352,7 @@ html.locked { overflow: hidden; }
       <p class="desc fade"><span class="en">The university in a student's pocket: live schedule, tasks and focus rooms. Works offline.</span><span class="ar">الجامعة في جيب الطالب: الجدول لحظة بلحظة، والمهام، وغرف المذاكرة. يعمل دون إنترنت.</span></p>
       <ul class="tags mono fade"><li>PWA</li><li><span class="en">Offline</span><span class="ar">دون إنترنت</span></li><li><span class="en">112 commits</span><span class="ar">112 تعديلًا</span></li></ul>
       <div class="acts fade">
-        <a class="pri" href="https://fareselzouhiry.github.io/Uni-app/" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a class="pri" href="https://fareselzouhiry.github.io/Uni-app/" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/Uni-app/" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/Uni-app</span></a>
         <button type="button" data-gal="uni"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
         <a href="https://github.com/FaresElzouhiry/Uni-app" target="_blank" rel="noopener">GitHub</a>
       </div>
@@ -366,7 +376,7 @@ html.locked { overflow: hidden; }
       <p class="desc fade"><span class="en">A cinematic site linking Saudi Arabia and Bangladesh, built around a 3D globe and the logo's ribbons.</span><span class="ar">موقع سينمائي يربط السعودية وبنغلاديش، مبني حول كرة أرضية ثلاثية الأبعاد وأشرطة الشعار.</span></p>
       <ul class="tags mono fade"><li>WebGL</li><li><span class="en">Scroll story</span><span class="ar">قصة بالتمرير</span></li><li>KSA · BD</li></ul>
       <div class="acts fade">
-        <a class="pri" href="https://fareselzouhiry.github.io/TSUB/" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        <a class="pri" href="https://fareselzouhiry.github.io/TSUB/" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/TSUB/" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/TSUB</span></a>
         <button type="button" data-gal="tsub"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
       </div>
       <div class="strip fade">
