@@ -1,6 +1,6 @@
 # Fares Elzouhiry — Portfolio
 
-**Websites from another dimension.** A one-page portfolio built around a live particle engine written from scratch in WebGL2: about 41,000 points of light (about 25,000 on phones) that start as a tesseract (a cube rotating through the fourth dimension), become an emblem for each project and then assemble into that project's real pages, and end as a ringed planet. The page opens with a short intro animation and is eight screens: an intro, six projects grouped by kind (websites, apps, a presentation and a game) and a contact screen.
+**Websites from another dimension.** A one-page portfolio built around a live particle engine written from scratch in WebGL2: about 41,000 points of light (about 25,000 on phones) that start as a tesseract (a cube rotating through the fourth dimension), become an emblem for each project and then assemble into that project's real pages, and end as a ringed planet. The page opens with a short intro animation and is ten screens: an intro, eight projects grouped by kind (websites, apps, a presentation, 3D modeling and a game) and a contact screen.
 
 - **Live site:** https://fareselzouhiry.github.io/Fares-Elzouhiry/
 - **Repository:** https://github.com/FaresElzouhiry/Fares-Elzouhiry
@@ -10,7 +10,7 @@
 
 ---
 
-## The eight screens
+## The ten screens
 
 Every section is exactly one screen. A flick on a phone, one notch of a mouse wheel, one trackpad swipe or one arrow key moves exactly one section, and the scene changes on its own as each section arrives.
 
@@ -22,16 +22,18 @@ Every section is exactly one screen. A flick on a phone, one notch of a mouse wh
 | 3 | Apps · Doctor Dashboard | `#doctor` | A **QR code** inside a scanner's viewfinder, with a scan line passing over it → then **the dashboard and a student's phone** saying "Checked in", with the dashboard's pages under it |
 | 4 | Apps · University App | `#uni` | A **focus timer**: a ring with a light running round it, minute ticks, and "25:00" written in particles → then **three screens of the app**, with its pages under it |
 | 5 | Presentations · Sport Barbecue | `#bbqpres` | **A stack of slides**, the front one reading "BBQ" and "GRILL · MOVE · MEET", with embers drifting up → then **the cover of model 3, the 3D night stadium**, with more slides under it |
-| 6 | Games · Pizza Spin | `#pizza` | **A spinning pizza**: crust, cheese, pepperoni, peppers and slice cuts, with steam rising → then **the game's split screen**, with its screens under it |
-| 7 | Contact | `#contact` | A **ringed planet** — "Let's build something out of this world." |
+| 6 | 3D Modeling · MHC Coalline | `#mhc` | **Chunks of coal**, each a solid with flat faces whose edges glow like embers, with sparks rising → then **the six 3D scenes** made for the coal maker (ember, factory line, globe, bag, mountain, shards) |
+| 7 | 3D Modeling · BBQ Fest in 3D | `#fest3d` | **A little model of the festival**: rows of booths with coloured roofs, the stage, palms and a red-and-white balloon → then **the festival modeled in 3D**, from above |
+| 8 | Games · Pizza Spin | `#pizza` | **A spinning pizza**: crust, cheese, pepperoni, peppers and slice cuts, with steam rising → then **the game's split screen**, with its screens under it |
+| 9 | Contact | `#contact` | A **ringed planet** — "Let's build something out of this world." |
 
 Each project's emblem holds for about one and a half seconds (and for as long as you're turning it), then its particles assemble into the project's real screens: first as a mosaic (each particle takes the colour of its pixel), then the sharp picture sweeps in behind a bright scan line. The screens stay for about six seconds, then the particles fly back into the emblem, and the loop carries on while you stay on the section. Clicking or tapping the emblem or the picture, **All screens**, or any thumbnail in the strip opens a gallery of that project's pictures with captions.
 
 - **Visit site:** every project has a **Visit site** button as its main action, in the project's colour with a live dot. It opens the real project in a new tab. On computers the address is shown under the buttons (the Doctor Dashboard notes that it asks for a sign-in); on phones the button runs the full width of the screen.
 - **Grab the shape:** with a mouse, drag anywhere in the empty space. On a phone, swipe sideways (up and down still scrolls). Project screens tilt in 3D and ease back.
 - **On phones**, the emblem and then the picture fill the top of the screen (the picture is a portrait mockup: phones and a laptop window), with the name, one line, the buttons and the page strip underneath.
-- **Opening:** every visit starts with a short opening (about two and a half seconds): the logo draws itself, the name settles, and the four kinds of work light up — Websites, Apps, Presentations, Games. A click, tap, scroll or key skips it.
-- **Kinds of work:** the projects are grouped and ordered by kind. The first screen shows four cards (Websites, Apps, Presentations, Games) with their projects inside; one tap jumps to any project. Every project carries its kind as a tag ("Websites 1/2"), the top bar lists the four kinds and lights up the one on screen, and the dots on the right are grouped the same way and show each section's name when pointed at.
+- **Opening:** every visit starts with a short opening (about two and a half seconds): the logo draws itself, the name settles, and the five kinds of work light up — Websites, Apps, Presentations, 3D Modeling, Games. A click, tap, scroll or key skips it.
+- **Kinds of work:** the projects are grouped and ordered by kind. The first screen shows five cards (Websites, Apps, Presentations, 3D Modeling, Games) with their projects inside; one tap jumps to any project. Every project carries its kind as a tag ("Websites 1/2"), the top bar lists the five kinds and lights up the one on screen, and the dots on the right are grouped the same way and show each section's name when pointed at.
 - **Pizza Spin plays in the browser:** "Play" opens `play/`, which runs the game with the keyboard for one person (W/S walk, A/D turn, Space to use, F shove, E item, Esc pause; the mouse or A/D for the dough). The second chef is the computer: it joins by itself and stays out of the way. The game file itself is unchanged: `play/keys.js` hands it a virtual controller. With two real controllers, "Two players?" in the game opens the original two-player version.
 - **Language:** visitors whose browser is set to Arabic get the Arabic version straight away; everyone else gets English, and the button in the top bar switches.
 
@@ -44,6 +46,8 @@ Each project's emblem holds for about one and a half seconds (and for as long as
 | **Doctor Dashboard** (Juster) *(app)* — students scan the doctor's QR code and appear live, only from inside the hall | [Live](https://fareselzouhiry.github.io/Uni-app/Doctor.html) (asks for the teacher key) · [Code](https://github.com/FaresElzouhiry/Uni-app) |
 | **University App** (Juster) *(app)* — the student app: live schedule, tasks, focus rooms; installable and offline | [Live](https://fareselzouhiry.github.io/Uni-app/) · [Code](https://github.com/FaresElzouhiry/Uni-app) |
 | **Sport Barbecue** *(presentation)* — a 27-slide sponsor deck for Riyadh 2027 set in a 3D night stadium (model 3), in Arabic and English | [Live](https://fareselzouhiry.github.io/web/models/3/) · [Code](https://github.com/FaresElzouhiry/web) |
+| **MHC Coalline** *(3D modeling)* — six 3D worlds for a charcoal maker, modeled in code and running live in the browser | [Live](https://fareselzouhiry.github.io/MHC-Coalline/) · [Code](https://github.com/FaresElzouhiry/MHC-Coalline) |
+| **BBQ Fest in 3D** *(3D modeling)* — the whole festival modeled in 3D (133 booths, stage, food trucks, palms, balloon), by day, sunset or night, and you can walk inside it | [Live](https://fareselzouhiry.github.io/bbq-fest/map-3d.html) |
 | **Pizza Spin** *(game)* — a first-person cooking duel; one player with the keyboard, or two players with controllers; one HTML file, no libraries | [Play](https://fareselzouhiry.github.io/Fares-Elzouhiry/play/) |
 
 The dashboard screenshots use **sample data**: they were taken locally with the attendance API answered by a small script, so nothing reached the real server, and the QR code in them points to this portfolio.

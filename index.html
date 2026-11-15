@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fares Elzouhiry — Websites from another dimension</title>
-<meta name="description" content="Fares Elzouhiry, front-end developer. Websites, apps, presentations and games in English and Arabic: Alliance Investment, a live attendance dashboard, a university app, the BBQ Fest site, the Sport Barbecue presentation and the Pizza Spin game.">
+<meta name="description" content="Fares Elzouhiry, front-end developer. Websites, apps, presentations, 3D modeling and games in English and Arabic: Alliance Investment, BBQ Fest, a live attendance dashboard, a university app, the Sport Barbecue presentation, the MHC Coalline 3D worlds and the Pizza Spin game.">
 <meta name="theme-color" content="#030306">
 <link rel="canonical" href="https://fareselzouhiry.github.io/Fares-Elzouhiry/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fares Elzouhiry">
 <meta property="og:title" content="Fares Elzouhiry — Websites from another dimension">
-<meta property="og:description" content="Websites, apps, presentations and games in English and Arabic: Alliance Investment, a live attendance dashboard, a university app, the BBQ Fest site, the Sport Barbecue presentation and the Pizza Spin game.">
+<meta property="og:description" content="Websites, apps, presentations, 3D modeling and games in English and Arabic: Alliance Investment, BBQ Fest, a live attendance dashboard, a university app, the Sport Barbecue presentation, the MHC Coalline 3D worlds and the Pizza Spin game.">
 <meta property="og:url" content="https://fareselzouhiry.github.io/Fares-Elzouhiry/">
 <meta property="og:image" content="https://fareselzouhiry.github.io/Fares-Elzouhiry/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@ main { position: relative; z-index: 10; }
 
 /* the first screen fits between the top bar and the bottom, whatever the window's height */
 .hero { align-items: center; padding: 76px 0 64px; box-sizing: border-box; }
-.hero-in { margin: 0 var(--pad); max-width: 640px; }
+.hero-in { margin: 0 var(--pad); max-width: 720px; }
 .hero h1 { margin-top: 14px; font-size: clamp(2.4rem, min(6.2vw, 8.6vh), 6rem); font-weight: 500; line-height: .98; letter-spacing: -.045em; }
 html[data-lang="ar"] .hero h1 { letter-spacing: 0; line-height: 1.2; }
 .hero h1 em { font-style: normal; background: linear-gradient(90deg, #8be9ff, #c4b5fd 50%, #f0abfc); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -126,7 +126,7 @@ html[dir="rtl"] .hint { right: auto; left: var(--pad); }
 .hint svg { width: 16px; height: 16px; flex: none; color: var(--acc); }
 /* the work by kind on the first screen: four cards, each with its projects, one tap to any of them */
 .cats { margin-top: clamp(20px, 3.4vh, 32px); }
-.cats ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-width: 600px; }
+.cats ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; max-width: 720px; }
 .kc { padding: 10px 12px 12px; border-radius: 12px; border: 1px solid var(--line); border-top: 2px solid var(--k); background: linear-gradient(rgb(255 255 255 / .045), rgb(255 255 255 / .015)); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .kc p { display: flex; align-items: center; gap: 7px; color: var(--k); font-size: .66rem; }
 .kc p svg, .kt svg, .kn svg, .o-cats svg { width: 15px; height: 15px; flex: none; }
@@ -299,6 +299,8 @@ html.locked { overflow: hidden; }
 .tr .kn.on svg, .tr .kn:hover svg { opacity: 1; }
 .tr .sep { width: 1px; height: 18px; background: var(--line); margin: 0 6px; }
 @media (max-width: 1100px) { .tr .kn span { display: none; } }
+/* small phones: the five kinds as icons, the language button, and Contact left to the last screen and the dots */
+@media (max-width: 440px) { .tr a, .tr button { padding: 9px 7px; } .tr .sep, .tr a[href="#contact"] { display: none; } }
 /* the dots are grouped by kind of work */
 .dots button.g { margin-top: 8px; }
 @media (max-width: 760px), (max-aspect-ratio: 1/1) { .dots button.g { margin: 0 0 0 6px; } html[dir="rtl"] .dots button.g { margin: 0 6px 0 0; } }
@@ -321,7 +323,7 @@ html[data-lang="ar"] .o-name { animation-name: o-name-ar; }
 @keyframes o-name-ar { from { opacity: 0; filter: blur(8px); transform: scale(1.08); } to { opacity: 1; filter: none; transform: none; } }
 .o-cats { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .o-cats li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--k) 40%, transparent); color: var(--k); background: color-mix(in srgb, var(--k) 8%, transparent); opacity: 0; transform: translateY(10px); animation: o-up .5s var(--ease) forwards; }
-.o-cats li:nth-child(1) { animation-delay: 1s; } .o-cats li:nth-child(2) { animation-delay: 1.18s; } .o-cats li:nth-child(3) { animation-delay: 1.36s; } .o-cats li:nth-child(4) { animation-delay: 1.54s; }
+.o-cats li:nth-child(1) { animation-delay: 1s; } .o-cats li:nth-child(2) { animation-delay: 1.18s; } .o-cats li:nth-child(3) { animation-delay: 1.36s; } .o-cats li:nth-child(4) { animation-delay: 1.54s; } .o-cats li:nth-child(5) { animation-delay: 1.72s; }
 @keyframes o-up { to { opacity: 1; transform: none; } }
 .o-bar { width: min(240px, 60vw); height: 1px; margin-top: 8px; background: var(--line); position: relative; overflow: hidden; }
 .o-bar::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #8be9ff, #c4b5fd, #f0abfc); transform: scaleX(0); transform-origin: left; animation: o-bar 2.3s .1s cubic-bezier(.4, 0, .2, 1) forwards; }
@@ -352,6 +354,7 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
       <li style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span></li>
       <li style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span></li>
       <li style="--k:#f9a8d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض تقديمية</span></li>
+      <li style="--k:#5eead4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D Modeling</span><span class="ar">نمذجة ثلاثية الأبعاد</span></li>
       <li style="--k:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></li>
     </ul>
     <i class="o-bar"></i>
@@ -370,7 +373,8 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     <a class="opt kn" href="#alliance" data-to="1" data-k="web" style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span></a>
     <a class="opt kn" href="#doctor" data-to="3" data-k="app" style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span></a>
     <a class="opt kn" href="#bbqpres" data-to="5" data-k="pres" style="--k:#f9a8d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض</span></a>
-    <a class="opt kn" href="#pizza" data-to="6" data-k="game" style="--k:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></a>
+    <a class="opt kn" href="#mhc" data-to="6" data-k="3d" style="--k:#5eead4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D Modeling</span><span class="ar">نمذجة 3D</span></a>
+    <a class="opt kn" href="#pizza" data-to="8" data-k="game" style="--k:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></a>
     <i class="sep opt" aria-hidden="true"></i>
     <a href="#contact"><span class="en">Contact</span><span class="ar">تواصل</span></a>
     <button class="lang" type="button" id="lang" aria-label="Switch language"><span class="en" lang="ar">عربي</span><span class="ar" lang="en">EN</span></button>
@@ -384,8 +388,10 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
   <button type="button" class="g" data-to="3" aria-label="Apps · Doctor Dashboard" style="--dot:#ff4d5a"><i></i></button>
   <button type="button" data-to="4" aria-label="Apps · University App" style="--dot:#ff6b7a"><i></i></button>
   <button type="button" class="g" data-to="5" aria-label="Presentations · Sport Barbecue" style="--dot:#ff8a2b"><i></i></button>
-  <button type="button" class="g" data-to="6" aria-label="Games · Pizza Spin" style="--dot:#ffc145"><i></i></button>
-  <button type="button" class="g" data-to="7" aria-label="Contact"><i></i></button>
+  <button type="button" class="g" data-to="6" aria-label="3D Modeling · MHC Coalline" style="--dot:#f2b84b"><i></i></button>
+  <button type="button" data-to="7" aria-label="3D Modeling · BBQ Fest in 3D" style="--dot:#5eead4"><i></i></button>
+  <button type="button" class="g" data-to="8" aria-label="Games · Pizza Spin" style="--dot:#ffc145"><i></i></button>
+  <button type="button" class="g" data-to="9" aria-label="Contact"><i></i></button>
 </nav>
 
 <main>
@@ -394,14 +400,15 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
       <p class="hint mono fade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2M18.5 2v4h-4M5.5 22v-4h4"/></svg><b><span class="en">4D tesseract</span><span class="ar">مكعّب رباعي الأبعاد</span></b><span class="fine"><span class="en">· drag to rotate</span><span class="ar">· اسحب لتديره</span></span><span class="coarse"><span class="en">· swipe sideways to spin</span><span class="ar">· اسحب يمينًا ويسارًا لتديره</span></span></p>
       <p class="kick mono fade"><span class="en">Fares Elzouhiry — Front-end developer</span><span class="ar">فارس الزهيري — مطوّر واجهات أمامية</span></p>
       <h1 class="fade"><span class="en">Websites from <em>another dimension.</em></span><span class="ar">مواقع من <em>بُعدٍ آخر.</em></span></h1>
-      <p class="sub fade"><span class="en">Websites, apps, presentations and games — in English and Arabic, designed and coded by hand.</span><span class="ar">مواقع وتطبيقات وعروض تقديمية وألعاب — بالعربية والإنجليزية، مصممة ومبرمجة يدويًا.</span></p>
+      <p class="sub fade"><span class="en">Websites, apps, presentations, 3D modeling and games — in English and Arabic, designed and coded by hand.</span><span class="ar">مواقع وتطبيقات وعروض تقديمية ونمذجة ثلاثية الأبعاد وألعاب — بالعربية والإنجليزية، مصممة ومبرمجة يدويًا.</span></p>
       <!-- the work, by kind: one tap to any project -->
       <nav class="cats fade" aria-label="Projects by category">
         <ul>
           <li class="kc" style="--k:#7dd3fc"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span></p><div><a href="#alliance" data-to="1" style="--c:#e9c46a"><span class="en">Alliance Investment</span><span class="ar">تحالف للاستثمار</span></a><a href="#bbqfest" data-to="2" style="--c:#ff5a36">BBQ Fest</a></div></li>
           <li class="kc" style="--k:#c4b5fd"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span></p><div><a href="#doctor" data-to="3" style="--c:#ff4d5a"><span class="en">Doctor Dashboard</span><span class="ar">لوحة الدكتور</span></a><a href="#uni" data-to="4" style="--c:#ff6b7a"><span class="en">University App</span><span class="ar">تطبيق الجامعة</span></a></div></li>
           <li class="kc" style="--k:#f9a8d4"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض تقديمية</span></p><div><a href="#bbqpres" data-to="5" style="--c:#ff8a2b">Sport Barbecue</a></div></li>
-          <li class="kc" style="--k:#fde047"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></p><div><a href="#pizza" data-to="6" style="--c:#ffc145">Pizza Spin</a></div></li>
+          <li class="kc" style="--k:#5eead4"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D Modeling</span><span class="ar">نمذجة ثلاثية الأبعاد</span></p><div><a href="#mhc" data-to="6" style="--c:#f2b84b">MHC Coalline</a><a href="#fest3d" data-to="7" style="--c:#5eead4"><span class="en">BBQ Fest in 3D</span><span class="ar">BBQ Fest مجسّمًا</span></a></div></li>
+          <li class="kc" style="--k:#fde047"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></p><div><a href="#pizza" data-to="8" style="--c:#ffc145">Pizza Spin</a></div></li>
         </ul>
       </nav>
     </div>
@@ -526,6 +533,53 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
         </ol>
       </div>
       <img class="shot" src="img/stage/bbqpres.jpg" width="1600" height="1000" alt="The cover of the Sport Barbecue presentation in a 3D night stadium" loading="lazy" data-gal="bbqpres">
+    </div>
+  </section>
+
+  <section class="sec proj" id="mhc" style="--acc:#f2b84b">
+    <div class="txt">
+      <p class="idx mono fade"><span class="kt" style="--k:#5eead4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D Modeling</span><span class="ar">نمذجة ثلاثية الأبعاد</span><b>1/2</b></span> <span class="en">Coal maker · Egypt</span><span class="ar">مصنع فحم · مصر</span></p>
+      <h2 class="fade"><span class="en scr">MHC Coalline</span><span class="ar">MHC Coalline</span></h2>
+      <p class="desc fade"><span class="en">Six 3D worlds for a charcoal maker, all modeled in code and running live in the browser: glowing coal, a factory line, a bag the client designs, a mountain from the logo.</span><span class="ar">ستة عوالم ثلاثية الأبعاد لمصنع فحم، كلها منمذجة بالكود وتعمل مباشرة في المتصفح: فحم متوهج، وخط مصنع، وكيس يصممه العميل، وجبل من الشعار.</span></p>
+      <ul class="tags mono fade"><li><span class="en">6 3D scenes</span><span class="ar">6 مشاهد ثلاثية الأبعاد</span></li><li>three.js</li><li><span class="en">Real-time</span><span class="ar">لحظي</span></li></ul>
+      <div class="acts fade">
+        <a class="pri" href="https://fareselzouhiry.github.io/MHC-Coalline/" target="_blank" rel="noopener"><span class="en">See it live</span><span class="ar">شاهده مباشرة</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/MHC-Coalline/" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/MHC-Coalline</span></a>
+        <button type="button" data-gal="mhc"><span class="en">All six</span><span class="ar">الستة كلها</span></button>
+        <a href="https://github.com/FaresElzouhiry/MHC-Coalline" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div class="strip fade">
+        <p class="mono"><b><span class="en">3D scenes</span><span class="ar">المشاهد</span></b></p>
+        <ol>
+          <li><button type="button" data-gal="mhc" data-gi="0" aria-label="The ember"><img src="img/xs/mhc-1.jpg" width="400" height="250" alt="" loading="lazy"><span>EMBER</span></button></li>
+          <li><button type="button" data-gal="mhc" data-gi="1" aria-label="The coal line"><img src="img/xs/mhc-2.jpg" width="400" height="250" alt="" loading="lazy"><span>FACTORY</span></button></li>
+          <li><button type="button" data-gal="mhc" data-gi="3" aria-label="The bag studio"><img src="img/xs/mhc-4.jpg" width="400" height="250" alt="" loading="lazy"><span>BAG</span></button></li>
+          <li><button type="button" data-gal="mhc" data-gi="4" aria-label="The mountain"><img src="img/xs/mhc-5.jpg" width="400" height="250" alt="" loading="lazy"><span>MOUNTAIN</span></button></li>
+        </ol>
+      </div>
+      <img class="shot" src="img/stage/mhc.jpg" width="1600" height="1000" alt="Six 3D scenes for MHC Coalline: coal, a factory tunnel, a globe, a coal bag, a mountain and the logo" loading="lazy" data-gal="mhc">
+    </div>
+  </section>
+
+  <section class="sec proj" id="fest3d" style="--acc:#5eead4">
+    <div class="txt">
+      <p class="idx mono fade"><span class="kt" style="--k:#5eead4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D Modeling</span><span class="ar">نمذجة ثلاثية الأبعاد</span><b>2/2</b></span> <span class="en">Event site · Riyadh</span><span class="ar">موقع فعالية · الرياض</span></p>
+      <h2 class="fade"><span class="en scr">BBQ Fest in 3D</span><span class="ar">BBQ Fest مجسّمًا</span></h2>
+      <p class="desc fade"><span class="en">The whole festival modeled in 3D: 133 booths, the stage, food trucks, palms and a balloon. From empty land to the full festival, by day, sunset or night — and you can walk inside it.</span><span class="ar">المهرجان كله منمذج بثلاثة أبعاد: 133 جناحًا والمسرح وعربات الطعام والنخيل والمنطاد. من الأرض الفاضية إلى المهرجان كاملًا، نهارًا أو غروبًا أو ليلًا — ويمكنك التجول بداخله.</span></p>
+      <ul class="tags mono fade"><li><span class="en">133 booths</span><span class="ar">133 جناحًا</span></li><li><span class="en">Walk inside</span><span class="ar">تجوّل بداخله</span></li><li><span class="en">Day · sunset · night</span><span class="ar">نهار · غروب · ليل</span></li></ul>
+      <div class="acts fade">
+        <a class="pri" href="https://fareselzouhiry.github.io/bbq-fest/map-3d.html" target="_blank" rel="noopener"><span class="en">Explore in 3D</span><span class="ar">استكشفه ثلاثي الأبعاد</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/bbq-fest/map-3d.html" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/bbq-fest/map-3d</span></a>
+        <button type="button" data-gal="fest3d"><span class="en">All views</span><span class="ar">كل المشاهد</span></button>
+      </div>
+      <div class="strip fade">
+        <p class="mono"><b><span class="en">From land to festival</span><span class="ar">من الأرض إلى المهرجان</span></b></p>
+        <ol>
+          <li><button type="button" data-gal="fest3d" data-gi="2" aria-label="Empty land"><img src="img/xs/f3d-land.jpg" width="400" height="250" alt="" loading="lazy"><span>LAND</span></button></li>
+          <li><button type="button" data-gal="fest3d" data-gi="3" aria-label="The plan on the ground"><img src="img/xs/f3d-plan.jpg" width="400" height="250" alt="" loading="lazy"><span>PLAN</span></button></li>
+          <li><button type="button" data-gal="fest3d" data-gi="0" aria-label="The festival"><img src="img/xs/f3d-sunset.jpg" width="400" height="250" alt="" loading="lazy"><span>FESTIVAL</span></button></li>
+          <li><button type="button" data-gal="fest3d" data-gi="6" aria-label="Walking inside"><img src="img/xs/f3d-walk.jpg" width="400" height="250" alt="" loading="lazy"><span>WALK</span></button></li>
+        </ol>
+      </div>
+      <img class="shot" src="img/stage/fest3d.jpg" width="1600" height="1000" alt="The BBQ Fest festival modeled in 3D, seen from above" loading="lazy" data-gal="fest3d">
     </div>
   </section>
 
@@ -679,6 +733,24 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
       { s: 'pres-zones', c: T('The event zones.', 'مناطق الفعالية.') },
       { s: 'pres-program', c: T('The program, by category.', 'البرنامج، حسب الفئة.') }
     ]},
+    mhc: { t: T('MHC Coalline — six 3D worlds', 'MHC Coalline — ستة عوالم ثلاثية الأبعاد'), link: ['https://fareselzouhiry.github.io/MHC-Coalline/', T('See it live', 'شاهده مباشرة')], items: [
+      { s: 'mhc-1', t: T('01 · The ember', '01 · الجمرة'), c: T('A piece of coal heats up, cracks and breaks into the products.', 'قطعة فحم تسخن وتتشقق ثم تتفتت إلى المنتجات.') },
+      { s: 'mhc-2', t: T('02 · The coal line', '02 · خط الفحم'), c: T('A whole factory you travel through as you scroll.', 'مصنع كامل تمشي بداخله مع التمرير.') },
+      { s: 'mhc-3', t: T('03 · The route', '03 · المسار'), c: T('A globe you turn by hand, with ships leaving Alexandria.', 'كرة أرضية تديرها بيدك، والسفن تخرج من الإسكندرية.') },
+      { s: 'mhc-4', t: T('04 · The showroom', '04 · المعرض'), c: T('A studio where the client designs their own bag in 3D.', 'استوديو يصمم فيه العميل كيسه بثلاثة أبعاد.') },
+      { s: 'mhc-5', t: T('05 · The mountain', '05 · الجبل'), c: T('The mountain, shovel and pickaxe from the logo become a world.', 'الجبل والجاروف والفأس من الشعار يصبحون عالمًا.') },
+      { s: 'mhc-6', t: T('06 · The shards', '06 · الشظايا'), c: T('Tens of thousands of black and gold shards form the logo, coal, a bag, a container and a globe.', 'عشرات الآلاف من الشظايا السوداء والذهبية تكوّن الشعار والفحم والكيس والحاوية والكرة الأرضية.') }
+    ]},
+    fest3d: { t: T('BBQ Fest in 3D', 'BBQ Fest مجسّمًا'), link: ['https://fareselzouhiry.github.io/bbq-fest/map-3d.html', T('Explore in 3D', 'استكشفه ثلاثي الأبعاد')], items: [
+      { s: 'f3d-sunset', c: T('The whole festival at sunset: booths, stage, food trucks, palms and the balloon.', 'المهرجان كله وقت الغروب: الأجنحة والمسرح وعربات الطعام والنخيل والمنطاد.') },
+      { s: 'f3d-m', p: 1, c: T('On a phone.', 'على الجوال.') },
+      { s: 'f3d-land', c: T('Step 1: the empty land, measured.', 'الخطوة 1: الأرض الفاضية بمقاساتها.') },
+      { s: 'f3d-plan', c: T('Step 2: the plan drawn on the ground, booth by booth.', 'الخطوة 2: المخطط مرسوم على الأرض، جناحًا جناحًا.') },
+      { s: 'f3d-day', c: T('Step 3: the festival built, by day.', 'الخطوة 3: المهرجان مبنيًا، نهارًا.') },
+      { s: 'f3d-night', c: T('At night.', 'ليلًا.') },
+      { s: 'f3d-walk', c: T('Walk inside it like a game, with a mini-map to jump around.', 'تجوّل بداخله مثل الألعاب، مع خريطة مصغّرة للتنقل.') },
+      { s: 'f3d-m-walk', p: 1, c: T('Walking on a phone, with an on-screen stick.', 'التجول على الجوال بعصا تحكم على الشاشة.') }
+    ]},
     pizza: { t: T('Pizza Spin'), link: ['play/index.html', T('Play now', 'العب الآن')], items: [
       { s: 'pizza-title', c: T('The start screen, in English or Arabic.', 'شاشة البداية، بالإنجليزية أو العربية.') },
       { s: 'pizza-chars', c: T('Each player picks a chef.', 'كل لاعب يختار طاهيه.') },
@@ -687,7 +759,7 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
       { s: 'pizza-play2', c: T('Every round has a twist, and the last one counts double.', 'لكل جولة مفاجأة، والجولة الأخيرة بنقاط مضاعفة.') }
     ]}
   };
-  var PROJ = ['alliance', 'bbqfest', 'doctor', 'uni', 'bbqpres', 'pizza'];
+  var PROJ = ['alliance', 'bbqfest', 'doctor', 'uni', 'bbqpres', 'mhc', 'fest3d', 'pizza'];
 
   var gal = document.getElementById('gal'), gImg = document.getElementById('g-img'), gCap = document.getElementById('g-cap'), gT = document.getElementById('g-t'), gN = document.getElementById('g-n');
   var gLink = document.getElementById('g-link'), gLt = document.getElementById('g-lt'), gThumbs = document.getElementById('g-thumbs');
@@ -775,7 +847,7 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
   /* sections: which one is on screen */
   var secs = [].slice.call(document.querySelectorAll('.sec')), dots = [].slice.call(document.querySelectorAll('#dots button')), active = -1;
   // the kind of work each section belongs to; the top bar lights up the one on screen
-  var KIND = [null, 'web', 'web', 'app', 'app', 'pres', 'game', null], kinds = [].slice.call(document.querySelectorAll('.kn'));
+  var KIND = [null, 'web', 'web', 'app', 'app', 'pres', '3d', '3d', 'game', null], kinds = [].slice.call(document.querySelectorAll('.kn'));
   function nearest() { var y = scrollY + innerHeight * .5, best = 0; secs.forEach(function (el, i) { if (y >= el.offsetTop) best = i; }); return best; }
   function markSections() {
     var k = nearest();
@@ -1103,6 +1175,66 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     for (; k < M; k++) { var sa = R() * 6.283, sr = Math.sqrt(R()) * .9; put(t, k, Math.cos(sa) * sr, .1, Math.sin(sa) * sr, 5 + R() * .99, 235, 230, 225, 120); }
     return seal(t);
   }
+  // MHC Coalline: chunks of coal, faceted and lit from one side, with glowing cracks and gold sparks drifting up
+  function shCoal() {
+    // each chunk is a solid cut by a dozen random planes: flat faces, sharp edges; the edges glow like embers
+    var t = blank(), k = 0, nS = M * .04 | 0, rocks = [], L = nrm([-.4, .8, .45]);
+    var spots = [[0, 0, 0, .62], [-1.05, .45, -.2, .32], [1.08, -.35, -.1, .36], [-.82, -.62, .3, .26], [.86, .64, .2, .28]];
+    spots.forEach(function (sp) {
+      var planes = [];
+      for (var i = 0; i < 12; i++) { var th = R() * 6.283, z = 2 * R() - 1, s = Math.sqrt(1 - z * z); planes.push({ n: [s * Math.cos(th), z, s * Math.sin(th)], h: sp[3] * (.75 + R() * .35) }); }
+      rocks.push({ c: [sp[0], sp[1], sp[2]], s: sp[3], p: planes });
+    });
+    var per = (M - nS) / rocks.length | 0;
+    rocks.forEach(function (o) {
+      for (var q = 0; q < per; q++, k++) {
+        var th = R() * 6.283, z = 2 * R() - 1, s = Math.sqrt(1 - z * z), d = [s * Math.cos(th), z, s * Math.sin(th)];
+        var best = 1e9, second = 1e9, face = null;
+        o.p.forEach(function (pl) { var dn = d[0] * pl.n[0] + d[1] * pl.n[1] + d[2] * pl.n[2]; if (dn > .05) { var r = pl.h / dn; if (r < best) { second = best; best = r; face = pl; } else if (r < second) second = r; } });
+        if (!face) { best = o.s; face = { n: d }; }
+        best = Math.min(best, o.s * 1.6);
+        var x = o.c[0] + d[0] * best, y = o.c[1] + d[1] * best, zz = o.c[2] + d[2] * best;
+        var edge = (second - best) / best < .035, lit = Math.max(0, face.n[0] * L[0] + face.n[1] * L[1] + face.n[2] * L[2]);
+        if (edge) put(t, k, x, y, zz, 0, 255, 120 + R() * 70, 30, 255);
+        else { var g = 28 + 120 * Math.pow(lit, 1.6), f = .85 + .3 * R(); put(t, k, x, y, zz, 0, g * f, g * f * .97, g * f * 1.04, 210); }
+      }
+    });
+    for (; k < M; k++) { var e = rocks[(R() * rocks.length) | 0]; put(t, k, e.c[0] + (R() - .5) * e.s, e.c[1] + e.s * .5, e.c[2] + (R() - .5) * e.s, 5 + R() * .99, 255, 150 + R() * 60, 40, 255); }
+    return seal(t);
+  }
+  // BBQ Fest in 3D: a little model of the festival on a sand plate — rows of booths with coloured roofs, the stage, palms and a balloon
+  function shDiorama() {
+    var t = blank(), k = 0, G = -.45, nGround = M * .16 | 0, nBooth = M * .42 | 0, nStage = M * .12 | 0, nPalm = M * .14 | 0;
+    var cols = [[230, 60, 50], [60, 190, 200], [240, 190, 60], [230, 230, 235]];
+    for (; k < nGround; k++) { var gx = (R() - .5) * 2.8, gz = (R() - .5) * 2.0, road = Math.abs(gz - .55) < .07 || Math.abs(gx + .95) < .06, f = .7 + .3 * R(); if (road) put(t, k, gx, G, gz, 0, 60, 60, 66, 230); else put(t, k, gx, G, gz, 0, 205 * f, 160 * f, 110 * f, 140); }
+    var booths = [];
+    for (var i = 0; i < 6; i++) for (var j = 0; j < 4; j++) booths.push([-.8 + i * .26, -.75 + j * .3, cols[(i + j * 2) % 4]]);
+    for (var q = 0; q < nBooth; q++, k++) {
+      var b = booths[q % booths.length], w = .17, h = .16, u = R(), v = R(), face = R(), x, y, z, c, a = 235;
+      if (face < .45) { x = b[0] + (u - .5) * w; z = b[1] + (v - .5) * w; y = G + h + (.5 - Math.abs(u - .5)) * .07; c = b[2]; }       // roof, slightly peaked
+      else { var side = (R() * 4) | 0, e = (u - .5) * w; x = b[0] + (side === 0 ? e : side === 1 ? w / 2 : side === 2 ? e : -w / 2); z = b[1] + (side === 0 ? w / 2 : side === 1 ? e : side === 2 ? -w / 2 : e); y = G + v * h; c = [245, 238, 225]; a = 170; if (v > .82) c = [b[2][0], b[2][1], b[2][2]]; }
+      put(t, k, x, y, z, 0, c[0], c[1], c[2], a);
+    }
+    for (q = 0; q < nStage; q++, k++) { // the stage: a platform and a screen between two towers
+      var p = R(), sx, sy, sz, sc;
+      if (p < .35) { sx = .95 + (R() - .5) * .7; sz = -.55 + (R() - .5) * .3; sy = G + .06; sc = [120, 60, 150]; }
+      else if (p < .8) { sx = .95 + (R() - .5) * .6; sy = G + .1 + R() * .4; sz = -.7; sc = [255, 80, 160]; }
+      else { sx = .95 + (R() < .5 ? -.36 : .36); sy = G + R() * .62; sz = -.7 + (R() - .5) * .04; sc = [220, 220, 230]; }
+      put(t, k, sx, sy, sz, 0, sc[0], sc[1], sc[2], 230);
+    }
+    var palms = [[-1.2, .8], [-.2, .85], [.55, .2], [1.25, .75], [1.2, -.1], [-1.25, -.6]];
+    for (q = 0; q < nPalm; q++, k++) {
+      var pm = palms[q % palms.length], top = G + .55;
+      if (R() < .35) { var tv = R(); put(t, k, pm[0] + Math.sin(tv * 2) * .03, G + tv * .55, pm[1], 0, 140, 95, 55, 255); }
+      else { var fa = ((R() * 7) | 0) / 7 * 6.283 + R() * .1, fl = R() * .3; put(t, k, pm[0] + Math.cos(fa) * fl, top - fl * fl * 1.2, pm[1] + Math.sin(fa) * fl, 0, 50, 170, 70, 255); }
+    }
+    for (; k < M; k++) { // the balloon, red and white stripes, over the corner
+      var bt = R() * 6.283, bz = 2 * R() - 1, bs = Math.sqrt(1 - bz * bz), stripe = Math.floor((bt / 6.283) * 12) % 2;
+      var by = bz > -.85 ? .9 + bz * .26 : .9 - .26 + (bz + .85) * .4;
+      put(t, k, -.95 + bs * Math.cos(bt) * .22, by, -.65 + bs * Math.sin(bt) * .22, 0, stripe ? 240 : 235, stripe ? 60 : 232, stripe ? 55 : 228, 230);
+    }
+    return seal(t);
+  }
   // the end: a ringed planet
   function shPlanet() {
     var t = blank(), nS = M * .46 | 0, k = 0;
@@ -1162,6 +1294,8 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     { n: 'qr', size: .012, vari: .8, hard: 0, nom: [3.5, 3.5] },
     { n: 'ring', size: .0125, vari: 1, hard: 0, nom: [2.9, 2.9] },
     { n: 'deck', size: .012, vari: .8, hard: 0, nom: [3.6, 2.3] },
+    { n: 'coal', size: .012, vari: 1, hard: 0, nom: [3.0, 2.4] },
+    { n: 'diorama', size: .0115, vari: .8, hard: 0, nom: [3.2, 2.6] },
     { n: 'pie', size: .013, vari: .9, hard: 0, nom: [2.9, 2.2] },
     { n: 'planet', size: .012, vari: 1, hard: 0, nom: [5.3, 3.0] },
     { n: 'alliance', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [233, 196, 106] },
@@ -1169,11 +1303,13 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     { n: 'doctor', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 77, 90] },
     { n: 'uni', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 107, 122] },
     { n: 'bbqpres', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 138, 43] },
+    { n: 'mhc', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [242, 184, 75] },
+    { n: 'fest3d', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [94, 234, 212] },
     { n: 'pizza', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 193, 69] }
   ];
   function stIdx(n) { for (var i = 0; i < ST.length; i++) if (ST[i].n === n) return i; return -1; }
   var SCATTER = upload(shScatter()), SCAT = { size: .012, vari: 1, hard: 0 };
-  [shTess, shGlobe, shGrill, shQR, shRing, shDeck, shPizza, shPlanet].forEach(function (fn, i) { ST[i].t = upload(fn()); });
+  [shTess, shGlobe, shGrill, shQR, shRing, shDeck, shCoal, shDiorama, shPizza, shPlanet].forEach(function (fn, i) { ST[i].t = upload(fn()); });
 
   /* ---- maths ---- */
   function persp(fov, asp, n, f) { var t = 1 / Math.tan(fov / 2), nf = 1 / (n - f); return new Float32Array([t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) * nf, -1, 0, 0, 2 * f * n * nf, 0]); }
@@ -1254,6 +1390,8 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
       case 'ring': rx = -.42 + pt; ry = yw; break;
       case 'grill': ry = t * .25 * sp + yw; rx = .32 + pt; break;
       case 'deck': ry = Math.sin(t * .4 * sp) * .3 - .22 + yw; rx = -.06 + pt * .6; break;
+      case 'coal': ry = t * .18 * sp + yw; rx = .25 + pt; rz = Math.sin(t * .3 * sp) * .05; break;
+      case 'diorama': ry = t * .16 * sp + yw - .5; rx = .62 + pt * .5; break;
       case 'pie': ry = t * .9 * sp + yw; rx = .78 + pt * .5; break; // it spins
       case 'planet': ry = t * .1 * sp + yw; rx = .4 + pt * .5; rz = -.26; break;
       default: ry = spin.tilt + mx * .1; rx = spin.tiltX + my * .06; // project screens tilt toward the hand
