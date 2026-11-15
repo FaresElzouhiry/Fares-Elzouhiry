@@ -1,0 +1,2791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pizza Spin</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #2b1d14; overflow: hidden; cursor: none; }
+  canvas { display: block; position: absolute; inset: 0; margin: auto; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<script>
+"use strict";
+
+/* =====================================================================
+   Pizza Spin — مبارزة مطبخ: لاعبين في نفس المطبخ، منظور أول (First-Person)،
+   كل التحكم بالدراعات (Gamepad API). إنجليزي + عربي.
+   ملف واحد، بدون مكتبات، بدون أونلاين، بدون حفظ.
+   ===================================================================== */
+
+// ============================ 1) الثوابت ============================
+const W = 1280, H = 720;            // المقاس المنطقي للشاشة
+const HALF = 640;                   // عرض نص كل لاعب
+const HUD_H = 96;                   // ارتفاع شريط المعلومات فوق
+const VW = HALF, VH = H - HUD_H;    // مقاس منظر اللاعب
+const ROUNDS = 5;
+const ROUND_TIME = 120;             // دقيقتين للراوند
+const SECTORS = 72;                 // قطاعات العجينة
+const DOUGH_DEADZONE = 0.1;
+const MOVE_DEADZONE = 0.2;
+const LOOK_DEADZONE = 0.15;
+const IDEAL_R = 0.7;                // نصف قطر الحلقة المثالية (Ghost) — لازم تمسك العصاية عند 70%
+
+// ---- ثوابت مهارات الطبخ ----
+const KNEAD_FOLDS = 5;              // عدد طيّات العجن
+const KNEAD_MAX = 1.6;              // أقصى سرعة لف مسموحة (لفة/ثانية) قبل ما العجينة تتقطع
+const TOSSES = 3;                   // عدد رميات العجينة
+const TOSS_AIR = 1.1;               // وقت العجينة في الهوا
+const N_MARKS = 5;                  // علامات كل مكوّن على البيتزا
+const DROP_TOL = 0.30;              // سماحية التنزيل (راديان)
+const BAKE_TIME = 7;                // مدة الخبز بالثواني
+const CRAFT_BONUS = 5;              // بونص أحسن عجينة / مكونات / خبز
+
+// ---- ثوابت المنافسة ----
+const FLOUR_TIME = 1.5;             // مدة العمى بالدقيق
+const BOOST_TIME = 5, BOOST_MULT = 1.6;   // الشطة: سرعة زيادة
+const SLIP_TIME = 1.1;              // مدة التزحلق على الزيت
+const SHOVE_RANGE = 1.4, SHOVE_ARC = 0.95;
+const SHOVE_CD = 5, SHOVE_MISS_CD = 1.2;  // وقت الانتظار بعد الزقّة
+const STUN_TIME = 0.8, IMMUNE_TIME = 3;   // دوخة المزقوق + حماية بعدها
+const FIRST_BONUS = 10;             // بونص أول واحد يسلّم
+const DROP_PENALTY = 0.85;          // كل وقعة للبيتزا بتخصم 15% من جودتها
+const CRATE_EVERY = 12;            // كل كام ثانية تنزل صناديق أدوات
+
+// أزرار الدراع (Standard Mapping)
+const BTN = { A: 0, B: 1, X: 2, RB: 5, START: 9, UP: 12, DOWN: 13, LEFT: 14, RIGHT: 15 };
+
+const FONT = "Montserrat, Cairo, 'Segoe UI', Tahoma, Arial, sans-serif";
+const ACCENTS = ['#e4572e', '#2a9d8f'];
+const CHARS = ['boy', 'girl'];
+const ITEM_TYPES = ['flour', 'chili', 'oil'];
+const MODS = ['classic', 'rush', 'slippery', 'blackout', 'double'];   // مفاجأة كل راوند
+
+// طلبات الزبون (أرقام المكونات: 0 صوص، 1 جبنة، 2 سجق، 3 فلفل)
+const ORDERS = [
+  { idx: 0, items: [0, 1] },
+  { idx: 1, items: [0, 1, 2] },
+  { idx: 2, items: [0, 1, 3] },
+  { idx: 3, items: [0, 2, 3] }
+];
+
+// ---- ثوابت المنظور الأول ----
+const PLANE = 0.7;
+const FOCAL = (VW / 2) / PLANE;
+const WALL_H = 2.2;
+const EYE = 1.3;
+const HORIZON = VH / 2;
+const COLW = 2, NCOL = VW / COLW;
+const MOVE_SPEED = 2.9;
+const TURN_SPEED = 2.9;
+const BODY_R = 0.22;
+const REACH = 1.35;
+const TS = 128;
+
+// خريطة المطبخ المشترك (متماثلة عشان العدل):
+// # حيطة، W شباك، M منيو، d باب، O فرن، S رفوف، K كاونتر، D طاولة العجين، T طاولة المكونات، . أرض
+const MAP = [
+  '##W##M##W##',
+  '#.........#',
+  '#KKKKKKKKK#',
+  '#.........#',
+  'S.........S',
+  '#....D....#',
+  'O.........O',
+  '#.........#',
+  '#...TTT...#',
+  'S.........S',
+  '#.........#',
+  '##d#####d##'
+];
+const LOW = { K: 0.86, D: 0.80, T: 0.80 };
+const LOW_TOP = { K: '#eadbbd', D: '#f5eddd', T: '#dcbd90' };
+const SPAWNS = [{ x: 2.5, y: 10.3 }, { x: 8.5, y: 10.3 }];     // كل لاعب عند بابه
+const CUSTOMER = { x: 5.5, y: 1.4 };
+
+// المحطات: علامات (marks) + خطوط التفاعل (segs)
+const STATIONS = {
+  customer: { marks: [{ x: 5.5, y: 1.4, z: 1.72 }], segs: [[4.3, 2.5, 6.7, 2.5]] },
+  dough:    { marks: [{ x: 5.5, y: 5.5, z: 1.30, top: true }], segs: [[5.5, 5.5, 5.5, 5.5]] },
+  toppings: { marks: [{ x: 5.5, y: 8.5, z: 1.30, top: true }], segs: [[4.5, 8.5, 6.5, 8.5]] },
+  oven:     { marks: [{ x: 1.16, y: 6.5, z: 1.45 }, { x: 9.84, y: 6.5, z: 1.45 }],
+              segs: [[0.5, 6.5, 0.5, 6.5], [10.5, 6.5, 10.5, 6.5]] }
+};
+const PHASE_STATION = { order: 'customer', dough: 'dough', toppings: 'toppings', bake: 'oven', serve: 'customer' };
+// أماكن نزول صناديق الأدوات (أزواج متماثلة) وبقع الزيت في راوند الأرض الزلقة
+const CRATE_PAIRS = [[[2.2, 3.8], [8.8, 3.8]], [[2.5, 7.5], [8.5, 7.5]], [[3.5, 10], [7.5, 10]]];
+const SPILLS = [[3.5, 4.5], [7.5, 4.5], [5.5, 7], [2.5, 8.6], [8.5, 8.6], [4, 6.5], [7, 6.5], [5.5, 3.9]];
+
+// ============================ 2) النصوص (English + عربي) ============================
+const STR = {
+  en: {
+    player: n => 'Player ' + n,
+    chars: ['Boy', 'Girl'],
+    ingredients: ['Sauce', 'Cheese', 'Sausage', 'Pepper'],
+    orders: ['Margherita', 'Sausage Pizza', 'Veggie Pizza', 'The Hot One'],
+    sub: 'One kitchen · two chefs · no mercy',
+    start: 'Press A on any controller to start',
+    langHint: 'D-Pad  ◀ ▶  to change language',
+    pads: n => 'Controllers detected: ' + n,
+    noPads: 'No controller detected — plug one in and press any button on it',
+    noApi: 'Controllers are blocked here — open the file directly in Chrome or Edge',
+    bindTitle: 'Connect the controllers',
+    bindPress: 'Press A on your controller',
+    bindWait: 'Wait for your turn…',
+    bound: n => '✓ Connected — controller ' + n,
+    bindSame: 'That controller belongs to Player 1 — use the other one',
+    bindGo: 'Continue — press A',
+    back: 'B  Back',
+    charTitle: 'Choose your character',
+    taken: 'Taken',
+    ready: c => '✓ Ready — ' + c,
+    charPick: 'D-Pad to choose · A to confirm',
+    charAuto: 'Already taken — switched automatically',
+    rulesTitle: 'How to win',
+    cookTitle: 'COOK',
+    cook: [
+      'Walk up to the customer to hear the order. Left stick moves, right stick turns.',
+      'Dough table, three techniques: knead at a steady pace the way the arrows go, trace the ring to shape it, then toss it, spin it and catch it.',
+      'Toppings table: pick the right ingredient, then press A to drop each piece on a mark while the pizza spins.',
+      'Oven: hold A to heat up, let go to cool down. Keep the needle inside the moving green band.',
+      'Serve the customer with A before the 2 minutes run out.'
+    ],
+    fightTitle: 'FIGHT',
+    fight: [
+      'Shove your rival: it stuns them, kicks them off a station and makes them drop a baked pizza.',
+      'A pizza on the floor belongs to whoever grabs it. Yes, you can serve a stolen pizza.',
+      'Use your item. Crates give flour (blinds the rival), chili (speed) or oil (a slippery trap).',
+      'First to serve gets +10. The better dough, toppings and bake earn +5 each. Every round has a twist, and round 5 counts double.'
+    ],
+    rulesScore: 'Each pizza: toppings 30 · dough 30 · bake 20 · speed 20     ·     Start = pause',
+    rulesGo: 'Let\'s go — A',
+    score: n => 'Score: ' + n,
+    rivalScore: n => 'Rival: ' + n,
+    sec: n => n + 's',
+    order: (n, it) => 'Order: ' + n + ' — ' + it,
+    orderUnknown: 'Order: ?? (ask the customer)',
+    hint: {
+      order: 'Go to the customer and take the order',
+      dough: 'Go to the dough table and press A', doughMini: 'Roll the right stick in a full, smooth circle',
+      toppings: 'Go to the toppings table and press A', toppingsMini: 'Pick exactly what was ordered',
+      bake: 'Go to an oven and press A', bakeMini: 'Press A while the marker is in the green',
+      serve: 'Bring the pizza to the customer and press A',
+      grab: 'There is a pizza on the floor — grab it!',
+      done: 'Served! Now make your rival\'s life hard'
+    },
+    station: { customer: 'Customer', dough: 'Dough table', toppings: 'Toppings', oven: 'Oven', pizza: 'Pizza!' },
+    act: { dough: 'Knead the dough', toppings: 'Pick toppings', bake: 'Bake', serve: 'Serve the pizza' },
+    items: { flour: 'Flour', chili: 'Chili', oil: 'Oil' },
+    noItem: 'Empty', shove: 'Shove', you: 'You', rival: 'Rival',
+    flourBig: 'FLOUR!',
+    toast: {
+      shoved: 'You got shoved!', shoveHit: 'Shoved!', dropped: 'You dropped the pizza — grab it!',
+      stole: 'Pizza stolen — go serve it!', stolen: 'Your pizza was stolen!', back: 'Got the pizza back',
+      floured: 'Flour in your eyes!', flourHit: 'Flour bomb away!', slip: 'You slipped!',
+      got: n => 'Picked up: ' + n, chili: 'Chili rush!', oil: 'Oil trap set',
+      rOrder: 'Rival took the order', rDough: 'Rival finished the dough', rTop: 'Rival has the toppings on',
+      rBake: 'Rival\'s pizza is baked!', rServed: 'Rival served first!', rServed2: 'Rival served too',
+      first: n => 'First to serve! +' + n
+    },
+    rivalClose: 'Your rival is right next to you!',
+    want: (n, it) => n + ', please! ' + it,
+    delivered: 'Delivered!',
+    roundScore: n => 'Round score: ' + n,
+    timeUp: 'Time\'s up!', roundOver: 'Round over!',
+    roundBadge: (r, n) => 'Round ' + r + ' of ' + n,
+    roundN: n => 'ROUND ' + n,
+    go: 'COOK!',
+    mods: {
+      classic: ['Classic duel', 'Same order for both chefs. Cook fast, fight dirty.'],
+      rush: ['Rush hour', 'First to serve earns +20 instead of +10.'],
+      slippery: ['Slippery floor', 'Somebody spilled oil all over the kitchen.'],
+      blackout: ['Power cut', 'The lights are out. Cook by torchlight.'],
+      double: ['Grand finale', 'Every point in this round counts double.'],
+      sudden: ['Sudden death', 'The scores are level. The first pizza served ends it.']
+    },
+    doughTitle: 'The dough — three techniques',
+    doughSteps: ['Knead', 'Shape', 'Toss'],
+    quality: n => 'Quality: ' + n + '%',
+    rivalQ: n => 'Rival: ' + n + '%',
+    rivalNone: 'Rival: nothing yet',
+    kneadTip: 'Roll the right stick the way the arrows go — steady, not fast · B back',
+    kneadFast: 'Too fast — you are tearing the dough!',
+    kneadWrong: 'Wrong way!',
+    coverage: n => 'Coverage: ' + n + '%',
+    shapeQ: n => 'Shape: ' + n + '%',
+    doughReady: 'Press A — time to toss it!',
+    shapeTip: 'Trace the dashed ring all the way round · B back',
+    tossN: (a, b) => 'Toss ' + a + ' of ' + b,
+    tossTip: 'Flick the right stick UP to toss the dough',
+    tossAir: 'Spin the stick! Press A when the ring closes',
+    catchLabels: ['Perfect catch!', 'Good catch', 'Sloppy catch', 'Dropped it!'],
+    spinLabel: n => 'Spin ×' + n,
+    topTitle: 'The toppings',
+    topPick: 'Pick the next ingredient: D-Pad, then A · B back',
+    topDrop: 'Press A to drop a piece on each mark as it passes',
+    topWrong: 'Wrong ingredient! −10%', topMiss: 'Missed the mark!', topOk: 'Toppings done!',
+    topStats: (w, m) => 'Wrong picks: ' + w + ' · wasted pieces: ' + m,
+    bakeTitle: 'The oven',
+    bakeTip: 'Hold A to heat up, let go to cool down — stay in the green · B back',
+    bakeProgress: 'Baking',
+    bakeLabels: ['Perfect!', 'Close', 'Far', 'Way off!'],
+    pauseTitle: 'Paused', pauseFrozen: 'The timer is stopped',
+    pauseDisc: n => n + ': controller disconnected!',
+    pauseReconnect: 'Reconnect it (or press A on a new controller)',
+    pauseItems: ['Resume', 'Restart round', 'Quit'],
+    pauseKeys: 'D-Pad move · A confirm · Start resume',
+    resTitle: (r, n) => 'Round ' + r + ' of ' + n + ' — results',
+    resSudden: 'Sudden death — results',
+    resNoPizza: 'Served nothing',
+    resStolen: 'served a stolen pizza',
+    resWon: 'Round winner',
+    resRows: ['Toppings', 'Dough', 'Bake', 'Speed', 'Bonuses'],
+    of: (a, b) => a + ' / ' + b,
+    resRound: 'Round score', resTotal: 'Total', resDouble: '×2',
+    resCustomer: t => 'Customer: “' + t + '”',
+    resNext: 'Next round — A', resFinal: 'Final result — A', resTie: 'Sudden death — A',
+    winTitle: 'Winner', tie: 'It\'s a tie!',
+    winTotal: n => 'Total score: ' + n,
+    tieNote: 'Even sudden death couldn\'t split you.',
+    statRows: ['Total score', 'Rounds won', 'First to serve', 'Shoves landed', 'Pizzas stolen', 'Perfect bakes'],
+    again: 'Play again — A', exit: 'Exit — B',
+    discBanner: n => n + ': controller disconnected — reconnect it',
+    and: ' & ',
+    comments: [
+      ['Wait… who really made this? It can\'t be you.', 'Better than Italy. I might marry this oven.'],
+      ['Good… honestly, I expected worse.', 'Not bad. I\'ll come back if everything else is closed.'],
+      ['Edible… if you are really, really hungry.', 'Well… my mum makes better in her sleep.'],
+      ['Is this a pizza or a frisbee?', 'Looks like it was made during a power cut.'],
+      ['I\'ll eat it only because I already paid.', 'My cat refused to even sniff it.']
+    ],
+    stolenComments: ['Funny… I watched the other chef make this one.', 'Stolen pizza. Tastes like crime. Not bad.'],
+    timeouts: ['I left… the pizza is still in your imagination!', 'I waited forever! I\'m going for a burger.']
+  },
+  ar: {
+    player: n => 'اللاعب ' + n,
+    chars: ['ولد', 'بنت'],
+    ingredients: ['صوص', 'جبنة', 'سجق', 'فلفل'],
+    orders: ['مارجريتا', 'بيتزا سجق', 'بيتزا خضار', 'الحرّاقة'],
+    sub: 'مطبخ واحد · شيفين · ومفيش رحمة',
+    start: 'اضغط A على أي دراع للبدء',
+    langHint: 'D-Pad  ◀ ▶  لتغيير اللغة',
+    pads: n => 'الدراعات المتصلة: ' + n,
+    noPads: 'مفيش دراع ظاهر — وصّل الدراع واضغط أي زرار عليه',
+    noApi: 'الدراعات محجوبة هنا — افتح الملف مباشرة في Chrome أو Edge',
+    bindTitle: 'ربط الدراعات',
+    bindPress: 'اضغط A على دراعك',
+    bindWait: 'استنى دورك…',
+    bound: n => '✓ اتربط — دراع رقم ' + n,
+    bindSame: 'الدراع ده بتاع اللاعب 1 — استخدم الدراع التاني',
+    bindGo: 'متابعة — اضغط A',
+    back: 'B رجوع',
+    charTitle: 'اختار شخصيتك',
+    taken: 'محجوزة',
+    ready: c => '✓ جاهز — ' + c,
+    charPick: 'D-Pad للاختيار · A تأكيد',
+    charAuto: 'الشخصية دي اتاخدت — اتغيرت تلقائي',
+    rulesTitle: 'إزاي تكسب',
+    cookTitle: 'اطبخ',
+    cook: [
+      'روح للزبون واسمع الطلب. العصاية الشمال مشي، والعصاية اليمين لف.',
+      'طاولة العجين، تلات تقنيات: اعجن بهدوء مع اتجاه الأسهم، وافرد على الحلقة المنقطة، وبعدين ارمي العجينة ولفّها وامسكها.',
+      'طاولة المكونات: اختار المكوّن الصح، وبعدين اضغط A عشان تنزّل كل قطعة على علامتها والبيتزا بتلف.',
+      'الفرن: دوس A عشان تسخّن وسيبه عشان يبرد. خلّي المؤشر جوه المنطقة الخضرا اللي بتتحرك.',
+      'سلّم البيتزا للزبون بـ A قبل ما الدقيقتين يخلصوا.'
+    ],
+    fightTitle: 'اتخانق',
+    fight: [
+      'زُق الخصم: بيدوخ، وبيطلع من أي محطة، ولو شايل بيتزا مخبوزة بتقع منه.',
+      'البيتزا اللي على الأرض بتاعة اللي يلحقها. أيوه، ينفع تسلّم بيتزا مسروقة.',
+      'استخدم الأداة اللي معاك. الصناديق فيها دقيق (يعمي الخصم) أو شطة (سرعة) أو زيت (فخ زلق).',
+      'أول واحد يسلّم ياخد +10. وأحسن عجينة وأحسن مكونات وأحسن خبز كل واحدة +5. كل راوند فيه مفاجأة، والخامس بالضعف.'
+    ],
+    rulesScore: 'كل بيتزا: مكونات 30 · عجينة 30 · خبز 20 · سرعة 20     ·     Start = إيقاف مؤقت',
+    rulesGo: 'يلا نبدأ — A',
+    score: n => 'النقاط: ' + n,
+    rivalScore: n => 'الخصم: ' + n,
+    sec: n => n + ' ث',
+    order: (n, it) => 'الطلب: ' + n + ' — ' + it,
+    orderUnknown: 'الطلب: ؟؟ (اسأل الزبون)',
+    hint: {
+      order: 'روح للزبون واسمع الطلب',
+      dough: 'روح لطاولة العجين واضغط A', doughMini: 'لفّ العصاية اليمين لفة كاملة ناعمة',
+      toppings: 'روح لطاولة المكونات واضغط A', toppingsMini: 'اختار مكونات الطلب بالظبط',
+      bake: 'روح لأي فرن واضغط A', bakeMini: 'اضغط A والمؤشر في الأخضر',
+      serve: 'ودّي البيتزا للزبون واضغط A',
+      grab: 'فيه بيتزا على الأرض — الحقها!',
+      done: 'سلّمت! دلوقتي نكّد على الخصم'
+    },
+    station: { customer: 'الزبون', dough: 'طاولة العجين', toppings: 'المكونات', oven: 'الفرن', pizza: 'بيتزا!' },
+    act: { dough: 'اعجن العجينة', toppings: 'اختار المكونات', bake: 'اخبز', serve: 'سلّم البيتزا' },
+    items: { flour: 'دقيق', chili: 'شطة', oil: 'زيت' },
+    noItem: 'فاضي', shove: 'زُق', you: 'إنت', rival: 'الخصم',
+    flourBig: 'دقيـــق!',
+    toast: {
+      shoved: 'اتزقّيت!', shoveHit: 'زقّيته!', dropped: 'البيتزا وقعت منك — الحقها!',
+      stole: 'سرقت البيتزا — اجري سلّمها!', stolen: 'البيتزا بتاعتك اتسرقت!', back: 'رجّعت البيتزا',
+      floured: 'دقيق في عينك!', flourHit: 'رميت الدقيق!', slip: 'اتزحلقت!',
+      got: n => 'أخدت: ' + n, chili: 'شطة! اجري!', oil: 'فخ الزيت جاهز',
+      rOrder: 'الخصم سمع الطلب', rDough: 'الخصم خلّص العجينة', rTop: 'الخصم حط المكونات',
+      rBake: 'بيتزا الخصم اتخبزت!', rServed: 'الخصم سلّم الأول!', rServed2: 'الخصم سلّم كمان',
+      first: n => 'سلّمت الأول! +' + n
+    },
+    rivalClose: 'الخصم واقف جنبك!',
+    want: (n, it) => 'عايز «' + n + '»: ' + it,
+    delivered: 'اتسلّمت!',
+    roundScore: n => 'سكور الراوند: ' + n,
+    timeUp: 'الوقت خلص!', roundOver: 'الراوند خلص!',
+    roundBadge: (r, n) => 'راوند ' + r + ' من ' + n,
+    roundN: n => 'الراوند ' + n,
+    go: 'اطبخ!',
+    mods: {
+      classic: ['مبارزة عادية', 'نفس الطلب للشيفين. اطبخ بسرعة والعب بخبث.'],
+      rush: ['ساعة الزحمة', 'أول واحد يسلّم ياخد +20 بدل +10.'],
+      slippery: ['أرض زلقة', 'حد دلق زيت في المطبخ كله.'],
+      blackout: ['النور قطع', 'المطبخ ضلمة. اطبخ على ضوء الكشاف.'],
+      double: ['الراوند الأخير', 'كل نقطة في الراوند ده بالضعف.'],
+      sudden: ['الموت المفاجئ', 'النقاط متساوية. أول بيتزا تتسلّم تحسمها.']
+    },
+    doughTitle: 'العجينة — تلات تقنيات',
+    doughSteps: ['اعجن', 'افرد', 'ارمي'],
+    quality: n => 'الجودة: ' + n + '%',
+    rivalQ: n => 'الخصم: ' + n + '%',
+    rivalNone: 'الخصم: لسه',
+    kneadTip: 'لفّ العصاية اليمين مع اتجاه الأسهم — بهدوء مش بسرعة · B رجوع',
+    kneadFast: 'بسرعة قوي — العجينة بتتقطع!',
+    kneadWrong: 'الاتجاه غلط!',
+    coverage: n => 'التغطية: ' + n + '%',
+    shapeQ: n => 'الشكل: ' + n + '%',
+    doughReady: 'اضغط A — يلا نرميها!',
+    shapeTip: 'امشي على الحلقة المنقطة لفة كاملة · B رجوع',
+    tossN: (a, b) => 'رمية ' + a + ' من ' + b,
+    tossTip: 'ادّي العصاية اليمين زقّة لفوق عشان ترمي العجينة',
+    tossAir: 'لفّ العصاية! واضغط A لما الحلقة تقفل',
+    catchLabels: ['مسكة مثالية!', 'مسكة كويسة', 'مسكة أي كلام', 'وقعت منك!'],
+    spinLabel: n => 'لفّ ×' + n,
+    topTitle: 'المكونات',
+    topPick: 'اختار المكوّن اللي عليه الدور: D-Pad ثم A · B رجوع',
+    topDrop: 'اضغط A عشان تنزّل قطعة على كل علامة وهي معدّية',
+    topWrong: 'مكوّن غلط! خصم 10%', topMiss: 'برّه العلامة!', topOk: 'المكونات تمام!',
+    topStats: (w, m) => 'اختيارات غلط: ' + w + ' · قطع ضايعة: ' + m,
+    bakeTitle: 'الفرن',
+    bakeTip: 'دوس A عشان تسخّن وسيبه عشان يبرد — خليك في الأخضر · B رجوع',
+    bakeProgress: 'بيتخبز',
+    bakeLabels: ['مثالي!', 'قريب', 'بعيد', 'برّه خالص!'],
+    pauseTitle: 'إيقاف مؤقت', pauseFrozen: 'الوقت واقف',
+    pauseDisc: n => 'دراع ' + n + ' اتفصل!',
+    pauseReconnect: 'وصّله تاني (أو اضغط A على دراع جديد)',
+    pauseItems: ['كمّل اللعب', 'عيد الراوند', 'خروج'],
+    pauseKeys: 'D-Pad للتنقل · A تأكيد · Start كمّل',
+    resTitle: (r, n) => 'نتيجة الراوند ' + r + ' من ' + n,
+    resSudden: 'نتيجة الموت المفاجئ',
+    resNoPizza: 'ماسلّمش حاجة',
+    resStolen: 'سلّم بيتزا مسروقة',
+    resWon: 'كسب الراوند',
+    resRows: ['المكونات', 'العجينة', 'الخبز', 'السرعة', 'بونص'],
+    of: (a, b) => a + ' من ' + b,
+    resRound: 'سكور الراوند', resTotal: 'الإجمالي', resDouble: '×2',
+    resCustomer: t => 'الزبون: «' + t + '»',
+    resNext: 'الراوند اللي بعده — A', resFinal: 'النتيجة النهائية — A', resTie: 'الموت المفاجئ — A',
+    winTitle: 'الفايز', tie: 'تعادل!',
+    winTotal: n => 'السكور الكلي: ' + n,
+    tieNote: 'حتى الموت المفاجئ ماعرفش يفرّق بينكم.',
+    statRows: ['السكور الكلي', 'راوندات كسبها', 'سلّم الأول', 'زقّات ناجحة', 'بيتزا مسروقة', 'خبز مثالي'],
+    again: 'إعادة — A', exit: 'خروج — B',
+    discBanner: n => 'دراع ' + n + ' اتفصل — وصّله تاني',
+    and: ' و',
+    comments: [
+      ['إيه ده! مين اللي عملها بجد؟ مش مصدق!', 'أحسن من بيتزا إيطاليا… هتجوز الفرن ده.'],
+      ['حلوة… بصراحة كنت متوقع أسوأ.', 'مش بطالة، هاجي تاني لو مفيش غيركم.'],
+      ['تتاكل… لو الواحد جعان قوي.', 'يعني… أمي بتعمل أحسن وهي نايمة.'],
+      ['دي بيتزا ولا طبق طاير؟', 'شكلها اتعملت والنور قاطع.'],
+      ['هاكلها بس عشان دفعت فلوسها.', 'القطة بتاعتي رفضت تشمّها.']
+    ],
+    stolenComments: ['غريبة… أنا شايف الشيف التاني هو اللي عاملها.', 'بيتزا مسروقة. طعمها جريمة. مش وحشة.'],
+    timeouts: ['أنا مشيت… البيتزا لسه في خيالك!', 'استنيت ساعة! هروح آكل كشري.']
+  }
+};
+const COMMENT_MIN = [90, 75, 55, 35, 0];
+
+function T(key, a, b) {
+  const v = STR[game.lang][key];
+  return typeof v === 'function' ? v(a, b) : v;
+}
+function rtl() { return game.lang === 'ar'; }
+function alStart() { return rtl() ? 'right' : 'left'; }
+function alEnd() { return rtl() ? 'left' : 'right'; }
+function sideStart(x0, x1, pad) { return rtl() ? x1 - pad : x0 + pad; }
+function sideEnd(x0, x1, pad) { return rtl() ? x0 + pad : x1 - pad; }
+
+// ============================ 3) تجهيز الكانفاس ============================
+const cv = document.getElementById('game');
+const mainCtx = cv.getContext('2d');
+let ctx = mainCtx;
+let viewScale = 1;
+
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+  cv.style.width = (W * s) + 'px';
+  cv.style.height = (H * s) + 'px';
+  cv.width = Math.max(1, Math.round(W * s * dpr));
+  cv.height = Math.max(1, Math.round(H * s * dpr));
+  viewScale = cv.width / W;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function drawOn(c, fn) { const keep = ctx; ctx = c.getContext('2d'); fn(); ctx = keep; return c; }
+
+// ============================ 4) الإدخال والاهتزاز والصوت ============================
+const padStates = [];
+let padApi = true;
+
+window.addEventListener('gamepadconnected', () => {});
+window.addEventListener('gamepaddisconnected', () => {});
+
+// قراءة كل الدراعات — بتتنادى كل فريم
+function pollGamepads() {
+  let list = [];
+  try {
+    if (navigator.getGamepads) list = navigator.getGamepads() || [];
+    else padApi = false;
+  } catch (e) { padApi = false; }
+  const n = Math.max(list.length, padStates.length);
+  for (let i = 0; i < n; i++) {
+    const st = padStates[i] || (padStates[i] = { connected: false, id: '', cur: [], prev: [], axes: [], nav: {}, navPrev: {} });
+    st.prev = st.cur;
+    st.navPrev = st.nav;
+    const gp = list[i];
+    if (gp && gp.connected) {
+      st.connected = true;
+      st.id = gp.id || '';
+      st.cur = Array.from(gp.buttons, b => (typeof b === 'object' ? (b.pressed || b.value > 0.5) : b > 0.5));
+      st.axes = Array.from(gp.axes);
+      const lx = st.axes[0] || 0, ly = -(st.axes[1] || 0);
+      st.nav = {
+        up:    !!st.cur[BTN.UP]    || ly > 0.6,
+        down:  !!st.cur[BTN.DOWN]  || ly < -0.6,
+        left:  !!st.cur[BTN.LEFT]  || lx < -0.6,
+        right: !!st.cur[BTN.RIGHT] || lx > 0.6
+      };
+    } else {
+      st.connected = false; st.cur = []; st.axes = []; st.nav = {};
+    }
+  }
+}
+
+function pressed(i, b) {
+  const s = padStates[i];
+  return !!(s && s.connected && s.cur[b] && !s.prev[b]);
+}
+// الزرار مضغوط دلوقتي (للتسخين في الفرن)
+function down(i, b) {
+  const s = padStates[i];
+  return !!(s && s.connected && s.cur[b]);
+}
+function navPressed(i, d) {
+  const s = padStates[i];
+  return !!(s && s.connected && s.nav[d] && !s.navPrev[d]);
+}
+// قراءة عصاية — Y معكوس (فوق = موجب)
+function stick(i, ax, ay) {
+  const s = padStates[i];
+  if (!s || !s.connected) return { x: 0, y: 0 };
+  return { x: s.axes[ax] || 0, y: -(s.axes[ay] || 0) };
+}
+function consume(i, b) { if (padStates[i]) padStates[i].prev[b] = true; }
+function connectedPads() { return padStates.map((s, i) => ({ s, i })).filter(o => o.s.connected); }
+function padOK(p) { return p.pad !== null && !!padStates[p.pad] && padStates[p.pad].connected; }
+function anyBoundPressed(b) { return game.players.some(p => p.pad !== null && pressed(p.pad, b)); }
+function anyBoundNav(d) { return game.players.some(p => p.pad !== null && navPressed(p.pad, d)); }
+function anyPadNav(d) { return padStates.some((s, i) => navPressed(i, d)); }
+
+// اهتزاز الدراع (لو بيدعمه)
+function rumble(p, strong, weak, ms) {
+  try {
+    const gp = navigator.getGamepads()[p.pad];
+    const v = gp && gp.vibrationActuator;
+    if (v && v.playEffect) {
+      const pr = v.playEffect('dual-rumble', { duration: ms, strongMagnitude: strong, weakMagnitude: weak });
+      if (pr && pr.catch) pr.catch(() => {});
+    }
+  } catch (e) {}
+}
+
+// مؤثرات صوتية بسيطة متولدة بالكود (لو المتصفح سامح بالصوت)
+let actx = null;
+function audio() {
+  if (actx === false) return null;
+  if (!actx) {
+    try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch (e) { actx = false; return null; }
+  }
+  if (actx.state === 'suspended') { const pr = actx.resume(); if (pr && pr.catch) pr.catch(() => {}); }
+  return actx.state === 'running' ? actx : null;
+}
+function tone(f, dur, type, vol, to, delay) {
+  const a = audio(); if (!a) return;
+  const t = a.currentTime + (delay || 0);
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type || 'square';
+  o.frequency.setValueAtTime(f, t);
+  if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+  g.gain.setValueAtTime(vol || 0.06, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(a.destination);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+function noise(dur, vol, delay) {
+  const a = audio(); if (!a) return;
+  const n = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const s = a.createBufferSource(), g = a.createGain();
+  s.buffer = buf; g.gain.value = vol;
+  s.connect(g); g.connect(a.destination);
+  s.start(a.currentTime + (delay || 0));
+}
+const SFX = {
+  ok:     () => { tone(660, 0.07, 'square', 0.05); tone(990, 0.09, 'square', 0.05, 0, 0.07); },
+  back:   () => tone(330, 0.09, 'square', 0.05, 220),
+  nav:    () => tone(520, 0.04, 'square', 0.03),
+  count:  () => tone(440, 0.12, 'square', 0.07),
+  go:     () => { tone(660, 0.12, 'square', 0.08); tone(880, 0.3, 'square', 0.08, 0, 0.12); },
+  tick:   () => tone(880, 0.06, 'square', 0.06),
+  shove:  () => { noise(0.18, 0.3); tone(130, 0.22, 'sine', 0.35, 50); },
+  miss:   () => noise(0.08, 0.06),
+  flour:  () => noise(0.55, 0.22),
+  chili:  () => { tone(300, 0.25, 'sawtooth', 0.06, 900); },
+  oil:    () => tone(260, 0.2, 'sine', 0.1, 120),
+  slip:   () => tone(800, 0.5, 'sawtooth', 0.07, 110),
+  pickup: () => { tone(520, 0.06, 'square', 0.05); tone(780, 0.06, 'square', 0.05, 0, 0.06); tone(1040, 0.1, 'square', 0.05, 0, 0.12); },
+  steal:  () => { tone(880, 0.08, 'sawtooth', 0.07); tone(440, 0.08, 'sawtooth', 0.07, 0, 0.08); tone(880, 0.16, 'sawtooth', 0.07, 0, 0.16); },
+  ding:   () => { tone(1320, 0.5, 'sine', 0.12); tone(1760, 0.5, 'sine', 0.08, 0, 0.08); },
+  buzz:   () => tone(140, 0.25, 'sawtooth', 0.08),
+  serve:  () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.14, 'square', 0.06, 0, i * 0.09)); },
+  end:    () => { tone(440, 0.2, 'square', 0.07); tone(330, 0.4, 'square', 0.07, 0, 0.2); },
+  win:    () => { [523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, 0.18, 'square', 0.07, 0, i * 0.13)); }
+};
+function sfx(name) { try { if (SFX[name]) SFX[name](); } catch (e) {} }
+
+// ============================ 5) حالة اللعبة ============================
+function newStats() { return { rounds: 0, firsts: 0, shoves: 0, steals: 0, perfects: 0 }; }
+function makePlayer(id) {
+  return {
+    id, accent: ACCENTS[id],
+    pad: null, charIdx: id, charConfirmed: false, charNote: 0,
+    total: 0, inv: 'flour', invAtRoundStart: 'flour', stats: newStats()
+  };
+}
+function pname(p) { return T('player', p.id + 1); }
+function rival(p) { return game.players[1 - p.id]; }
+
+const game = {
+  lang: 'en',
+  screen: 'welcome', screenTime: 0, t: 0,
+  players: [makePlayer(0), makePlayer(1)],
+  round: 1, mod: 'classic', order: ORDERS[0],
+  timeLeft: ROUND_TIME, roundOver: false, roundEndT: 0,
+  countT: 0, goT: 0, firstServed: false,
+  crates: [], puddles: [], pizzas: [], spawnT: 0,
+  paused: false, pauseIdx: 0, pauseShake: 0,
+  bindMsgT: 0, charDoneT: 0, winnerIdx: 0
+};
+
+function setScreen(name) { game.screen = name; game.screenTime = 0; }
+function inputReady(delay) { return game.screenTime > (delay || 0.3); }
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const rnd = i => { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+// حالة الميني جيمز (بتتصفّر لما اللاعب يبدأ بيتزا جديدة)
+function resetMini(p) {
+  p.dough = {
+    step: 0,                                        // 0 عجن، 1 فرد، 2 رمي
+    folds: 0, dir: Math.random() < 0.5 ? 1 : -1, prog: 0, lastAng: null, speed: 0, bad: 0, warn: '', warnT: 0, q1: 0,
+    radii: new Array(SECTORS).fill(0), painted: new Array(SECTORS).fill(false),
+    lastIdx: -1, lastM: 0, px: 0, py: 0, coverage: 0, smooth: 0, acc: 0, q2: 0,
+    tosses: 0, air: -1, armed: false, spin: 0, spinAng: null, rot: 0, catches: [], lastCatch: null, showT: 0, q3: 0, doneT: 0
+  };
+  p.top = { focus: 0, done: [false, false, false, false], placed: [[], [], [], []], wrong: 0, waste: 0, shake: 0, wrongIdx: -1,
+            mode: 'pick', cur: -1, rot: 0, dirn: 1, marks: [], strays: [], accs: [], msg: '', msgT: 0, doneT: 0, score: 0 };
+  p.bake = { T: 0.5, vel: 0, t: 0, qsum: 0, zi: 0, seed: Math.random() * 10, result: null, endT: 0 };
+  p.bake.T = bandCenter(p.bake);                    // المؤشر بيبدأ جوه الأخضر
+}
+
+// تجهيز اللاعب لراوند جديد
+function resetPlayerRound(p) {
+  const s = SPAWNS[p.id];
+  p.x = s.x; p.y = s.y; p.a = -Math.PI / 2; p.walk = 0; p.moving = false; p.mvx = 0; p.mvy = -1;
+  p.heard = false;          // سمع طلب الزبون؟
+  p.item = null;            // اللي في إيده: {stage: dough/topped/baked, dough, toppings, bake, maker, drops}
+  p.servedItem = null;
+  p.mini = null;            // الميني جيم المفتوحة
+  p.phase = 'order';        // order → dough → toppings → bake → serve → done
+  resetMini(p);
+  p.scores = { toppings: 0, dough: 0, bake: 0, speed: 0, bonus: 0, craft: 0, awards: {}, mult: 1, total: 0, served: false, stolen: false };
+  p.finished = false; p.bubble = null; p.toast = null;
+  p.flourT = 0; p.stunT = 0; p.immuneT = 0; p.slipT = 0; p.slipImm = 0; p.boostT = 0;
+  p.shoveCd = 0; p.lungeT = 0; p.kT = 0; p.kvx = 0; p.kvy = 0; p.sdx = 0; p.sdy = 0;
+}
+
+function startMatch() {
+  game.players.forEach(p => { p.total = 0; p.inv = 'flour'; p.stats = newStats(); });   // كل لاعب بيبدأ بكيس دقيق
+  game.round = 1;
+  startRound();
+}
+function startRound() {
+  game.mod = game.round > ROUNDS ? 'sudden' : MODS[game.round - 1];
+  game.order = pick(ORDERS);                     // نفس الطلب للاتنين: سباق عادل
+  game.timeLeft = ROUND_TIME;
+  game.roundOver = false; game.roundEndT = 0; game.paused = false;
+  game.countT = 3.2; game.goT = 0; game.firstServed = false;
+  game.crates = []; game.pizzas = []; game.spawnT = 4;
+  game.puddles = game.mod === 'slippery'
+    ? SPILLS.map(([x, y]) => ({ x, y, owner: -1, arm: 0, life: Infinity }))
+    : [];
+  game.players.forEach(p => { p.invAtRoundStart = p.inv; resetPlayerRound(p); });
+  setScreen('play');
+  sfx('count');
+}
+function restartRound() {
+  game.players.forEach(p => { p.inv = p.invAtRoundStart; });
+  startRound();
+}
+function quitToWelcome() {
+  game.players = [makePlayer(0), makePlayer(1)];
+  game.paused = false;
+  setScreen('welcome');
+}
+
+// ============================ 6) منطق الشاشات ============================
+function updateWelcome() {
+  if (anyPadNav('left') && game.lang !== 'en') { game.lang = 'en'; sfx('nav'); }
+  if (anyPadNav('right') && game.lang !== 'ar') { game.lang = 'ar'; sfx('nav'); }
+  if (!inputReady()) return;
+  for (let i = 0; i < padStates.length; i++) {
+    if (pressed(i, BTN.A)) { game.players.forEach(p => { p.pad = null; }); game.bindMsgT = 0; setScreen('bind'); sfx('ok'); return; }
+  }
+}
+
+// ربط الدراعات: اللاعب 1 ثم اللاعب 2 (ونرفض نفس الدراع)
+function updateBind(dt) {
+  const [p1, p2] = game.players;
+  game.bindMsgT = Math.max(0, game.bindMsgT - dt);
+  if (!inputReady()) return;
+  for (let i = 0; i < padStates.length; i++) {
+    if (pressed(i, BTN.B)) {
+      sfx('back');
+      if (p2.pad !== null) p2.pad = null;
+      else if (p1.pad !== null) p1.pad = null;
+      else setScreen('welcome');
+      return;
+    }
+    if (pressed(i, BTN.A)) {
+      if (p1.pad === null) { p1.pad = i; sfx('ok'); }
+      else if (p2.pad === null) {
+        if (i === p1.pad) { game.bindMsgT = 2.2; sfx('buzz'); }
+        else { p2.pad = i; game.bindMsgT = 0; sfx('ok'); }
+      } else if (i === p1.pad || i === p2.pad) { sfx('ok'); enterCharSelect(); }
+      return;
+    }
+  }
+}
+
+function enterCharSelect() {
+  game.players.forEach((p, i) => { p.charIdx = i; p.charConfirmed = false; p.charNote = 0; });
+  game.charDoneT = 0;
+  setScreen('charselect');
+}
+function updateCharSelect(dt) {
+  const ps = game.players;
+  ps.forEach(p => { p.charNote = Math.max(0, p.charNote - dt); });
+  if (!inputReady()) return;
+  const startDir = rtl() ? 'right' : 'left', endDir = rtl() ? 'left' : 'right';
+  for (const p of ps) {
+    const other = rival(p);
+    if (!p.charConfirmed) {
+      if (navPressed(p.pad, startDir) && p.charIdx !== 0) { p.charIdx = 0; sfx('nav'); }
+      if (navPressed(p.pad, endDir) && p.charIdx !== 1) { p.charIdx = 1; sfx('nav'); }
+      if (pressed(p.pad, BTN.A)) {
+        // لو الشخصية متاخدة، التانية تتغير تلقائي
+        if (other.charConfirmed && other.charIdx === p.charIdx) { p.charIdx = 1 - p.charIdx; p.charNote = 3; }
+        p.charConfirmed = true; sfx('ok');
+      } else if (pressed(p.pad, BTN.B)) { sfx('back'); setScreen('bind'); return; }
+    } else if (pressed(p.pad, BTN.B)) { p.charConfirmed = false; game.charDoneT = 0; sfx('back'); }
+  }
+  if (ps.every(p => p.charConfirmed)) {
+    game.charDoneT += dt;
+    if (game.charDoneT > 1.0) setScreen('rules');
+  }
+}
+
+function updateRules() {
+  if (!inputReady()) return;
+  if (anyBoundPressed(BTN.A)) { sfx('ok'); startMatch(); }
+  else if (anyBoundPressed(BTN.B)) { sfx('back'); enterCharSelect(); }
+}
+
+function updateRoundResult() {
+  if (!inputReady(0.7)) return;
+  if (anyBoundPressed(BTN.A)) {
+    const [a, b] = game.players;
+    if (game.round < ROUNDS) { game.round++; startRound(); }
+    else if (game.round === ROUNDS && a.total === b.total) { game.round++; startRound(); }   // تعادل → موت مفاجئ
+    else { game.winnerIdx = 0; setScreen('winner'); sfx('win'); }
+  }
+}
+
+function updateWinner() {
+  if (!inputReady(0.7)) return;
+  if (anyBoundNav(rtl() ? 'right' : 'left')) game.winnerIdx = 0;
+  if (anyBoundNav(rtl() ? 'left' : 'right')) game.winnerIdx = 1;
+  if (anyBoundPressed(BTN.B)) { sfx('back'); quitToWelcome(); return; }
+  if (anyBoundPressed(BTN.A)) { sfx('ok'); if (game.winnerIdx === 0) startMatch(); else quitToWelcome(); }
+}
+
+// لو دراع اتفصل ومارجعش بنفس الرقم: أي دراع جديد يضغط A ياخد مكانه
+function tryRebind() {
+  for (const p of game.players) {
+    if (p.pad === null || padOK(p)) continue;
+    for (let i = 0; i < padStates.length; i++) {
+      if (game.players.some(q => q.pad === i)) continue;
+      if (pressed(i, BTN.A)) { p.pad = i; consume(i, BTN.A); break; }
+    }
+  }
+}
+
+// ============================ 7) منطق اللعب ============================
+function cellAt(x, y) {
+  if (y < 0 || y >= MAP.length || x < 0 || x >= MAP[0].length) return '#';
+  return MAP[y][x];
+}
+
+// تصادم اللاعب مع الخريطة: أي خلية مش أرض تعتبر حاجز
+function checkCollision(x, y) {
+  const r = BODY_R;
+  return cellAt(Math.floor(x - r), Math.floor(y - r)) !== '.' || cellAt(Math.floor(x + r), Math.floor(y - r)) !== '.' ||
+         cellAt(Math.floor(x - r), Math.floor(y + r)) !== '.' || cellAt(Math.floor(x + r), Math.floor(y + r)) !== '.';
+}
+// اللاعبين مايعدّوش من بعض
+function bumpsRival(nx, ny, p) {
+  const o = rival(p);
+  const dNew = Math.hypot(nx - o.x, ny - o.y);
+  return dNew < 0.5 && dNew < Math.hypot(p.x - o.x, p.y - o.y);
+}
+
+function angDiff(a, b) {
+  let d = a - b;
+  while (d > Math.PI) d -= Math.PI * 2;
+  while (d < -Math.PI) d += Math.PI * 2;
+  return d;
+}
+// أقرب نقطة من خطوط المحطة + المسافة + فرق الزاوية عن اتجاه نظر اللاعب
+function stationInfo(p, key) {
+  let best = null;
+  for (const [x0, y0, x1, y1] of STATIONS[key].segs) {
+    const dx = x1 - x0, dy = y1 - y0, L = dx * dx + dy * dy;
+    const t = L ? clamp(((p.x - x0) * dx + (p.y - y0) * dy) / L, 0, 1) : 0;
+    const qx = x0 + dx * t - p.x, qy = y0 + dy * t - p.y, d = Math.hypot(qx, qy);
+    if (!best || d < best.d) best = { d, diff: angDiff(Math.atan2(qy, qx), p.a) };
+  }
+  return best;
+}
+function canUse(p, key, reach) {
+  const i = stationInfo(p, key);
+  return i.d < (reach || REACH) && Math.abs(i.diff) < 1.25;
+}
+
+// المرحلة الحالية بتتحسب من اللي في إيد اللاعب
+function phaseOf(p) {
+  if (p.finished) return 'done';
+  if (p.item && p.item.stage === 'baked') return 'serve';
+  if (!p.heard) return 'order';
+  if (!p.item) return 'dough';
+  return p.item.stage === 'dough' ? 'toppings' : 'bake';
+}
+function stageOf(p) {
+  if (p.finished) return 5;
+  if (!p.item) return p.heard ? 1 : 0;
+  return p.item.stage === 'dough' ? 2 : p.item.stage === 'topped' ? 3 : 4;
+}
+
+// الهدف الحالي: محطة المرحلة، أو بيتزا واقعة على الأرض
+function targetOf(p) {
+  if (p.finished) return null;
+  if (!(p.item && p.item.stage === 'baked') && game.pizzas.length) {
+    let best = game.pizzas[0];
+    for (const z of game.pizzas) if (Math.hypot(z.x - p.x, z.y - p.y) < Math.hypot(best.x - p.x, best.y - p.y)) best = z;
+    return { key: 'pizza', pts: [{ x: best.x, y: best.y, z: 0.6 }] };
+  }
+  const key = PHASE_STATION[p.phase];
+  return key ? { key, pts: STATIONS[key].marks } : null;
+}
+
+function toast(p, text, color) { p.toast = { text, t: 2.2, color: color || 'rgba(45,28,12,.85)' }; }
+
+// اللف بالعصاية اليمين
+function look(p, dt) {
+  const R = stick(p.pad, 2, 3);
+  if (Math.abs(R.x) > LOOK_DEADZONE) {
+    const v = Math.min(1, (Math.abs(R.x) - LOOK_DEADZONE) / (1 - LOOK_DEADZONE));
+    p.a = angDiff(p.a + Math.sign(R.x) * v * TURN_SPEED * dt, 0);
+  }
+}
+// المشي بالعصاية الشمال — سرعة ثابتة (والشطة بتزوّدها)
+function walk(p, dt) {
+  const L = stick(p.pad, 0, 1);
+  const m = Math.hypot(L.x, L.y);
+  p.moving = false;
+  if (m < MOVE_DEADZONE) return;
+  p.moving = true;
+  p.walk += dt * 10;
+  const dirX = Math.cos(p.a), dirY = Math.sin(p.a);
+  const f = L.y / m, s = L.x / m;
+  const ux = dirX * f - dirY * s, uy = dirY * f + dirX * s;
+  p.mvx = ux; p.mvy = uy;
+  const dist = MOVE_SPEED * (p.boostT > 0 ? BOOST_MULT : 1) * dt, steps = Math.max(1, Math.ceil(dist / 0.04));
+  const vx = ux * dist / steps, vy = uy * dist / steps;
+  for (let k = 0; k < steps; k++) {
+    if (!checkCollision(p.x + vx, p.y) && !bumpsRival(p.x + vx, p.y, p)) p.x += vx;
+    if (!checkCollision(p.x, p.y + vy) && !bumpsRival(p.x, p.y + vy, p)) p.y += vy;
+  }
+}
+// حركة إجبارية (زقّة أو تزحلق)
+function slideMove(p, dx, dy) {
+  const dist = Math.hypot(dx, dy), steps = Math.max(1, Math.ceil(dist / 0.04));
+  const vx = dx / steps, vy = dy / steps;
+  for (let k = 0; k < steps; k++) {
+    if (!checkCollision(p.x + vx, p.y)) p.x += vx;
+    if (!checkCollision(p.x, p.y + vy)) p.y += vy;
+  }
+}
+
+function orderName(o) { return T('orders')[o.idx]; }
+function orderItemsText(o) { return o.items.map(i => T('ingredients')[i]).join(' + '); }
+
+// ---- المنافسة: الزقّ ----
+function kickFromMini(o) {
+  if (o.mini === 'bake' && o.bake.result) finishBake(o);
+  else if (o.mini === 'toppings' && o.top.doneT > 0) finishToppings(o);
+  else if (o.mini === 'dough' && o.dough.doneT > 0) finishDough(o);
+  o.mini = null;
+}
+// البيتزا المخبوزة بتقع على الأرض (وكل وقعة بتقلل جودتها)
+function dropPizza(o) {
+  if (!o.item || o.item.stage !== 'baked') return false;
+  o.item.drops++;
+  game.pizzas.push({ x: o.x, y: o.y, item: o.item, age: 0 });
+  o.item = null;
+  resetMini(o);
+  return true;
+}
+function tryShove(p) {
+  if (p.shoveCd > 0) return;
+  const o = rival(p);
+  const dx = o.x - p.x, dy = o.y - p.y, d = Math.hypot(dx, dy) || 0.001;
+  p.lungeT = 0.25;
+  if (d < SHOVE_RANGE && Math.abs(angDiff(Math.atan2(dy, dx), p.a)) < SHOVE_ARC && o.immuneT <= 0) {
+    p.shoveCd = SHOVE_CD;
+    p.stats.shoves++;
+    o.stunT = STUN_TIME; o.immuneT = STUN_TIME + IMMUNE_TIME;
+    o.kvx = dx / d * 5.5; o.kvy = dy / d * 5.5; o.kT = 0.25;
+    o.slipT = 0;
+    kickFromMini(o);
+    const dropped = dropPizza(o);
+    toast(p, T('toast').shoveHit, '#3aa655');
+    toast(o, dropped ? T('toast').dropped : T('toast').shoved, '#c8362b');
+    rumble(o, 1, 0.6, 350); rumble(p, 0.3, 0.3, 120);
+    sfx('shove');
+  } else {
+    p.shoveCd = SHOVE_MISS_CD;
+    sfx('miss');
+  }
+}
+
+// ---- المنافسة: الأدوات ----
+function useItem(p) {
+  if (!p.inv) return;
+  const o = rival(p), type = p.inv;
+  p.inv = null;
+  if (type === 'flour') {
+    o.flourT = FLOUR_TIME;
+    toast(o, T('toast').floured, '#c8362b'); toast(p, T('toast').flourHit, '#3aa655');
+    rumble(o, 0.3, 0.8, 400); sfx('flour');
+  } else if (type === 'chili') {
+    p.boostT = BOOST_TIME;
+    toast(p, T('toast').chili, '#e4572e'); sfx('chili');
+  } else {
+    // بقعة زيت ورا اللاعب: الخصم لو داس عليها يتزحلق
+    const bx = p.x - Math.cos(p.a) * 0.55, by = p.y - Math.sin(p.a) * 0.55;
+    const ok = cellAt(Math.floor(bx), Math.floor(by)) === '.';
+    game.puddles.push({ x: ok ? bx : p.x, y: ok ? by : p.y, owner: p.id, arm: 0.5, life: 25 });
+    toast(p, T('toast').oil, '#b8860b'); sfx('oil');
+  }
+}
+function slip(p) {
+  p.slipT = SLIP_TIME; p.slipImm = SLIP_TIME + 1.5;
+  const m = Math.hypot(p.mvx, p.mvy);
+  if (p.moving && m > 0.1) { p.sdx = p.mvx / m; p.sdy = p.mvy / m; }
+  else { p.sdx = Math.cos(p.a); p.sdy = Math.sin(p.a); }
+  const dropped = dropPizza(p);
+  toast(p, dropped ? T('toast').dropped : T('toast').slip, '#c8362b');
+  rumble(p, 0.8, 0.4, 350); sfx('slip');
+}
+function checkPuddles(p) {
+  if (p.slipImm > 0) return;
+  for (let i = 0; i < game.puddles.length; i++) {
+    const pd = game.puddles[i];
+    if (pd.owner === p.id || pd.arm > 0) continue;
+    if (Math.hypot(pd.x - p.x, pd.y - p.y) < 0.5) {
+      if (pd.owner >= 0) game.puddles.splice(i, 1); else pd.arm = 2.5;
+      slip(p);
+      return;
+    }
+  }
+}
+// التقاط الصناديق والبيتزا اللي على الأرض
+function pickups(p) {
+  if (!p.inv) {
+    const i = game.crates.findIndex(c => Math.hypot(c.x - p.x, c.y - p.y) < 0.55);
+    if (i >= 0) {
+      p.inv = game.crates[i].type;
+      game.crates.splice(i, 1);
+      toast(p, T('toast').got(T('items')[p.inv]), '#2f7fd1');
+      sfx('pickup');
+    }
+  }
+  if (!p.finished && !(p.item && p.item.stage === 'baked')) {
+    const i = game.pizzas.findIndex(z => z.age > 0.35 && Math.hypot(z.x - p.x, z.y - p.y) < 0.6);
+    if (i >= 0) {
+      const it = game.pizzas[i].item;
+      game.pizzas.splice(i, 1);
+      if (p.item) resetMini(p);                    // اللي كان في إيده بيترمي
+      p.item = it;
+      if (it.maker !== p.id) {                     // سرقة!
+        p.stats.steals++;
+        toast(p, T('toast').stole, '#3aa655'); toast(rival(p), T('toast').stolen, '#c8362b');
+        rumble(rival(p), 0.6, 0.6, 250); sfx('steal');
+      } else { toast(p, T('toast').back, '#3aa655'); sfx('pickup'); }
+    }
+  }
+}
+function spawnCrates() {
+  const free = CRATE_PAIRS.filter(pair => pair.every(([x, y]) => !game.crates.some(c => c.x === x && c.y === y)));
+  if (!free.length) return;
+  const type = pick(ITEM_TYPES);                   // نفس الأداة للناحيتين: عدل
+  pick(free).forEach(([x, y]) => game.crates.push({ x, y, type }));
+}
+function updateWorld(dt) {
+  game.spawnT -= dt;
+  if (game.spawnT <= 0) { game.spawnT = CRATE_EVERY; spawnCrates(); }
+  game.pizzas.forEach(z => { z.age += dt; });
+  game.puddles = game.puddles.filter(pd => { pd.arm = Math.max(0, pd.arm - dt); pd.life -= dt; return pd.life > 0; });
+}
+
+function tickTimers(p, dt) {
+  p.flourT = Math.max(0, p.flourT - dt);
+  p.stunT = Math.max(0, p.stunT - dt);
+  p.immuneT = Math.max(0, p.immuneT - dt);
+  p.slipImm = Math.max(0, p.slipImm - dt);
+  p.boostT = Math.max(0, p.boostT - dt);
+  p.shoveCd = Math.max(0, p.shoveCd - dt);
+  p.lungeT = Math.max(0, p.lungeT - dt);
+  if (p.toast) { p.toast.t -= dt; if (p.toast.t <= 0) p.toast = null; }
+  if (p.bubble && p.bubble.t !== Infinity) { p.bubble.t -= dt; if (p.bubble.t <= 0) p.bubble = null; }
+}
+
+// تحديث لاعب واحد في الراوند
+function updatePlayer(p, dt) {
+  tickTimers(p, dt);
+  if (p.kT > 0) { p.kT -= dt; slideMove(p, p.kvx * dt, p.kvy * dt); }
+  if (p.stunT > 0) { p.moving = false; p.phase = phaseOf(p); return; }       // دايخ من الزقّة
+  if (p.slipT > 0) {                                                          // بيتزحلق ويلف حوالين نفسه
+    p.slipT -= dt;
+    p.a = angDiff(p.a + (Math.PI * 2 / SLIP_TIME) * dt, 0);
+    slideMove(p, p.sdx * 3.4 * dt, p.sdy * 3.4 * dt);
+    p.phase = phaseOf(p);
+    return;
+  }
+  if (pressed(p.pad, BTN.X)) useItem(p);                                      // X = استخدم الأداة
+
+  if (p.mini) {
+    if (p.mini === 'dough') updateDough(p, dt);
+    else if (p.mini === 'toppings') updateToppings(p, dt);
+    else updateBake(p, dt);
+    p.phase = phaseOf(p);
+    return;
+  }
+  if (pressed(p.pad, BTN.B) || pressed(p.pad, BTN.RB)) tryShove(p);           // B = زُق
+  look(p, dt);
+  walk(p, dt);
+  pickups(p);
+  checkPuddles(p);
+  p.phase = phaseOf(p);
+  if (p.finished || p.slipT > 0) return;
+
+  if (p.phase === 'order') {                    // المرحلة 1: اسمع الطلب
+    if (canUse(p, 'customer', 1.9)) {
+      p.heard = true;
+      p.bubble = { text: T('want', orderName(game.order), orderItemsText(game.order)), t: 4.5 };
+      toast(rival(p), T('toast').rOrder);
+      sfx('ok');
+      p.phase = phaseOf(p);
+    }
+  } else if (pressed(p.pad, BTN.A) && canUse(p, PHASE_STATION[p.phase])) {
+    if (p.phase === 'serve') servePizza(p);
+    else { p.mini = p.phase; sfx('ok'); }       // dough / toppings / bake
+  }
+}
+
+// --- المرحلة 2: العجن بالعصاية اليمين ---
+function paintSector(d, idx, r) { d.radii[idx] = r; d.painted[idx] = true; }
+const avg = arr => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
+
+// جودة العجينة لحد دلوقتي (بتتعرض للاعب ولخصمه)
+function doughQuality(d) {
+  const parts = [d.step > 0 ? d.q1 : clamp(1 - d.bad / 2.5, 0, 1)];
+  if (d.step > 1) parts.push(d.q2);
+  if (d.catches.length) parts.push(avg(d.catches));
+  return avg(parts);
+}
+function finishDough(p) {
+  const d = p.dough;
+  p.item = { stage: 'dough', dough: (d.q1 + d.q2 + d.q3) / 3, toppings: 0, bake: 0, maker: p.id, drops: 0 };
+  p.mini = null;
+  toast(rival(p), T('toast').rDough);
+  sfx('ok');
+}
+
+// التقنية 1 — العجن: لف العصاية في اتجاه الأسهم بإيقاع ثابت، والاتجاه بيتعكس بعد كل طيّة.
+// السرعة الزيادة بتقطّع العجينة، واللف في الاتجاه الغلط بيرجّعك لورا.
+function kneadStep(p, d, s, m, dt) {
+  if (m > 0.5 && dt > 0) {
+    const ang = Math.atan2(s.y, s.x);
+    if (d.lastAng !== null) {
+      const da = angDiff(ang, d.lastAng), mag = Math.abs(da);
+      if (mag < 2) {
+        d.speed += (mag / (Math.PI * 2) / dt - d.speed) * Math.min(1, dt * 8);
+        if (mag > 0.002) {
+          if (Math.sign(da) === d.dir) d.prog += mag;
+          else { d.prog = Math.max(0, d.prog - mag); d.bad += mag / (Math.PI * 2) * 0.6; d.warn = 'wrong'; d.warnT = 0.5; }
+        }
+      }
+    }
+    d.lastAng = ang;
+  } else { d.lastAng = null; d.speed += (0 - d.speed) * Math.min(1, dt * 8); }
+  if (d.speed > KNEAD_MAX) { d.bad += dt; d.warn = 'fast'; d.warnT = 0.4; }
+  if (d.prog >= Math.PI * 2) {
+    d.folds++; d.prog = 0; d.dir = -d.dir;
+    sfx('nav'); rumble(p, 0.2, 0.3, 80);
+    if (d.folds >= KNEAD_FOLDS) { d.q1 = clamp(1 - d.bad / 2.5, 0, 1); d.step = 1; d.lastIdx = -1; sfx('ok'); }
+  }
+}
+
+// التقنية 2 — الفرد: امشي على الحلقة المنقطة كلها (72 قطاع) وإنت ماسك العصاية على نفس البعد
+function shapeStep(p, d, s, m) {
+  if (m > DOUGH_DEADZONE) {
+    m = Math.min(m, 1);
+    const ang = (Math.atan2(s.y, s.x) + Math.PI * 2) % (Math.PI * 2);
+    const idx = Math.floor(ang / (Math.PI * 2) * SECTORS) % SECTORS;
+    if (d.lastIdx >= 0) {                         // املا القطاعات اللي العصاية نطّتها
+      let diff = idx - d.lastIdx;
+      if (diff > SECTORS / 2) diff -= SECTORS;
+      if (diff < -SECTORS / 2) diff += SECTORS;
+      const n = Math.abs(diff);
+      if (n > 1 && n <= 12) {
+        const step = Math.sign(diff);
+        for (let j = 1; j < n; j++) {
+          const q = ((d.lastIdx + step * j) % SECTORS + SECTORS) % SECTORS;
+          paintSector(d, q, d.lastM + (m - d.lastM) * j / n);
+        }
+      }
+    }
+    paintSector(d, idx, m);
+    d.lastIdx = idx; d.lastM = m;
+  } else d.lastIdx = -1;
+
+  // التغطية = القطاعات / 72 ، النعومة = 1 - (الانحراف المعياري / أكبر radius) ، الدقة = القرب من الحلقة
+  const rs = d.radii.filter((_, i) => d.painted[i]);
+  d.coverage = rs.length / SECTORS;
+  if (rs.length) {
+    const mean = avg(rs);
+    const sd = Math.sqrt(avg(rs.map(r => (r - mean) * (r - mean))));
+    d.smooth = clamp(1 - sd / Math.max(...rs), 0, 1);
+    d.acc = avg(rs.map(r => 1 - Math.min(1, Math.abs(r - IDEAL_R) / 0.3)));
+  } else { d.smooth = 0; d.acc = 0; }
+
+  if (pressed(p.pad, BTN.A) && d.coverage >= 1) {
+    d.q2 = d.smooth * 0.5 + d.acc * 0.5;
+    d.step = 2; d.air = -1; d.armed = false;
+    sfx('ok');
+  }
+}
+
+// التقنية 3 — الرمي: ارمي العجينة لفوق، لفّها في الهوا، وامسكها بـ A في اللحظة الصح
+function tossStep(p, d, s, m, dt) {
+  if (d.showT > 0) {
+    d.showT -= dt;
+    if (d.showT <= 0 && d.tosses >= TOSSES) { d.q3 = avg(d.catches); d.doneT = 0.5; }
+    return;
+  }
+  if (d.air < 0) {                                // العجينة على الإيد
+    if (s.y < 0.3) d.armed = true;
+    if (d.armed && s.y > 0.75) { d.air = 0; d.armed = false; d.spin = 0; d.spinAng = null; sfx('chili'); }
+    return;
+  }
+  d.air += dt;
+  if (m > 0.5) {                                  // اللف في الهوا
+    const ang = Math.atan2(s.y, s.x);
+    if (d.spinAng !== null) {
+      const da = angDiff(ang, d.spinAng);
+      if (Math.abs(da) < 2) { d.spin += Math.abs(da) / (Math.PI * 2); d.rot += da; }
+    }
+    d.spinAng = ang;
+  } else d.spinAng = null;
+  const e = Math.abs(d.air - TOSS_AIR);
+  let zi = -1;
+  if (pressed(p.pad, BTN.A)) zi = e <= 0.08 ? 0 : e <= 0.18 ? 1 : e <= 0.30 ? 2 : 3;
+  else if (d.air > TOSS_AIR + 0.30) zi = 3;       // ماتمسكتش: وقعت
+  if (zi >= 0) {
+    const catchQ = [1, 0.7, 0.4, 0][zi];
+    d.catches.push(catchQ * (0.6 + 0.4 * Math.min(1, d.spin / 2)));     // لفتين كاملين = أحسن نتيجة
+    d.lastCatch = { zi, spin: d.spin };
+    d.tosses++; d.air = -1; d.showT = 0.7;
+    if (zi === 0) { sfx('ding'); rumble(p, 0.2, 0.6, 150); }
+    else if (zi === 3) { sfx('buzz'); rumble(p, 0.6, 0.2, 200); }
+    else sfx('ok');
+  }
+}
+
+// --- المرحلة 2: العجينة (تلات تقنيات ورا بعض) ---
+function updateDough(p, dt) {
+  const d = p.dough;
+  d.warnT = Math.max(0, d.warnT - dt);
+  if (d.doneT > 0) { d.doneT -= dt; if (d.doneT <= 0) finishDough(p); return; }
+  const s = stick(p.pad, 2, 3);
+  const m = Math.hypot(s.x, s.y);
+  const k = m > 1 ? 1 / m : 1;
+  d.px = s.x * k; d.py = s.y * k;                 // مكان المؤشر (بدون أي تنعيم أو acceleration)
+  if (d.step === 0) kneadStep(p, d, s, m, dt);
+  else if (d.step === 1) shapeStep(p, d, s, m);
+  else tossStep(p, d, s, m, dt);
+  if (pressed(p.pad, BTN.B) && d.doneT <= 0) { p.mini = null; sfx('back'); }
+}
+
+// --- المرحلة 3: المكونات — اختار المكوّن الصح، وبعدين نزّل القطع على العلامات والبيتزا بتلف ---
+const RING = [0.5, 0.76, 0.28, 0.62];             // بُعد كل مكوّن عن مركز البيتزا
+const PIECE = [17, 14, 12, 12];                   // حجم القطعة
+function topQuality(t) {
+  const all = t.accs.slice();
+  const cur = t.marks.filter(mk => mk.filled).map(mk => mk.acc);
+  if (cur.length) all.push(avg(cur));
+  return (all.length ? avg(all) : 1) * Math.max(0, 1 - 0.1 * t.wrong) * Math.max(0.5, 1 - 0.04 * t.waste);
+}
+function startDrop(t, i) {
+  t.mode = 'drop'; t.cur = i; t.dirn = -t.dirn;
+  const off = Math.random() * Math.PI * 2;
+  t.marks = [];
+  for (let k = 0; k < N_MARKS; k++) t.marks.push({ ang: off + k * Math.PI * 2 / N_MARKS, filled: false, acc: 0 });
+  t.strays = [];
+}
+function finishToppings(p) {
+  p.item.stage = 'topped'; p.item.toppings = p.top.score;
+  p.mini = null;
+  toast(rival(p), T('toast').rTop);
+}
+function updateToppings(p, dt) {
+  const t = p.top;
+  t.shake = Math.max(0, t.shake - dt);
+  t.msgT = Math.max(0, t.msgT - dt);
+  t.rot += t.dirn * (0.38 + 0.04 * Math.min(game.round, 6)) * Math.PI * 2 * dt;     // كل راوند البيتزا بتلف أسرع
+  if (t.doneT > 0) {
+    t.doneT -= dt;
+    if (t.doneT <= 0) finishToppings(p);
+    return;
+  }
+  if (t.mode === 'pick') {
+    if (navPressed(p.pad, rtl() ? 'left' : 'right') && t.focus < 3) { t.focus++; sfx('nav'); }
+    if (navPressed(p.pad, rtl() ? 'right' : 'left') && t.focus > 0) { t.focus--; sfx('nav'); }
+    if (pressed(p.pad, BTN.A)) {
+      if (t.done[t.focus]) return;
+      if (game.order.items.includes(t.focus)) { startDrop(t, t.focus); sfx('ok'); }
+      else {                                      // مكوّن مش في الطلب = خصم 10%
+        t.wrong++; t.shake = 0.45; t.wrongIdx = t.focus; t.msg = 'wrong'; t.msgT = 0.9;
+        sfx('buzz'); rumble(p, 0.4, 0.2, 150);
+      }
+    } else if (pressed(p.pad, BTN.B)) { p.mini = null; sfx('back'); }
+    return;
+  }
+  // وضع التنزيل: A بينزّل قطعة تحت الصبّابة
+  if (pressed(p.pad, BTN.A)) {
+    const local = -Math.PI / 2 - t.rot;           // الزاوية اللي تحت الصبّابة دلوقتي
+    let best = null, bd = 9;
+    for (const mk of t.marks) {
+      if (mk.filled) continue;
+      const dd = Math.abs(angDiff(mk.ang, local));
+      if (dd < bd) { bd = dd; best = mk; }
+    }
+    if (best && bd <= DROP_TOL) {
+      best.filled = true;
+      best.acc = bd <= 0.07 ? 1 : 1 - 0.5 * (bd - 0.07) / (DROP_TOL - 0.07);
+      t.placed[t.cur].push(local);
+      sfx(best.acc >= 1 ? 'ding' : 'ok');
+      if (t.marks.every(mk => mk.filled)) {
+        t.accs.push(avg(t.marks.map(mk => mk.acc)));
+        t.done[t.cur] = true; t.mode = 'pick'; t.cur = -1; t.marks = [];
+        if (game.order.items.every(i => t.done[i])) { t.score = topQuality(t); t.doneT = 0.7; }
+      }
+    } else {                                      // برّه العلامة: قطعة ضايعة
+      t.waste++; t.strays.push(local); t.msg = 'miss'; t.msgT = 0.6;
+      sfx('buzz');
+    }
+  } else if (pressed(p.pad, BTN.B)) { p.mini = null; sfx('back'); }
+}
+
+// --- المرحلة 4: الخبز — دوس A للتسخين وسيبه للتبريد، وخليك جوه المنطقة الخضرا اللي بتتحرك ---
+const BAKE_ZONES = [
+  { s: 1.0, color: '#3aa655' }, { s: 0.7, color: '#d9a400' },
+  { s: 0.4, color: '#e07b22' }, { s: 0.1, color: '#c8362b' }
+];
+function bandCenter(b) {
+  const t = b.t + b.seed;
+  return 0.52 + 0.2 * Math.sin(t * 1.25) + 0.09 * Math.sin(t * 2.9 + 1.3);
+}
+function finishBake(p) {
+  p.item.stage = 'baked'; p.item.bake = p.bake.result.s;
+  p.mini = null;
+  toast(rival(p), T('toast').rBake);
+}
+function updateBake(p, dt) {
+  const b = p.bake;
+  if (b.result) {
+    b.endT -= dt;
+    if (b.endT <= 0) finishBake(p);
+    return;
+  }
+  const held = down(p.pad, BTN.A);
+  b.vel += ((held ? 0.8 : -0.65) - b.vel) * Math.min(1, dt * 5);
+  b.T = clamp(b.T + b.vel * dt, 0, 1);
+  if (b.T <= 0 || b.T >= 1) b.vel = 0;
+  const d = Math.abs(b.T - bandCenter(b));
+  b.zi = d <= 0.075 ? 0 : d <= 0.16 ? 1 : d <= 0.28 ? 2 : 3;     // مثالي 100% · قريب 70% · بعيد 40% · برّه 10%
+  b.qsum += BAKE_ZONES[b.zi].s * dt;
+  b.t += dt;
+  if (b.t >= BAKE_TIME) {
+    const s = b.qsum / b.t;
+    const zi = s >= 0.85 ? 0 : s >= 0.62 ? 1 : s >= 0.38 ? 2 : 3;
+    b.result = { zi, s, color: BAKE_ZONES[zi].color };
+    b.endT = 1.0;
+    if (zi === 0) { p.stats.perfects++; sfx('ding'); rumble(p, 0.2, 0.6, 200); } else sfx(zi === 3 ? 'buzz' : 'ok');
+  } else if (pressed(p.pad, BTN.B)) { p.mini = null; sfx('back'); }
+}
+
+// --- المرحلة 5: التقديم ---
+// السكور: مكونات 30 + عجينة 30 + خبز 20 + سرعة 20 (+ البونصات) × مضاعف الراوند
+function computeScore(p, served, first) {
+  const sc = p.scores, it = p.item;
+  // كل وقعة بتخصم 15%، والبيتزا اللي ماتسلّمتش بتتحسب بنص قيمتها
+  const pen = it ? Math.pow(DROP_PENALTY, it.drops) * (served ? 1 : 0.5) : 1;
+  sc.dough = it ? Math.round(30 * it.dough * pen) : 0;
+  sc.toppings = it && it.stage !== 'dough' ? Math.round(30 * it.toppings * pen) : 0;
+  sc.bake = it && it.stage === 'baked' ? Math.round(20 * it.bake * pen) : 0;
+  sc.speed = served ? Math.round(20 * clamp(game.timeLeft / ROUND_TIME, 0, 1)) : 0;
+  sc.bonus = first ? (game.mod === 'rush' ? FIRST_BONUS * 2 : FIRST_BONUS) : 0;
+  sc.mult = game.mod === 'double' ? 2 : 1;
+  sc.craft = 0; sc.awards = {};
+  sc.total = (sc.toppings + sc.dough + sc.bake + sc.speed + sc.bonus) * sc.mult;
+  sc.served = served;
+  sc.stolen = served && it.maker !== p.id;
+}
+// مبارزة الصنعة: أحسن عجينة / مكونات / خبز في الراوند ياخد +5 (البيتزا المسروقة ماتتحسبش)
+function applyAwards() {
+  const [a, b] = game.players;
+  ['toppings', 'dough', 'bake'].forEach(k => {
+    if (a.scores[k] === b.scores[k]) return;
+    const w = a.scores[k] > b.scores[k] ? a : b;
+    if (w.scores.stolen) return;
+    w.scores.awards[k] = true; w.scores.craft += CRAFT_BONUS;
+  });
+  game.players.forEach(p => {
+    const sc = p.scores;
+    sc.total = (sc.toppings + sc.dough + sc.bake + sc.speed + sc.bonus + sc.craft) * sc.mult;
+  });
+}
+function commentFor(score) {
+  const tiers = T('comments');
+  for (let i = 0; i < COMMENT_MIN.length; i++) if (score >= COMMENT_MIN[i]) return pick(tiers[i]);
+  return '';
+}
+function servePizza(p) {
+  const o = rival(p), first = !game.firstServed;
+  game.firstServed = true;
+  computeScore(p, true, first);
+  const sc = p.scores;
+  p.servedItem = p.item; p.item = null;
+  p.finished = true; p.phase = 'done';
+  p.bubble = { text: sc.stolen ? pick(T('stolenComments')) : commentFor(sc.toppings + sc.dough + sc.bake + sc.speed), t: Infinity };
+  if (first) {
+    p.stats.firsts++;
+    toast(p, T('toast').first(sc.bonus), '#3aa655');
+    toast(o, T('toast').rServed, '#c8362b');
+  } else toast(o, T('toast').rServed2);
+  sfx('serve'); rumble(p, 0.5, 0.5, 250);
+}
+
+// نهاية الراوند: الاتنين سلّموا أو الوقت خلص
+function endRound() {
+  game.roundOver = true; game.roundEndT = 2.8;
+  for (const p of game.players) {
+    if (p.finished) continue;
+    if (p.mini) kickFromMini(p);
+    computeScore(p, false, false);                // اللي ماسلّمش ياخد نص نقاط اللي في إيده بس
+    p.bubble = { text: pick(T('timeouts')), t: Infinity };
+  }
+  applyAwards();
+  sfx('end');
+}
+function finishRound() {
+  const [a, b] = game.players;
+  game.players.forEach(p => { p.total += p.scores.total; });
+  if (a.scores.total !== b.scores.total) (a.scores.total > b.scores.total ? a : b).stats.rounds++;
+  setScreen('roundResult');
+}
+
+// --- Pause ---
+function openPause() { game.paused = true; game.pauseIdx = 0; game.pauseShake = 0; }
+function updatePause(dt) {
+  game.pauseShake = Math.max(0, game.pauseShake - dt);
+  const missing = game.players.some(p => !padOK(p));
+  const resume = () => { if (missing) game.pauseShake = 0.4; else game.paused = false; };
+  if (anyBoundNav('up')) { game.pauseIdx = (game.pauseIdx + 2) % 3; sfx('nav'); }
+  if (anyBoundNav('down')) { game.pauseIdx = (game.pauseIdx + 1) % 3; sfx('nav'); }
+  if (anyBoundPressed(BTN.A)) {
+    if (game.pauseIdx === 0) resume();
+    else if (game.pauseIdx === 1) restartRound();
+    else quitToWelcome();
+  } else if (anyBoundPressed(BTN.START) || anyBoundPressed(BTN.B)) resume();
+}
+
+function updatePlay(dt) {
+  if (!game.paused && game.players.some(p => !padOK(p))) openPause();   // دراع اتفصل: Pause تلقائي
+  if (game.paused) { updatePause(dt); return; }
+  if (anyBoundPressed(BTN.START)) { openPause(); return; }
+
+  if (game.roundOver) {
+    game.roundEndT -= dt;
+    game.players.forEach(p => tickTimers(p, dt));
+    if (game.roundEndT <= 0) finishRound();
+    return;
+  }
+  if (game.countT > 0) {                          // العد التنازلي: تقدر تبص حواليك بس
+    const before = Math.ceil(game.countT);
+    game.countT -= dt;
+    game.players.forEach(p => look(p, dt));
+    if (game.countT <= 0) { game.goT = 0.9; sfx('go'); }
+    else if (Math.ceil(game.countT) !== before) sfx('count');
+    return;
+  }
+  game.goT = Math.max(0, game.goT - dt);
+  const secBefore = Math.ceil(game.timeLeft);
+  game.timeLeft -= dt;
+  if (game.timeLeft > 0 && game.timeLeft <= 5 && Math.ceil(game.timeLeft) !== secBefore) sfx('tick');
+  updateWorld(dt);
+  game.players.forEach(p => updatePlayer(p, dt));
+  if (game.timeLeft <= 0) { game.timeLeft = 0; endRound(); }
+  else if (game.players.every(p => p.finished)) endRound();
+  else if (game.mod === 'sudden' && game.players.some(p => p.finished)) endRound();
+}
+
+function update(dt) {
+  if (game.screen !== 'welcome' && game.screen !== 'bind') tryRebind();
+  switch (game.screen) {
+    case 'welcome':     updateWelcome(); break;
+    case 'bind':        updateBind(dt); break;
+    case 'charselect':  updateCharSelect(dt); break;
+    case 'rules':       updateRules(); break;
+    case 'play':        updatePlay(dt); break;
+    case 'roundResult': updateRoundResult(); break;
+    case 'winner':      updateWinner(); break;
+  }
+}
+
+// ============================ 8) أدوات الرسم ============================
+function rr(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function circle(x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+function ellipse(x, y, rx, ry) { ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill(); }
+function txt(s, x, y, size, color, align, weight) {
+  ctx.font = (weight || 700) + ' ' + size + 'px ' + FONT;
+  ctx.fillStyle = color;
+  ctx.textAlign = align || 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(s, x, y);
+}
+function txtFit(s, x, y, size, color, align, weight, maxW) {
+  ctx.font = (weight || 700) + ' ' + size + 'px ' + FONT;
+  const w = ctx.measureText(s).width;
+  if (w > maxW) size = Math.max(9, size * maxW / w);
+  txt(s, x, y, size, color, align, weight);
+}
+function wrapText(s, maxW, size, weight) {
+  ctx.font = (weight || 700) + ' ' + size + 'px ' + FONT;
+  const words = s.split(' '), lines = [];
+  let line = '';
+  for (const w of words) {
+    const test = line ? line + ' ' + w : w;
+    if (line && ctx.measureText(test).width > maxW) { lines.push(line); line = w; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+// فقرة بتتكسر على كذا سطر — بترجّع ارتفاعها
+function para(s, x, y, maxW, size, lh, color, align, weight) {
+  const lines = wrapText(s, maxW, size, weight || 600);
+  lines.forEach((l, i) => txt(l, x, y + i * lh, size, color, align, weight || 600));
+  return lines.length * lh;
+}
+function card(x, y, w, h, r, fill, stroke) {
+  ctx.save();
+  ctx.shadowColor = 'rgba(60,35,10,.22)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
+  ctx.fillStyle = fill || '#fffaf0'; rr(x, y, w, h, r); ctx.fill();
+  ctx.restore();
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 3; rr(x, y, w, h, r); ctx.stroke(); }
+}
+// الـ Focus: إطار متوهج بينبض
+function focusFrame(x, y, w, h, r, color) {
+  const pulse = 0.5 + 0.5 * Math.sin(game.t * 6);
+  ctx.save();
+  ctx.shadowColor = color; ctx.shadowBlur = 16 + 14 * pulse;
+  ctx.strokeStyle = color; ctx.lineWidth = 5;
+  rr(x - 5, y - 5, w + 10, h + 10, r + 5); ctx.stroke();
+  ctx.restore();
+}
+function button(x, y, w, h, label, focused, size) {
+  if (focused) focusFrame(x, y, w, h, 16, '#ffb703');
+  ctx.fillStyle = focused ? '#e4572e' : '#fff3df';
+  rr(x, y, w, h, 16); ctx.fill();
+  ctx.strokeStyle = focused ? '#9b2f12' : '#c9a777'; ctx.lineWidth = 3;
+  rr(x, y, w, h, 16); ctx.stroke();
+  txtFit(label, x + w / 2, y + h / 2 + 1, size || 28, focused ? '#fff' : '#6b4a2e', 'center', 800, w - 30);
+}
+function glyph(x, y, letter, r) {
+  r = r || 15;
+  const colors = { A: '#3aa655', B: '#d64541', X: '#2f7fd1' };
+  ctx.fillStyle = colors[letter] || '#666'; circle(x, y, r);
+  ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(x, y, r - 1, 0, Math.PI * 2); ctx.stroke();
+  txt(letter, x, y + 1, r * 1.15, '#fff', 'center', 800);
+}
+function pill(s, x, y, size, bg, fg) {
+  ctx.font = '800 ' + size + 'px ' + FONT;
+  const w = ctx.measureText(s).width + size * 1.3, h = size * 1.75;
+  ctx.fillStyle = bg; rr(x - w / 2, y - h / 2, w, h, h / 2); ctx.fill();
+  txt(s, x, y + 1, size, fg, 'center', 800);
+}
+
+function drawMenuBg() {
+  ctx.fillStyle = '#f6ead2'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#f1e0c0';
+  for (let i = 0; i < 16; i++) for (let j = 0; j < 9; j++) if ((i + j) % 2 === 0) ctx.fillRect(i * 80, j * 80, 80, 80);
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(0, 0, W, 12); ctx.fillRect(0, H - 12, W, 12);
+}
+
+function drawPizza(x, y, r, rot, o) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  ctx.fillStyle = o.baked ? '#c98a3c' : '#e3cf9c'; circle(0, 0, r);
+  ctx.fillStyle = o.baked ? '#e3ae62' : '#f4e6c0'; circle(0, 0, r * 0.88);
+  if (o.sauce) { ctx.fillStyle = o.baked ? '#b8301f' : '#d2473a'; circle(0, 0, r * 0.82); }
+  if (o.cheese) { ctx.fillStyle = o.baked ? '#f0b93a' : '#f7d774'; circle(0, 0, r * 0.72); }
+  if (o.sausage) {
+    ctx.fillStyle = '#8f3b2a';
+    for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3 + 0.3; circle(Math.cos(a) * r * 0.47, Math.sin(a) * r * 0.47, r * 0.11); }
+  }
+  if (o.pepper) {
+    ctx.strokeStyle = '#3f8f3a'; ctx.lineWidth = Math.max(1.5, r * 0.04);
+    for (let i = 0; i < 5; i++) {
+      const a = i * Math.PI * 2 / 5 + 1;
+      ctx.beginPath(); ctx.arc(Math.cos(a) * r * 0.22, Math.sin(a) * r * 0.22, r * 0.085, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+  if (o.slices) {
+    ctx.strokeStyle = 'rgba(120,60,20,.35)'; ctx.lineWidth = 2;
+    for (let i = 0; i < 4; i++) {
+      const a = i * Math.PI / 4;
+      ctx.beginPath(); ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r); ctx.lineTo(-Math.cos(a) * r, -Math.sin(a) * r); ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+const FULL_PIZZA = { sauce: 1, cheese: 1, sausage: 1, pepper: 1, baked: 1, slices: 1 };
+function pizzaLook(order, baked) {
+  const it = order ? order.items : [];
+  return { sauce: it.includes(0), cheese: it.includes(1), sausage: it.includes(2), pepper: it.includes(3), baked: baked };
+}
+
+// الشخصية الصغيرة (للقوايم والـ HUD): ولد بقبعة / بنت بتاج
+function drawChar(kind, x, y, s, accent) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  ctx.fillStyle = 'rgba(0,0,0,.18)'; ellipse(0, 23, 17, 5);
+  ctx.fillStyle = accent; rr(-15, -2, 30, 25, 10); ctx.fill();
+  ctx.fillStyle = '#fffdf7'; rr(-8, 5, 16, 15, 4); ctx.fill();
+  if (kind === 'girl') {
+    ctx.fillStyle = '#5a3220';
+    circle(0, -13, 15); circle(-14, -6, 6); circle(14, -6, 6);
+  }
+  ctx.fillStyle = '#f6cfa5'; circle(0, -12, 13);
+  if (kind === 'girl') { ctx.fillStyle = '#5a3220'; ctx.beginPath(); ctx.arc(0, -14, 13, Math.PI * 1.05, Math.PI * 1.95); ctx.closePath(); ctx.fill(); }
+  ctx.fillStyle = '#3b2a20'; circle(-4.5, -11, 1.8); circle(4.5, -11, 1.8);
+  ctx.strokeStyle = '#3b2a20'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.arc(0, -8.5, 4, 0.18 * Math.PI, 0.82 * Math.PI); ctx.stroke();
+  if (kind === 'boy') {
+    ctx.fillStyle = '#2f6fb7';
+    ctx.beginPath(); ctx.arc(0, -17, 12.5, Math.PI, 0); ctx.closePath(); ctx.fill();
+    rr(-3, -20.5, 20, 5, 2.5); ctx.fill();
+    ctx.fillStyle = '#fff'; circle(0, -29, 2.2);
+  } else {
+    ctx.fillStyle = '#f4c430'; ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-10, -22); ctx.lineTo(-11, -33); ctx.lineTo(-5, -27); ctx.lineTo(0, -35);
+    ctx.lineTo(5, -27); ctx.lineTo(11, -33); ctx.lineTo(10, -22); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#e4572e'; circle(0, -26, 1.8);
+  }
+  ctx.restore();
+}
+
+function drawIngredient(i, x, y, r, noPlate) {
+  if (!noPlate) {
+    ctx.fillStyle = '#fff'; circle(x, y, r);
+    ctx.strokeStyle = '#d9cdb8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r - 1, 0, Math.PI * 2); ctx.stroke();
+  }
+  if (i === 0) {
+    ctx.fillStyle = '#c8362b'; circle(x, y, r * 0.68);
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; circle(x - r * 0.22, y - r * 0.22, r * 0.14);
+  } else if (i === 1) {
+    ctx.fillStyle = '#f2c94c';
+    ctx.beginPath(); ctx.moveTo(x - r * 0.62, y + r * 0.42); ctx.lineTo(x + r * 0.62, y + r * 0.42); ctx.lineTo(x + r * 0.1, y - r * 0.58); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#d9a520'; circle(x - r * 0.15, y + r * 0.18, r * 0.1); circle(x + r * 0.22, y + r * 0.1, r * 0.08);
+  } else if (i === 2) {
+    ctx.fillStyle = '#9c4a32';
+    circle(x - r * 0.3, y + r * 0.2, r * 0.27); circle(x + r * 0.3, y + r * 0.2, r * 0.27); circle(x, y - r * 0.3, r * 0.27);
+    ctx.fillStyle = '#c47a5e';
+    circle(x - r * 0.3, y + r * 0.2, r * 0.1); circle(x + r * 0.3, y + r * 0.2, r * 0.1); circle(x, y - r * 0.3, r * 0.1);
+  } else {
+    ctx.strokeStyle = '#4c9a3f'; ctx.lineWidth = Math.max(2.5, r * 0.14);
+    [[-0.3, 0.2], [0.3, 0.2], [0, -0.3]].forEach(([dx, dy]) => {
+      ctx.beginPath(); ctx.arc(x + dx * r, y + dy * r, r * 0.22, 0, Math.PI * 2); ctx.stroke();
+    });
+  }
+}
+
+// أيقونة الأداة: دقيق / شطة / زيت
+function drawItemIcon(type, x, y, r) {
+  if (type === 'flour') {
+    ctx.fillStyle = '#fff'; rr(x - r * 0.7, y - r * 0.85, r * 1.4, r * 1.7, r * 0.35); ctx.fill();
+    ctx.strokeStyle = '#a8977c'; ctx.lineWidth = Math.max(1.5, r * 0.12); rr(x - r * 0.7, y - r * 0.85, r * 1.4, r * 1.7, r * 0.35); ctx.stroke();
+    ctx.fillStyle = '#a8977c'; ctx.fillRect(x - r * 0.4, y - r * 0.25, r * 0.8, r * 0.16); ctx.fillRect(x - r * 0.4, y + r * 0.1, r * 0.8, r * 0.16);
+  } else if (type === 'chili') {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(-0.6);
+    ctx.fillStyle = '#d62828'; ctx.beginPath(); ctx.ellipse(0, 0, r * 0.95, r * 0.38, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#3f8f3a'; ctx.fillRect(r * 0.7, -r * 0.13, r * 0.42, r * 0.26);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = '#e0a81c';
+    ctx.beginPath(); ctx.moveTo(x, y - r);
+    ctx.bezierCurveTo(x + r * 1.1, y + r * 0.1, x + r * 0.7, y + r, x, y + r);
+    ctx.bezierCurveTo(x - r * 0.7, y + r, x - r * 1.1, y + r * 0.1, x, y - r);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; circle(x - r * 0.22, y + r * 0.3, r * 0.16);
+  }
+}
+
+// بالون كلام الزبون
+function drawBubble(cx, by, text, tail) {
+  const size = 17, lh = 24;
+  const lines = wrapText(text, 400, size);
+  const w = Math.max(...lines.map(l => ctx.measureText(l).width)) + 30;
+  const h = lines.length * lh + 14;
+  const x = clamp(cx - w / 2, 8, VW - 8 - w), y = by - h;
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#5b3a21'; ctx.lineWidth = 2.5;
+  rr(x, y, w, h, 12); ctx.fill(); ctx.stroke();
+  if (tail) {
+    const tx = clamp(cx, x + 20, x + w - 20);
+    ctx.beginPath(); ctx.moveTo(tx - 9, by - 1); ctx.lineTo(tx, by + 11); ctx.lineTo(tx + 9, by - 1);
+    ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(tx - 9, by); ctx.lineTo(tx, by + 11); ctx.lineTo(tx + 9, by); ctx.stroke();
+  }
+  lines.forEach((l, i) => txt(l, x + w / 2, y + 7 + lh / 2 + i * lh, size, '#3b2a20'));
+}
+
+function drawPadIcon(x, y, s, color) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  ctx.fillStyle = color;
+  rr(-60, -28, 120, 56, 26); ctx.fill();
+  circle(-48, 22, 20); circle(48, 22, 20);
+  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  ctx.fillRect(-42, -8, 22, 7); ctx.fillRect(-34.5, -15.5, 7, 22);
+  circle(30, -12, 5); circle(40, -3, 5); circle(20, -3, 5); circle(30, 6, 5);
+  ctx.fillStyle = 'rgba(0,0,0,.28)'; circle(-14, 14, 9); circle(14, 14, 9);
+  ctx.restore();
+}
+
+// ============================ 9) خامات ومجسمات المنظور الأول ============================
+const TEX = {};
+const SPR = {};
+
+function makeTex(draw) {
+  const l = drawOn(makeCanvas(TS, TS), draw);
+  const d = drawOn(makeCanvas(TS, TS), () => { ctx.drawImage(l, 0, 0); ctx.fillStyle = 'rgba(60,30,0,.16)'; ctx.fillRect(0, 0, TS, TS); });
+  return { l, d };
+}
+function texWall() {
+  ctx.fillStyle = '#f3e3c3'; ctx.fillRect(0, 0, TS, TS);
+  ctx.fillStyle = '#e6d0a6'; ctx.fillRect(0, 0, TS, 5);
+  ctx.fillStyle = '#dccaa6'; ctx.fillRect(0, 58, TS, 62);
+  ctx.fillStyle = '#fffaf0';
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) ctx.fillRect(c * 32 + 1.5, 60 + r * 20 + 1, 29, 18);
+  ctx.fillStyle = '#b07a48'; ctx.fillRect(0, 53, TS, 5);
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(0, 120, TS, 8);
+}
+function texWindow() {
+  texWall();
+  const g = ctx.createLinearGradient(0, 10, 0, 50);
+  g.addColorStop(0, '#9fd3f0'); g.addColorStop(1, '#e2f3fb');
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(20, 8, 88, 44);
+  ctx.fillStyle = g; ctx.fillRect(25, 13, 78, 34);
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(62, 13, 4, 34); ctx.fillRect(25, 28, 78, 4);
+}
+function texMenu() {
+  texWall();
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(14, 6, 100, 46);
+  ctx.fillStyle = '#2f3b36'; ctx.fillRect(18, 10, 92, 38);
+  ctx.font = '800 17px ' + FONT; ctx.fillStyle = '#fff8ec'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('PIZZA', 64, 22);
+  ctx.fillStyle = 'rgba(255,248,236,.7)';
+  ctx.fillRect(30, 33, 68, 2); ctx.fillRect(38, 39, 52, 2);
+}
+function texDoor() {
+  texWall();
+  ctx.fillStyle = '#7a4a26'; ctx.fillRect(28, 8, 72, 120);
+  ctx.fillStyle = '#9a6236'; ctx.fillRect(32, 12, 64, 116);
+  ctx.fillStyle = '#86522c'; ctx.fillRect(40, 20, 48, 40); ctx.fillRect(40, 70, 48, 48);
+  ctx.fillStyle = '#e0b040'; circle(88, 66, 4);
+}
+function texOven() {
+  ctx.fillStyle = '#75635a'; ctx.fillRect(0, 0, TS, TS);
+  ctx.fillStyle = '#5a4a43'; ctx.fillRect(0, 0, TS, 34);
+  ctx.fillStyle = '#463a34';
+  for (let i = 0; i < 5; i++) ctx.fillRect(18, 7 + i * 5, 92, 2);
+  ctx.fillStyle = '#d9d2c8'; ctx.fillRect(18, 42, 92, 5);
+  ctx.fillStyle = '#2a211d'; ctx.fillRect(16, 50, 96, 52);
+  const g = ctx.createRadialGradient(64, 80, 4, 64, 78, 46);
+  g.addColorStop(0, '#ffd66b'); g.addColorStop(0.6, '#f08a2c'); g.addColorStop(1, '#b8381a');
+  ctx.fillStyle = g; ctx.fillRect(22, 56, 84, 40);
+  ctx.fillStyle = '#d9d2c8';
+  for (let i = 0; i < 4; i++) circle(28 + i * 24, 113, 5);
+  ctx.fillStyle = '#463a34'; ctx.fillRect(0, 122, TS, 6);
+}
+function texShelf() {
+  texWall();
+  const jars = ['#c8362b', '#f2c94c', '#4c9a3f', '#9c4a32', '#2f7fd1'];
+  [20, 44].forEach((y, row) => {
+    ctx.fillStyle = '#8a5a34'; ctx.fillRect(10, y, 108, 5);
+    for (let i = 0; i < 5; i++) {
+      ctx.fillStyle = jars[(i + row * 2) % 5]; ctx.fillRect(16 + i * 21, y - 13, 12, 13);
+      ctx.fillStyle = '#e9e2d4'; ctx.fillRect(16 + i * 21, y - 16, 12, 3);
+    }
+  });
+}
+function texCounter() {
+  ctx.fillStyle = '#b07a48'; ctx.fillRect(0, 0, TS, TS);
+  ctx.fillStyle = '#9a683a';
+  for (let i = 0; i < 4; i++) ctx.fillRect(i * 32, 0, 2, TS);
+  ctx.fillStyle = '#d2a26e'; ctx.fillRect(0, 0, TS, 16);
+  ctx.fillStyle = '#7a4f28'; ctx.fillRect(0, 112, TS, 16);
+}
+function texTable() {
+  ctx.fillStyle = '#c08d57'; ctx.fillRect(0, 0, TS, TS);
+  ctx.fillStyle = '#a97a47';
+  for (let i = 0; i < 4; i++) ctx.fillRect(i * 32, 0, 2, TS);
+  ctx.fillStyle = '#d9ac77'; ctx.fillRect(0, 0, TS, 14);
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(0, 0, 8, TS); ctx.fillRect(120, 0, 8, TS); ctx.fillRect(0, 116, TS, 12);
+}
+
+// الزبون (5 أشكال، واحد لكل راوند)
+function drawCustomerSprite(k) {
+  const shirts = ['#7b8fb8', '#b87b9a', '#7bb88f', '#b8a27b', '#9a7bb8'];
+  const hairs = ['#3b2a20', '#8a5a34', '#222', '#c9a24b', '#6b3a2a'];
+  ctx.fillStyle = '#4a4f63'; rr(36, 148, 20, 76, 7); ctx.fill(); rr(64, 148, 20, 76, 7); ctx.fill();
+  ctx.fillStyle = '#2b2b33'; rr(32, 214, 26, 14, 6); ctx.fill(); rr(62, 214, 26, 14, 6); ctx.fill();
+  ctx.fillStyle = shirts[k]; rr(10, 84, 20, 66, 10); ctx.fill(); rr(90, 84, 20, 66, 10); ctx.fill();
+  ctx.fillStyle = '#eec39a'; circle(20, 152, 10); circle(100, 152, 10);
+  ctx.fillStyle = shirts[k]; rr(24, 76, 72, 88, 24); ctx.fill();
+  ctx.fillStyle = '#e2b488'; rr(52, 62, 16, 20, 6); ctx.fill();
+  ctx.fillStyle = hairs[k]; circle(60, 38, 33);
+  ctx.fillStyle = '#eec39a'; circle(60, 44, 29);
+  ctx.fillStyle = '#3b2a20'; circle(49, 42, 4); circle(71, 42, 4);
+  ctx.strokeStyle = '#3b2a20'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(51, 59); ctx.lineTo(69, 59); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(41, 31); ctx.lineTo(54, 35); ctx.moveTo(79, 31); ctx.lineTo(66, 35); ctx.stroke();
+}
+
+// الشيف الخصم بالحجم الكامل (ولد بقبعة / بنت بتاج) بلون اللاعب
+function drawChefSprite(kind, accent) {
+  ctx.fillStyle = '#3d4256'; rr(36, 152, 20, 72, 7); ctx.fill(); rr(64, 152, 20, 72, 7); ctx.fill();
+  ctx.fillStyle = '#2b2b33'; rr(32, 214, 26, 14, 6); ctx.fill(); rr(62, 214, 26, 14, 6); ctx.fill();
+  ctx.fillStyle = accent; rr(10, 88, 20, 62, 10); ctx.fill(); rr(90, 88, 20, 62, 10); ctx.fill();
+  ctx.fillStyle = '#f6cfa5'; circle(20, 152, 10); circle(100, 152, 10);
+  ctx.fillStyle = accent; rr(24, 80, 72, 88, 24); ctx.fill();
+  ctx.fillStyle = '#fffdf7'; rr(38, 100, 44, 64, 10); ctx.fill();
+  ctx.fillStyle = '#e8b98a'; rr(52, 68, 16, 18, 6); ctx.fill();
+  if (kind === 'girl') { ctx.fillStyle = '#5a3220'; circle(60, 50, 33); circle(27, 66, 13); circle(93, 66, 13); }
+  ctx.fillStyle = '#f6cfa5'; circle(60, 52, 28);
+  if (kind === 'girl') { ctx.fillStyle = '#5a3220'; ctx.beginPath(); ctx.arc(60, 48, 28, Math.PI * 1.05, Math.PI * 1.95); ctx.closePath(); ctx.fill(); }
+  ctx.fillStyle = '#3b2a20'; circle(50, 54, 4); circle(70, 54, 4);
+  ctx.strokeStyle = '#3b2a20'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.arc(60, 60, 9, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(42, 44); ctx.lineTo(54, 47); ctx.moveTo(78, 44); ctx.lineTo(66, 47); ctx.stroke();   // حواجب شريرة
+  if (kind === 'boy') {
+    ctx.fillStyle = '#2f6fb7';
+    ctx.beginPath(); ctx.arc(60, 42, 28, Math.PI, 0); ctx.closePath(); ctx.fill();
+    rr(54, 34, 46, 11, 5); ctx.fill();
+    ctx.fillStyle = '#fff'; circle(60, 15, 5);
+  } else {
+    ctx.fillStyle = '#f4c430'; ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(38, 28); ctx.lineTo(36, 4); ctx.lineTo(49, 17); ctx.lineTo(60, 1);
+    ctx.lineTo(71, 17); ctx.lineTo(84, 4); ctx.lineTo(82, 28); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#e4572e'; circle(60, 19, 4);
+  }
+}
+
+function buildAssets() {
+  TEX['#'] = makeTex(texWall);
+  TEX.W = makeTex(texWindow);
+  TEX.M = makeTex(texMenu);
+  TEX.d = makeTex(texDoor);
+  TEX.O = makeTex(texOven);
+  TEX.S = makeTex(texShelf);
+  TEX.K = makeTex(texCounter);
+  TEX.D = makeTex(texTable);
+  TEX.T = TEX.D;
+
+  SPR.customer = [0, 1, 2, 3, 4].map(k => drawOn(makeCanvas(120, 230), () => drawCustomerSprite(k)));
+  // SPR.chef[شخصية][لاعب]
+  SPR.chef = CHARS.map(kind => ACCENTS.map(acc => drawOn(makeCanvas(120, 230), () => drawChefSprite(kind, acc))));
+  SPR.dough = drawOn(makeCanvas(140, 70), () => {
+    ctx.fillStyle = 'rgba(90,60,30,.18)'; ellipse(70, 56, 62, 10);
+    ctx.fillStyle = '#e8d3a2'; ellipse(70, 38, 60, 28);
+    ctx.fillStyle = '#f4e6c0'; ellipse(56, 28, 30, 12);
+  });
+  SPR.plate = [0, 1, 2, 3].map(i => drawOn(makeCanvas(120, 70), () => {
+    ctx.fillStyle = 'rgba(90,60,30,.18)'; ellipse(60, 46, 56, 20);
+    ctx.fillStyle = '#fff'; ellipse(60, 38, 56, 26);
+    ctx.fillStyle = '#ece3d2'; ellipse(60, 38, 44, 19);
+    ctx.save(); ctx.translate(60, 36); ctx.scale(1, 0.5); drawIngredient(i, 0, 0, 50, true); ctx.restore();
+  }));
+  // بيتزا لكل طلب: نيّة ومخبوزة
+  const flat = (o, baked) => drawOn(makeCanvas(120, 60), () => {
+    ctx.fillStyle = 'rgba(60,35,10,.25)'; ellipse(60, 34, 58, 24);
+    ctx.save(); ctx.translate(60, 29); ctx.scale(1, 0.45); drawPizza(0, 0, 58, 0, pizzaLook(o, baked)); ctx.restore();
+  });
+  SPR.pizza = ORDERS.map(o => flat(o, true));
+  SPR.pizzaRaw = ORDERS.map(o => flat(o, false));
+  // سهم العلامة
+  SPR.arrow = drawOn(makeCanvas(80, 90), () => {
+    ctx.fillStyle = '#ffb703'; ctx.strokeStyle = '#7a3b10'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(26, 6); ctx.lineTo(54, 6); ctx.lineTo(54, 44); ctx.lineTo(74, 44);
+    ctx.lineTo(40, 84); ctx.lineTo(6, 44); ctx.lineTo(26, 44); ctx.closePath(); ctx.fill(); ctx.stroke();
+  });
+  // صناديق الأدوات
+  SPR.crate = {};
+  ITEM_TYPES.forEach(type => {
+    SPR.crate[type] = drawOn(makeCanvas(100, 100), () => {
+      ctx.fillStyle = '#c99562'; rr(6, 6, 88, 88, 10); ctx.fill();
+      ctx.strokeStyle = '#7a4f28'; ctx.lineWidth = 6; ctx.lineJoin = 'round'; rr(6, 6, 88, 88, 10); ctx.stroke();
+      ctx.fillStyle = '#fff8ec'; circle(50, 50, 30);
+      drawItemIcon(type, 50, 50, 20);
+    });
+  });
+  // بقعة الزيت
+  SPR.puddle = drawOn(makeCanvas(160, 48), () => {
+    ctx.fillStyle = 'rgba(160,110,10,.55)'; ellipse(80, 24, 78, 22);
+    ctx.fillStyle = 'rgba(235,190,60,.75)'; ellipse(74, 22, 58, 15);
+    ctx.fillStyle = 'rgba(255,255,255,.5)'; ellipse(56, 17, 16, 4);
+  });
+}
+
+// ---- الأرضية: بنرسمها بيكسل بيكسل في صورة صغيرة ونكبّرها ----
+const FW = VW / 2, FH = (VH - HORIZON) / 2;
+const floorCv = makeCanvas(FW, FH), floorCtx = floorCv.getContext('2d');
+const floorImg = floorCtx.createImageData(FW, FH);
+const floorPx = new Uint32Array(floorImg.data.buffer);
+const rowDist = new Float32Array(FH);
+const rowKA = new Uint32Array(FH), rowKB = new Uint32Array(FH), rowDA = new Uint32Array(FH), rowDB = new Uint32Array(FH);
+(function initFloorRows() {
+  const pack = (c) => (255 << 24) | (c[2] << 16) | (c[1] << 8) | c[0];
+  const mixTo = (c, m, f) => [0, 1, 2].map(i => Math.round(c[i] + (m[i] - c[i]) * f));
+  const KA = [245, 233, 208], KB = [222, 198, 158], KM = [234, 216, 184];
+  const DA = [251, 243, 228], DB = [208, 132, 98], DM = [232, 192, 166];
+  for (let r = 0; r < FH; r++) {
+    const d = EYE * FOCAL / ((r + 0.5) * 2);
+    rowDist[r] = d;
+    const f = clamp((d - 2.5) / 9, 0, 0.85);
+    rowKA[r] = pack(mixTo(KA, KM, f)); rowKB[r] = pack(mixTo(KB, KM, f));
+    rowDA[r] = pack(mixTo(DA, DM, f)); rowDB[r] = pack(mixTo(DB, DM, f));
+  }
+})();
+
+function drawFloor(p, cam) {
+  const lx = cam.dirX - cam.plX, ly = cam.dirY - cam.plY;
+  const sx = 2 * cam.plX / FW, sy = 2 * cam.plY / FW;
+  let o = 0;
+  for (let r = 0; r < FH; r++) {
+    const d = rowDist[r];
+    const dx = d * sx, dy = d * sy;
+    let wx = p.x + d * lx + dx * 0.5, wy = p.y + d * ly + dy * 0.5;
+    const ka = rowKA[r], kb = rowKB[r], da = rowDA[r], db = rowDB[r];
+    for (let c = 0; c < FW; c++) {
+      const chk = (Math.floor(wx * 2) + Math.floor(wy * 2)) & 1;
+      floorPx[o++] = wy < 2 ? (chk ? da : db) : (chk ? ka : kb);
+      wx += dx; wy += dy;
+    }
+  }
+  floorCtx.putImageData(floorImg, 0, 0);
+  ctx.drawImage(floorCv, 0, HORIZON, VW, VH - HORIZON);
+}
+
+// ---- الحيطان: Raycasting عمود عمود ----
+const viewCv = makeCanvas(VW, VH), viewCtx = viewCv.getContext('2d');
+const zbuf = new Float32Array(NCOL);
+const MAXLOW = NCOL * 14;
+const lowCol = new Int16Array(MAXLOW), lowSide = new Uint8Array(MAXLOW);
+const lowDist = new Float32Array(MAXLOW), lowExit = new Float32Array(MAXLOW), lowU = new Float32Array(MAXLOW);
+const lowCell = new Array(MAXLOW), lowIdx = new Int32Array(MAXLOW);
+let lowN = 0;
+
+function castWalls(p, cam) {
+  lowN = 0;
+  for (let c = 0; c < NCOL; c++) {
+    const camX = 2 * (c + 0.5) / NCOL - 1;
+    const rx = cam.dirX + cam.plX * camX, ry = cam.dirY + cam.plY * camX;
+    let mx = Math.floor(p.x), my = Math.floor(p.y);
+    const ddx = Math.abs(1 / rx), ddy = Math.abs(1 / ry);
+    let stepX, stepY, sdx, sdy;
+    if (rx < 0) { stepX = -1; sdx = (p.x - mx) * ddx; } else { stepX = 1; sdx = (mx + 1 - p.x) * ddx; }
+    if (ry < 0) { stepY = -1; sdy = (p.y - my) * ddy; } else { stepY = 1; sdy = (my + 1 - p.y) * ddy; }
+    let side = 0, dist = 1, cell = '#', u = 0;
+    for (let it = 0; it < 48; it++) {
+      if (sdx < sdy) { dist = sdx; sdx += ddx; mx += stepX; side = 0; }
+      else { dist = sdy; sdy += ddy; my += stepY; side = 1; }
+      cell = cellAt(mx, my);
+      if (cell === '.') continue;
+      u = side === 0 ? p.y + dist * ry : p.x + dist * rx;
+      u -= Math.floor(u);
+      if ((side === 0 && rx < 0) || (side === 1 && ry > 0)) u = 1 - u;
+      if (LOW[cell] !== undefined) {                                       // صندوق واطي: سجّله وكمّل
+        if (lowN < MAXLOW) {
+          lowCol[lowN] = c; lowSide[lowN] = side; lowDist[lowN] = Math.max(dist, 0.05);
+          lowExit[lowN] = Math.min(sdx, sdy); lowU[lowN] = u; lowCell[lowN] = cell; lowN++;
+        }
+        continue;
+      }
+      break;
+    }
+    dist = Math.max(dist, 0.05);
+    zbuf[c] = dist;
+    const top = HORIZON - (WALL_H - EYE) * FOCAL / dist, bot = HORIZON + EYE * FOCAL / dist;
+    const tex = TEX[cell] || TEX['#'];
+    ctx.drawImage(side ? tex.d : tex.l, Math.min(TS - 1, (u * TS) | 0), 0, 1, TS, c * COLW, top, COLW, bot - top);
+  }
+}
+
+// عمود واحد من صندوق واطي: السطح + الوش
+function drawLowHit(i) {
+  const cell = lowCell[i], h = LOW[cell], d = lowDist[i], e = lowExit[i], x = lowCol[i] * COLW;
+  const yTopFront = HORIZON + (EYE - h) * FOCAL / d;
+  const yBot = HORIZON + EYE * FOCAL / d;
+  const yTopBack = HORIZON + (EYE - h) * FOCAL / e;
+  ctx.fillStyle = LOW_TOP[cell];
+  ctx.fillRect(x, yTopBack, COLW, yTopFront - yTopBack + 1);
+  const tex = TEX[cell];
+  ctx.drawImage(lowSide[i] ? tex.d : tex.l, Math.min(TS - 1, (lowU[i] * TS) | 0), 0, 1, TS, x, yTopFront, COLW, yBot - yTopFront);
+}
+
+// إسقاط نقطة من العالم على الشاشة
+function project(p, cam, x, y, z) {
+  const dx = x - p.x, dy = y - p.y;
+  const tx = cam.inv * (cam.dirY * dx - cam.dirX * dy);
+  const ty = cam.inv * (-cam.plY * dx + cam.plX * dy);
+  if (ty < 0.15) return null;
+  return { x: (VW / 2) * (1 + tx / ty), y: HORIZON + (EYE - z) * FOCAL / ty, depth: ty };
+}
+
+// رسم مجسم مسطح مع اختبار العمق ضد الحيطان عمود بعمود
+function drawSpr(s) {
+  const pt = s.pt, sc = FOCAL / pt.depth, sw = s.w * sc, sh = s.h * sc;
+  const left = pt.x - sw / 2, yt = pt.y - sh, img = s.img;
+  const c0 = Math.max(0, Math.floor(left / COLW)), c1 = Math.min(NCOL - 1, Math.floor((left + sw) / COLW));
+  let run = -1;
+  s.visible = false; s.yTop = yt;
+  for (let c = c0; c <= c1 + 1; c++) {
+    const vis = c <= c1 && pt.depth < zbuf[c];
+    if (vis && run < 0) run = c;
+    if (!vis && run >= 0) {
+      const xs = Math.max(left, run * COLW), xe = Math.min(left + sw, c * COLW);
+      if (xe > xs) {
+        ctx.drawImage(img, (xs - left) / sw * img.width, 0, (xe - xs) / sw * img.width, img.height, xs, yt, xe - xs, sh);
+        s.visible = true;
+      }
+      run = -1;
+    }
+  }
+}
+
+function itemSprite(item) {
+  if (item.stage === 'dough') return SPR.dough;
+  return (item.stage === 'baked' ? SPR.pizza : SPR.pizzaRaw)[game.order.idx];
+}
+
+// رسم منظر اللاعب كله في كانفاس جانبية + تجهيز العناوين اللي هتترسم فوقه
+function render3D(p) {
+  const keep = ctx; ctx = viewCtx;
+  const o = rival(p);
+  const dirX = Math.cos(p.a), dirY = Math.sin(p.a);
+  const cam = { dirX, dirY, plX: -dirY * PLANE, plY: dirX * PLANE };
+  cam.inv = 1 / (cam.plX * cam.dirY - cam.dirX * cam.plY);
+
+  const cg = ctx.createLinearGradient(0, 0, 0, HORIZON);
+  cg.addColorStop(0, '#fdf8ec'); cg.addColorStop(1, '#efe0c2');
+  ctx.fillStyle = cg; ctx.fillRect(0, 0, VW, HORIZON);
+  drawFloor(p, cam);
+  castWalls(p, cam);
+
+  // كل المجسمات — bias بيظبط ترتيب الرسم (اللي فوق طاولة بيترسم بعد الطاولة)
+  const sprites = [];
+  const add = (img, x, y, z, w, h, bias, tag) => {
+    const pt = project(p, cam, x, y, z);
+    if (!pt) return null;
+    const s = { img, pt, w, h, key: pt.depth - (bias || 0), tag };
+    sprites.push(s);
+    return s;
+  };
+  add(SPR.customer[(game.round - 1) % 5], CUSTOMER.x, CUSTOMER.y, 0, 0.80, 1.53, 0, 'customer');
+  // الشيف الخصم واللي شايله
+  add(SPR.chef[o.charIdx][o.id], o.x, o.y, 0, 0.78, 1.5, 0, 'rival');
+  if (o.item) add(itemSprite(o.item), o.x, o.y, 0.72, 0.5, 0.25, 0.04);
+  // فوق الطاولات والكاونتر
+  add(SPR.dough, 5.5, 5.5, LOW.D, 0.7, 0.35, 0.75);
+  for (let i = 0; i < 4; i++) add(SPR.plate[i], 4.45 + i * 0.7, 8.5, LOW.T, 0.6, 0.35, 0.75, 'ing' + i);
+  game.players.forEach(q => { if (q.finished) add(SPR.pizza[game.order.idx], 5.5 + (q.id ? 0.6 : -0.6), 2.5, LOW.K, 0.6, 0.3, 0.75); });
+  // على الأرض: زيت، بيتزا واقعة، صناديق
+  game.puddles.forEach(pd => add(SPR.puddle, pd.x, pd.y, 0, 1.0, 0.3, -0.3));
+  game.pizzas.forEach(z => add(SPR.pizza[game.order.idx], z.x, z.y, 0.02, 0.75, 0.37, -0.2));
+  game.crates.forEach(c => add(SPR.crate[c.type], c.x, c.y, 0.2 + 0.07 * Math.sin(game.t * 3 + c.x), 0.44, 0.44, 0, 'crate:' + c.type));
+  // أسهم الهدف
+  const tg = p.mini ? null : targetOf(p);
+  if (tg) {
+    for (const m of tg.pts) {
+      const k = clamp(Math.hypot(m.x - p.x, m.y - p.y) / 3.2, 0.3, 1);    // السهم بيصغر لما تقرّب
+      add(SPR.arrow, m.x, m.y, m.z + 0.07 * Math.sin(game.t * 6), 0.36 * k, 0.4 * k, m.top ? 0.75 : 0);
+    }
+  }
+
+  // رسّام من البعيد للقريب: أعمدة الصناديق الواطية والمجسمات مع بعض
+  for (let i = 0; i < lowN; i++) lowIdx[i] = i;
+  const ord = lowIdx.subarray(0, lowN);
+  ord.sort((a, b) => lowDist[b] - lowDist[a]);
+  sprites.sort((a, b) => b.key - a.key);
+  let si = 0;
+  for (let k = 0; k < lowN; k++) {
+    const d = lowDist[ord[k]];
+    while (si < sprites.length && sprites[si].key >= d) drawSpr(sprites[si++]);
+    drawLowHit(ord[k]);
+  }
+  while (si < sprites.length) drawSpr(sprites[si++]);
+
+  // العناوين اللي هتترسم فوق المنظر
+  const labels = [];
+  let cust = null;
+  for (const s of sprites) {
+    if (!s.visible || !s.tag) continue;
+    if (s.tag === 'customer') cust = { x: s.pt.x, yTop: s.yTop, visible: true };
+    else if (s.tag === 'rival') {
+      labels.push({ text: pname(o) + (o.stunT > 0 || o.slipT > 0 ? ' ✶' : ''), x: s.pt.x, y: s.yTop - 12,
+                    size: clamp(40 / s.pt.depth, 11, 18), bg: o.accent, fg: '#fff' });
+    } else if (s.tag.startsWith('ing') && s.pt.depth < 3.4) {
+      labels.push({ text: T('ingredients')[+s.tag.slice(3)], x: s.pt.x, y: s.yTop - 12, size: clamp(26 / s.pt.depth, 11, 17) });
+    } else if (s.tag.startsWith('crate:') && s.pt.depth < 5) {
+      labels.push({ text: T('items')[s.tag.slice(6)], x: s.pt.x, y: s.yTop - 12, size: clamp(30 / s.pt.depth, 11, 16), bg: '#2f7fd1', fg: '#fff' });
+    }
+  }
+  const tkey = tg ? tg.key : null;
+  for (const key in STATIONS) {
+    if (key === 'customer' && p.bubble) continue;          // البالون مكان العنوان
+    for (const m of STATIONS[key].marks) {
+      const isT = key === tkey;
+      const pt = project(p, cam, m.x, m.y, m.z + (isT ? 0.56 : 0.1));
+      if (!pt || pt.x < -60 || pt.x > VW + 60) continue;
+      const col = clamp(Math.floor(pt.x / COLW), 0, NCOL - 1);
+      if (pt.depth > zbuf[col] + 0.2) continue;
+      labels.push({ text: T('station')[key], x: pt.x, y: pt.y, size: clamp(44 / pt.depth, 12, 22),
+                    bg: isT ? '#ffb703' : null, fg: isT ? '#4a2c0a' : '#fff' });
+    }
+  }
+  if (tkey === 'pizza') {
+    const m = tg.pts[0], pt = project(p, cam, m.x, m.y, m.z + 0.5);
+    if (pt && pt.x > -60 && pt.x < VW + 60) labels.push({ text: T('station').pizza, x: pt.x, y: pt.y, size: clamp(44 / pt.depth, 12, 22), bg: '#ffb703', fg: '#4a2c0a' });
+  }
+  // لو الهدف برّه مجال الرؤية: نشاور عليه
+  let turn = 0;
+  if (tg) {
+    let best = null;
+    for (const m of tg.pts) { const d = Math.hypot(m.x - p.x, m.y - p.y); if (!best || d < best.d) best = { d, m }; }
+    const diff = angDiff(Math.atan2(best.m.y - p.y, best.m.x - p.x), p.a);
+    if (Math.abs(diff) > 0.52) turn = Math.sign(diff);
+  }
+  ctx = keep;
+  return { cust, labels, turn };
+}
+
+// ============================ 10) رسم شاشة اللعب ============================
+function hintFor(p) {
+  const h = T('hint');
+  if (p.finished) return h.done;
+  if (p.mini) return h[p.mini + 'Mini'];
+  const tg = targetOf(p);
+  if (tg && tg.key === 'pizza') return h.grab;
+  return h[p.phase];
+}
+
+// زرار الأداة (X) وزرار الزقّ (B) في الـ HUD
+function drawActionPills(p, x, y) {
+  const pw = 124, ph = 30;
+  // الأداة
+  const has = !!p.inv;
+  ctx.fillStyle = has ? '#e3f0fb' : '#ece6da'; rr(x, y, pw, ph, 10); ctx.fill();
+  ctx.strokeStyle = has ? '#2f7fd1' : '#b9aa92'; ctx.lineWidth = 2; rr(x, y, pw, ph, 10); ctx.stroke();
+  ctx.globalAlpha = has ? 1 : 0.45; glyph(x + 17, y + 15, 'X', 11); ctx.globalAlpha = 1;
+  if (has) drawItemIcon(p.inv, x + 42, y + 15, 9);
+  txtFit(has ? T('items')[p.inv] : T('noItem'), x + (has ? 86 : 74), y + 16, 14, has ? '#1f5d9c' : '#8a8376', 'center', 700, has ? 66 : 84);
+  // الزقّ (بيتملي تاني بعد الاستخدام)
+  const x2 = x + pw + 8, ready = p.shoveCd <= 0;
+  ctx.fillStyle = '#ece6da'; rr(x2, y, pw, ph, 10); ctx.fill();
+  ctx.save(); rr(x2, y, pw, ph, 10); ctx.clip();
+  ctx.fillStyle = ready ? '#fbe3e0' : '#d9cfc0';
+  ctx.fillRect(x2, y, pw * (ready ? 1 : 1 - p.shoveCd / SHOVE_CD), ph);
+  ctx.restore();
+  ctx.strokeStyle = ready ? '#d64541' : '#b9aa92'; ctx.lineWidth = 2; rr(x2, y, pw, ph, 10); ctx.stroke();
+  ctx.globalAlpha = ready ? 1 : 0.45; glyph(x2 + 17, y + 15, 'B', 11); ctx.globalAlpha = 1;
+  txtFit(T('shove'), x2 + 74, y + 16, 14, ready ? '#9b2f2b' : '#8a8376', 'center', 700, 84);
+}
+
+// شريط المعلومات فوق: الاسم + النقاط (بتاعتي وبتاعة الخصم) + الوقت + الطلب + الأزرار
+function drawHUD(p, ox) {
+  const x0 = ox, x1 = ox + HALF, o = rival(p);
+  ctx.fillStyle = '#fff8ec'; ctx.fillRect(ox, 0, HALF, HUD_H);
+  ctx.fillStyle = p.accent; ctx.fillRect(ox, 0, HALF, 6);
+  ctx.fillStyle = '#8a5a34'; ctx.fillRect(ox, HUD_H - 4, HALF, 4);
+  drawChar(CHARS[p.charIdx], sideStart(x0, x1, 32), 36, 0.72, p.accent);
+  txt(pname(p), sideStart(x0, x1, 60), 30, 23, p.accent, alStart(), 800);
+  const cx = ox + HALF / 2 + (rtl() ? -16 : 16);
+  txt(T('score', p.total), cx, 23, 21, '#3b2a20', 'center', 800);
+  txt(T('rivalScore', o.total), cx, 44, 13, o.accent, 'center', 700);
+  const low = game.timeLeft <= 10;
+  const tx = rtl() ? x0 + 14 : x1 - 14 - 112;
+  ctx.fillStyle = low ? '#c8362b' : '#6b4a2e'; rr(tx, 12, 112, 36, 10); ctx.fill();
+  txt(T('sec', Math.ceil(game.timeLeft)), tx + 56, 31, 22, '#fff', 'center', 800);
+  const order = p.heard ? T('order', orderName(game.order), orderItemsText(game.order)) : T('orderUnknown');
+  txtFit(order, sideStart(x0, x1, 16), 72, 16, '#3b2a20', alStart(), 700, 340);
+  drawActionPills(p, rtl() ? x0 + 14 : x1 - 14 - 256, 57);
+}
+
+// الخريطة الصغيرة + متابعة تقدم اللاعبين
+function drawMinimap(p, x, y) {
+  const cs = 10, mw = MAP[0].length * cs, mh = MAP.length * cs, o = rival(p);
+  ctx.fillStyle = 'rgba(30,18,8,.74)'; rr(x - 6, y - 44, mw + 12, mh + 50, 10); ctx.fill();
+  // نقط التقدم: إنت والخصم
+  [[T('you'), stageOf(p), p.accent], [T('rival'), stageOf(o), o.accent]].forEach(([label, n, col], r) => {
+    const py = y - 32 + r * 16;
+    txtFit(label, rtl() ? x + mw : x, py, 11, '#fff', alStart(), 700, 42);
+    for (let i = 0; i < 5; i++) {
+      ctx.fillStyle = i < n ? col : 'rgba(255,255,255,.25)';
+      circle(rtl() ? x + mw - 50 - i * 13 : x + 50 + i * 13, py, 4.5);
+    }
+  });
+  for (let r = 0; r < MAP.length; r++) for (let q = 0; q < MAP[0].length; q++) {
+    const c = MAP[r][q];
+    if (c === '.') continue;
+    ctx.fillStyle = c === 'K' ? '#b07a48' : c === 'D' ? '#f5eddd' : c === 'T' ? '#dcbd90' : c === 'O' ? '#f08a2c' : 'rgba(255,243,223,.26)';
+    ctx.fillRect(x + q * cs, y + r * cs, cs, cs);
+  }
+  ctx.fillStyle = '#9db4e0'; circle(x + CUSTOMER.x * cs, y + CUSTOMER.y * cs, 3.5);
+  // الهدف
+  const tg = p.mini ? null : targetOf(p);
+  if (tg) {
+    ctx.strokeStyle = '#ffb703'; ctx.lineWidth = 2;
+    for (const m of tg.pts) { ctx.beginPath(); ctx.arc(x + m.x * cs, y + m.y * cs, 6 + 2 * Math.sin(game.t * 6), 0, Math.PI * 2); ctx.stroke(); }
+  }
+  game.puddles.forEach(pd => { ctx.fillStyle = 'rgba(224,168,28,.8)'; circle(x + pd.x * cs, y + pd.y * cs, 3); });
+  game.crates.forEach(c => { ctx.fillStyle = '#6fb6ff'; ctx.fillRect(x + c.x * cs - 3, y + c.y * cs - 3, 6, 6); });
+  game.pizzas.forEach(z => { ctx.fillStyle = '#ffb703'; circle(x + z.x * cs, y + z.y * cs, 4); });
+  // الخصم ثم أنا (سهم باتجاه النظر)
+  ctx.fillStyle = o.accent; circle(x + o.x * cs, y + o.y * cs, 4.5);
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x + o.x * cs, y + o.y * cs, 4.5, 0, Math.PI * 2); ctx.stroke();
+  ctx.save(); ctx.translate(x + p.x * cs, y + p.y * cs); ctx.rotate(p.a);
+  ctx.fillStyle = p.accent; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(8, 0); ctx.lineTo(-5, -5.5); ctx.lineTo(-2, 0); ctx.lineTo(-5, 5.5); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+
+// اللي اللاعب شايله قدامه
+function drawHeld(p) {
+  if (!p.item) return;
+  const look = p.item.stage === 'dough' ? {} : pizzaLook(game.order, p.item.stage === 'baked');
+  const bob = p.moving ? Math.sin(p.walk) * 5 : 0;
+  const cx = VW / 2, cy = VH - 40 + bob;
+  ctx.fillStyle = p.accent;
+  rr(cx - 198, cy + 6, 72, 110, 22); ctx.fill(); rr(cx + 126, cy + 6, 72, 110, 22); ctx.fill();
+  ctx.fillStyle = '#f6cfa5'; circle(cx - 158, cy + 8, 23); circle(cx + 158, cy + 8, 23);
+  ctx.fillStyle = '#8a5a34'; ellipse(cx, cy + 5, 162, 50);
+  ctx.fillStyle = '#c99562'; ellipse(cx, cy, 160, 48);
+  ctx.save(); ctx.translate(cx, cy - 5); ctx.scale(1, 0.3); drawPizza(0, 0, 130, 0, look); ctx.restore();
+}
+// إيدين الزقّة
+function drawLunge(p) {
+  if (p.lungeT <= 0) return;
+  const k = Math.sin((1 - p.lungeT / 0.25) * Math.PI), cx = VW / 2, hy = VH - 60 - 150 * k;
+  [-1, 1].forEach(s => {
+    ctx.fillStyle = p.accent; rr(cx + s * 95 - 32, hy, 64, VH - hy + 20, 22); ctx.fill();
+    ctx.fillStyle = '#f6cfa5'; circle(cx + s * 95, hy, 30 + 6 * k);
+  });
+}
+// ضلمة راوند "النور قطع": كشاف في النص
+function drawBlackout() {
+  const g = ctx.createRadialGradient(VW / 2, HORIZON + 30, 60, VW / 2, HORIZON + 30, 400);
+  g.addColorStop(0, 'rgba(10,6,2,0)'); g.addColorStop(0.45, 'rgba(10,6,2,.62)'); g.addColorStop(1, 'rgba(10,6,2,.97)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
+}
+
+// كل اللي بيترسم فوق المنظر
+function drawViewOverlays(p, ov) {
+  for (const l of ov.labels) pill(l.text, clamp(l.x, 50, VW - 50), l.y, l.size, l.bg || 'rgba(60,36,14,.78)', l.fg || '#fff');
+  if (ov.turn) {                                   // سهم "لفّ ناحية الهدف"
+    const b = 8 * Math.sin(game.t * 7) * ov.turn;
+    const x = (ov.turn > 0 ? VW - 44 : 44) + b;
+    ctx.fillStyle = '#ffb703'; ctx.strokeStyle = '#7a3b10'; ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + 22 * ov.turn, HORIZON); ctx.lineTo(x - 14 * ov.turn, HORIZON - 30); ctx.lineTo(x - 14 * ov.turn, HORIZON + 30);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+  if (p.boostT > 0) {                              // وهج الشطة على الأطراف
+    const g = ctx.createRadialGradient(VW / 2, VH / 2, 220, VW / 2, VH / 2, 460);
+    g.addColorStop(0, 'rgba(228,87,46,0)'); g.addColorStop(1, 'rgba(228,87,46,.5)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
+  }
+  if (p.stunT > 0) { ctx.fillStyle = 'rgba(200,54,43,' + (0.35 * p.stunT / STUN_TIME) + ')'; ctx.fillRect(0, 0, VW, VH); }
+  drawHeld(p);
+  drawLunge(p);
+  pill(hintFor(p), VW / 2, 26, 16, 'rgba(45,28,12,.78)', '#fff');
+  if (p.bubble) {
+    if (ov.cust && ov.cust.x > 20 && ov.cust.x < VW - 20) drawBubble(ov.cust.x, Math.max(ov.cust.yTop - 14, 150), p.bubble.text, true);
+    else drawBubble(VW / 2, 150, p.bubble.text, false);
+  }
+  // "اضغط A" لما يوصل للمحطة ويبص عليها
+  if (!p.finished && p.phase !== 'order' && p.stunT <= 0 && p.slipT <= 0 && canUse(p, PHASE_STATION[p.phase])) {
+    const label = T('act')[p.phase];
+    ctx.font = '800 20px ' + FONT;
+    const w = ctx.measureText(label).width + 78, x = VW / 2 - w / 2, y = HORIZON + 78 + 3 * Math.sin(game.t * 8);
+    ctx.fillStyle = 'rgba(45,28,12,.85)'; rr(x, y, w, 46, 23); ctx.fill();
+    glyph(rtl() ? x + w - 26 : x + 26, y + 23, 'A', 16);
+    txt(label, rtl() ? x + (w - 46) / 2 + 4 : x + 46 + (w - 46) / 2 - 4, y + 24, 20, '#fff', 'center', 800);
+  }
+  if (p.finished) {
+    const cy = VH - 150;
+    card(210, cy, 300, 88, 16, '#fffaf0', p.accent);
+    txt(T('delivered'), 360, cy + 28, 23, p.accent, 'center', 800);
+    txt(T('roundScore', p.scores.total), 360, cy + 60, 20, '#3b2a20', 'center', 700);
+  }
+  drawMinimap(p, p.id === 0 ? 14 : VW - 14 - MAP[0].length * 10, VH - 12 - MAP.length * 10);
+}
+
+// --- رسم الميني جيمز ---
+function miniPanel(p, title) {
+  ctx.fillStyle = 'rgba(45,28,12,.62)'; ctx.fillRect(0, -12, VW, VH + 12);
+  card(50, 60, 540, 490, 22, '#fffaf0', '#8a5a34');
+  txtFit(title, 320, 94, 25, '#8a3a1e', 'center', 800, 500);
+  // تحذير: الخصم قريب وممكن يزقّك
+  const o = rival(p);
+  if (Math.hypot(o.x - p.x, o.y - p.y) < 2.4 && Math.sin(game.t * 12) > -0.3) pill(T('rivalClose'), 320, 36, 17, '#c8362b', '#fff');
+}
+// جودة الخصم في نفس المرحلة: عشان تعرف لازم تكسر كام
+function rivalStageQ(p, key) {
+  const o = rival(p), it = o.item || o.servedItem;
+  if (it && it.maker === o.id) {
+    if (key === 'dough') return it.dough;
+    if (key === 'toppings' && it.stage !== 'dough') return it.toppings;
+    if (key === 'bake' && it.stage === 'baked') return it.bake;
+  }
+  if (key === 'dough' && !it && (o.dough.step > 0 || o.dough.folds > 0)) return doughQuality(o.dough);
+  return null;
+}
+function qualityLine(p, y, mine, key) {
+  const o = rival(p), rq = rivalStageQ(p, key);
+  txt(T('quality', Math.round(mine * 100)), sideStart(50, 590, 34), y, 18, p.accent, alStart(), 800);
+  txt(rq === null ? T('rivalNone') : T('rivalQ', Math.round(rq * 100)), sideEnd(50, 590, 34), y, 18, o.accent, alEnd(), 800);
+}
+function stickPointer(d, cx, cy, R) {
+  const px = cx + d.px * R, py = cy - d.py * R;
+  ctx.fillStyle = 'rgba(47,127,209,.35)'; circle(px, py, 14);
+  ctx.strokeStyle = 'rgba(47,127,209,.9)'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(px, py, 14, 0, Math.PI * 2); ctx.stroke();
+}
+
+function drawDough(p) {
+  const d = p.dough, cx = 320, cy = 326;
+  miniPanel(p, T('doughTitle'));
+  // التلات تقنيات
+  T('doughSteps').forEach((name, i) => {
+    const x = 320 + (rtl() ? -1 : 1) * (i - 1) * 156 - 70, y = 114, cur = d.step === i && d.doneT <= 0, done = d.step > i || d.doneT > 0;
+    ctx.fillStyle = done ? '#3aa655' : cur ? '#e4572e' : '#efe2c8';
+    rr(x, y, 140, 32, 16); ctx.fill();
+    txtFit((i + 1) + '  ' + name + (done ? '  ✓' : ''), x + 70, y + 17, 16, done || cur ? '#fff' : '#8a6a4a', 'center', 800, 124);
+  });
+  qualityLine(p, 170, doughQuality(d), 'dough');
+  if (d.step === 0) drawKnead(d, cx, cy, 100);
+  else if (d.step === 1) drawShape(d, cx, cy, 112);
+  else drawToss(d, cx);
+}
+
+// التقنية 1: العجن
+function drawKnead(d, cx, cy, R) {
+  ctx.strokeStyle = '#eadbbd'; ctx.lineWidth = 16; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  if (d.prog > 0.01) {                              // تقدم الطيّة الحالية
+    ctx.strokeStyle = '#e4572e'; ctx.lineWidth = 16; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(cx, cy, R, -Math.PI / 2, -(Math.PI / 2 + d.dir * d.prog), d.dir > 0); ctx.stroke();
+    ctx.lineCap = 'butt';
+  }
+  for (let k = 0; k < 6; k++) {                     // أسهم الاتجاه المطلوب
+    const th = k * Math.PI / 3 + d.dir * game.t * 1.6;
+    ctx.save(); ctx.translate(cx + Math.cos(th) * (R + 26), cy - Math.sin(th) * (R + 26));
+    ctx.rotate(-(th + d.dir * Math.PI / 2));
+    ctx.fillStyle = '#b23a1e'; ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, -8); ctx.lineTo(-6, 8); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  const sq = 1 + 0.08 * Math.sin(d.prog * 2);       // كورة العجين بتتطبّق
+  ctx.fillStyle = '#e8d3a2'; ellipse(cx, cy, 62 * sq, 56 / sq);
+  ctx.fillStyle = '#f4e6c0'; ellipse(cx - 14, cy - 12, 30, 20);
+  ctx.strokeStyle = 'rgba(160,120,60,.5)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(cx, cy, 36, -d.dir * d.prog, -d.dir * d.prog + 2.2); ctx.stroke();
+  stickPointer(d, cx, cy, R);
+  // عدّاد السرعة: الأخضر مسموح، الأحمر بيقطّع العجينة
+  const gx = 170, gw = 300, gy = 470, maxS = KNEAD_MAX * 1.7;
+  ctx.fillStyle = '#c8362b'; rr(gx, gy, gw, 14, 7); ctx.fill();
+  ctx.fillStyle = '#3aa655'; rr(gx, gy, gw * (KNEAD_MAX / maxS), 14, 7); ctx.fill();
+  ctx.fillStyle = '#2b1d14'; ctx.fillRect(gx + gw * Math.min(1, d.speed / maxS) - 2.5, gy - 6, 5, 26);
+  for (let i = 0; i < KNEAD_FOLDS; i++) {           // الطيّات اللي خلصت
+    ctx.fillStyle = i < d.folds ? '#e4572e' : '#e3d3b4';
+    circle(320 + (i - (KNEAD_FOLDS - 1) / 2) * 22, 503, 7);
+  }
+  if (d.warnT > 0) txtFit(d.warn === 'fast' ? T('kneadFast') : T('kneadWrong'), 320, 529, 18, '#c8362b', 'center', 800, 500);
+  else txtFit(T('kneadTip'), 320, 529, 16, '#8a6a4a', 'center', 600, 500);
+}
+
+// التقنية 2: الفرد
+function drawShape(d, cx, cy, R) {
+  ctx.fillStyle = '#f3e7cf'; circle(cx, cy, R + 12);
+  ctx.strokeStyle = '#d9c7a3'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  // القطاعات: أخضر لو قريب من المثالي، أحمر لو بعيد
+  const da = Math.PI * 2 / SECTORS;
+  for (let i = 0; i < SECTORS; i++) {
+    if (!d.painted[i]) continue;
+    const k = Math.min(1, Math.abs(d.radii[i] - IDEAL_R) / 0.3);
+    ctx.fillStyle = 'hsl(' + (120 * (1 - k)) + ',62%,50%)';
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, d.radii[i] * R, -(i + 1) * da - 0.004, -i * da + 0.004);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.save();                                       // Ghost Circle: الحلقة المثالية
+  ctx.setLineDash([8, 7]); ctx.strokeStyle = 'rgba(90,60,30,.6)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(cx, cy, IDEAL_R * R, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+  stickPointer(d, cx, cy, R);
+  txt(T('coverage', Math.round(d.coverage * 100)), rtl() ? 440 : 200, 470, 19, '#3b2a20', 'center', 700);
+  txt(T('shapeQ', Math.round((d.smooth * 0.5 + d.acc * 0.5) * 100)), rtl() ? 200 : 440, 470, 19, '#3b2a20', 'center', 700);
+  if (d.coverage >= 1) {
+    focusFrame(130, 494, 380, 42, 12, '#3aa655');
+    ctx.fillStyle = '#3aa655'; rr(130, 494, 380, 42, 12); ctx.fill();
+    txtFit(T('doughReady'), 320, 516, 20, '#fff', 'center', 800, 350);
+  } else txtFit(T('shapeTip'), 320, 516, 16, '#8a6a4a', 'center', 600, 500);
+}
+
+// التقنية 3: الرمي واللف
+function drawToss(d, cx) {
+  const by = 430, u = d.air < 0 ? 0 : d.air / TOSS_AIR;
+  const h = d.air < 0 ? 0 : Math.max(0, 4 * u * (1 - u));
+  txt(T('tossN', Math.min(d.tosses + 1, TOSSES), TOSSES), cx, 202, 18, '#8a6a4a', 'center', 700);
+  ctx.fillStyle = 'rgba(90,60,30,.16)'; ellipse(cx, by + 8, 80 - 34 * h, 18 - 8 * h);
+  ctx.strokeStyle = '#3aa655'; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.ellipse(cx, by, 76, 22, 0, 0, Math.PI * 2); ctx.stroke();
+  if (d.air >= 0) {                                 // حلقة التوقيت بتقفل لحد لحظة المسك
+    const k = Math.max(0, 1 - u);
+    ctx.strokeStyle = '#e4572e'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.ellipse(cx, by, 76 + 150 * k, 22 + 44 * k, 0, 0, Math.PI * 2); ctx.stroke();
+  }
+  const rad = 60 + Math.min(18, d.spin * 7);
+  ctx.save(); ctx.translate(cx, by - 12 - h * 180); ctx.scale(1, 0.4 + 0.32 * h);
+  ctx.fillStyle = '#e8d3a2'; circle(0, 0, rad);
+  ctx.fillStyle = '#f4e6c0'; circle(0, 0, rad * 0.8);
+  ctx.rotate(-d.rot);
+  ctx.strokeStyle = 'rgba(160,120,60,.55)'; ctx.lineWidth = 4;
+  for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.arc(0, 0, rad * 0.55, i * 2.1, i * 2.1 + 1.1); ctx.stroke(); }
+  ctx.restore();
+  if (d.showT > 0 && d.lastCatch) {
+    const colors = ['#3aa655', '#d9a400', '#e07b22', '#c8362b'];
+    txt(T('catchLabels')[d.lastCatch.zi], cx, 494, 28, colors[d.lastCatch.zi], 'center', 800);
+    if (d.lastCatch.zi < 3) txt(T('spinLabel', d.lastCatch.spin.toFixed(1)), cx, 526, 17, '#8a6a4a', 'center', 700);
+  } else if (d.doneT > 0) {
+    txt('✓', cx, 500, 40, '#3aa655', 'center', 800);
+  } else if (d.air < 0) {
+    const b = 6 * Math.sin(game.t * 8);
+    ctx.fillStyle = '#e4572e'; ctx.beginPath(); ctx.moveTo(cx, 268 - b); ctx.lineTo(cx - 20, 298 - b); ctx.lineTo(cx + 20, 298 - b); ctx.closePath(); ctx.fill();
+    ctx.fillRect(cx - 7, 296 - b, 14, 26);
+    txtFit(T('tossTip'), cx, 506, 18, '#3b2a20', 'center', 700, 500);
+  } else {
+    txtFit(T('tossAir'), cx, 506, 18, '#b23a1e', 'center', 800, 500);
+  }
+}
+
+// المكونات: البيتزا بتلف تحت الصبّابة
+function drawToppings(p) {
+  const t = p.top, cx = 320, cy = 338, R = 100;
+  miniPanel(p, T('topTitle') + ' — ' + orderName(game.order));
+  const bw = 118, bh = 42, gap = 10, x0 = 320 - (4 * bw + 3 * gap) / 2, y = 116;
+  for (let i = 0; i < 4; i++) {
+    let x = x0 + (rtl() ? 3 - i : i) * (bw + gap);
+    const wrongNow = t.shake > 0 && t.wrongIdx === i, cur = t.mode === 'drop' && t.cur === i;
+    if (wrongNow) x += Math.sin(game.t * 60) * 5;
+    if (t.mode === 'pick' && t.focus === i && t.doneT <= 0) focusFrame(x, y, bw, bh, 12, '#ffb703');
+    ctx.fillStyle = wrongNow ? '#f6c7c2' : t.done[i] ? '#d8f0d6' : cur ? '#ffe2b8' : '#fff3df';
+    rr(x, y, bw, bh, 12); ctx.fill();
+    ctx.strokeStyle = wrongNow ? '#c8362b' : t.done[i] ? '#3aa655' : cur ? '#e07b22' : '#c9a777'; ctx.lineWidth = 2.5;
+    rr(x, y, bw, bh, 12); ctx.stroke();
+    drawIngredient(i, x + 22, y + bh / 2, 15, true);
+    txtFit(T('ingredients')[i] + (t.done[i] ? ' ✓' : ''), x + 74, y + bh / 2 + 1, 16, '#3b2a20', 'center', 800, 76);
+  }
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(t.rot);
+  ctx.fillStyle = '#e3cf9c'; circle(0, 0, R);
+  ctx.fillStyle = '#f4e6c0'; circle(0, 0, R * 0.9);
+  ctx.strokeStyle = 'rgba(160,120,60,.35)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(-R * 0.9, 0); ctx.lineTo(-R * 0.8, 0); ctx.stroke();      // علامة صغيرة تبيّن اللف
+  for (let i = 0; i < 4; i++) for (const a of t.placed[i]) drawIngredient(i, Math.cos(a) * RING[i] * R, Math.sin(a) * RING[i] * R, PIECE[i], true);
+  if (t.mode === 'drop') {
+    ctx.setLineDash([5, 4]); ctx.strokeStyle = '#b23a1e'; ctx.lineWidth = 2.5;
+    for (const mk of t.marks) {
+      if (mk.filled) continue;
+      ctx.beginPath(); ctx.arc(Math.cos(mk.ang) * RING[t.cur] * R, Math.sin(mk.ang) * RING[t.cur] * R, PIECE[t.cur] + 3, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(120,110,100,.6)';
+    for (const a of t.strays) circle(Math.cos(a) * RING[t.cur] * R, Math.sin(a) * RING[t.cur] * R, 5);
+  }
+  ctx.restore();
+  if (t.mode === 'drop') {                          // الصبّابة ومكان نزول القطعة
+    const ly = cy - RING[t.cur] * R;
+    ctx.strokeStyle = '#2b1d14'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, ly, PIECE[t.cur] + 8, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = '#2b1d14';
+    ctx.beginPath(); ctx.moveTo(cx, cy - R - 3); ctx.lineTo(cx - 11, cy - R - 22); ctx.lineTo(cx + 11, cy - R - 22); ctx.closePath(); ctx.fill();
+  }
+  qualityLine(p, 464, topQuality(t), 'toppings');
+  if (t.doneT > 0) txt(T('topOk'), 320, 494, 22, '#3aa655', 'center', 800);
+  else if (t.msgT > 0) txt(t.msg === 'wrong' ? T('topWrong') : T('topMiss'), 320, 494, 22, '#c8362b', 'center', 800);
+  else txtFit(t.mode === 'pick' ? T('topPick') : T('topDrop'), 320, 494, 16, '#3b2a20', 'center', 700, 500);
+  txtFit(T('topStats', t.wrong, t.waste), 320, 524, 14, '#8a6a4a', 'center', 600, 500);
+}
+
+// الفرن: ترمومتر والمنطقة الخضرا بتتحرك
+function drawBake(p) {
+  const b = p.bake, held = down(p.pad, BTN.A) && !b.result;
+  miniPanel(p, T('bakeTitle'));
+  ctx.fillStyle = '#6b5a52'; rr(220, 114, 200, 136, 14); ctx.fill();
+  ctx.fillStyle = '#2a211d'; rr(238, 138, 164, 98, 10); ctx.fill();
+  ctx.fillStyle = 'rgba(240,' + Math.round(160 - 90 * b.T) + ',40,' + (0.45 + 0.55 * b.T) + ')'; rr(244, 144, 152, 86, 8); ctx.fill();
+  drawPizza(320, 187, 34, game.t * 0.6, pizzaLook(game.order, b.t > BAKE_TIME * 0.6));
+  ctx.fillStyle = '#d9d2c8'; circle(250, 126, 5); circle(270, 126, 5); circle(290, 126, 5);
+  const x0 = 90, w = 460, y = 288, h = 44, c = bandCenter(b);
+  const zone = (a, col) => { ctx.fillStyle = col; ctx.fillRect(x0 + (c - a) * w, y, 2 * a * w, h); };
+  ctx.save(); rr(x0, y, w, h, 12); ctx.clip();
+  ctx.fillStyle = '#c8362b'; ctx.fillRect(x0, y, w, h);
+  zone(0.28, '#e07b22'); zone(0.16, '#e9c33a'); zone(0.075, '#3aa655');
+  ctx.restore();
+  ctx.strokeStyle = '#5b3a21'; ctx.lineWidth = 3; rr(x0, y, w, h, 12); ctx.stroke();
+  const mx = x0 + b.T * w;                          // مؤشر الحرارة
+  ctx.fillStyle = '#2b1d14'; ctx.fillRect(mx - 3, y - 8, 6, h + 16);
+  ctx.beginPath(); ctx.moveTo(mx, y - 8); ctx.lineTo(mx - 11, y - 24); ctx.lineTo(mx + 11, y - 24); ctx.closePath(); ctx.fill();
+  // شريط الخبز
+  txt(T('bakeProgress'), 320, 360, 15, '#8a6a4a', 'center', 700);
+  ctx.fillStyle = '#efe2c8'; rr(x0, 374, w, 16, 8); ctx.fill();
+  const f = Math.min(1, b.t / BAKE_TIME);
+  if (f > 0.02) { ctx.fillStyle = '#e4572e'; rr(x0, 374, w * f, 16, 8); ctx.fill(); }
+  if (held) focusFrame(300, 404, 40, 40, 20, '#3aa655');
+  glyph(320, 424, 'A', 20);
+  qualityLine(p, 424, b.t > 0.05 ? b.qsum / b.t : 1, 'bake');
+  if (b.result) txt(T('bakeLabels')[b.result.zi] + ' ' + Math.round(b.result.s * 100) + '%', 320, 494, 36, b.result.color, 'center', 800);
+  else txtFit(T('bakeTip'), 320, 494, 16, '#3b2a20', 'center', 700, 500);
+}
+
+// طبقة الدقيق البيضا على شاشة الخصم
+function drawFlour(ox, t) {
+  const a = Math.min(1, t / 0.3);
+  ctx.fillStyle = 'rgba(255,255,255,' + (0.86 * a) + ')'; ctx.fillRect(ox, 0, HALF, H);
+  for (let i = 0; i < 16; i++) {
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.7 * a) + ')';
+    circle(ox + rnd(i) * HALF, rnd(i + 40) * H, 50 + rnd(i + 80) * 90);
+  }
+  txt(T('flourBig'), ox + HALF / 2, H / 2, 64, 'rgba(150,140,125,' + a + ')', 'center', 800);
+}
+
+function missingNames(list) { return list.map(pname).join(T('and')); }
+
+function drawPause() {
+  ctx.fillStyle = 'rgba(30,18,8,.72)'; ctx.fillRect(0, 0, W, H);
+  const missing = game.players.filter(p => !padOK(p));
+  const sx = game.pauseShake > 0 ? Math.sin(game.t * 60) * 7 : 0;
+  card(390 + sx, 150, 500, 420, 24, '#fffaf0', '#8a5a34');
+  txt(T('pauseTitle'), 640 + sx, 205, 38, '#8a3a1e', 'center', 800);
+  if (missing.length) {
+    txtFit(T('pauseDisc', missingNames(missing)), 640 + sx, 252, 20, '#c8362b', 'center', 800, 460);
+    txtFit(T('pauseReconnect'), 640 + sx, 280, 16, '#8a6a4a', 'center', 600, 460);
+  } else {
+    txt(T('pauseFrozen'), 640 + sx, 258, 18, '#8a6a4a', 'center', 600);
+  }
+  T('pauseItems').forEach((l, i) => button(470 + sx, 308 + i * 76, 340, 58, l, game.pauseIdx === i, 24));
+  txt(T('pauseKeys'), 640 + sx, 545, 15, '#8a6a4a', 'center', 600);
+}
+
+// بطاقة بداية الراوند: المفاجأة + العد التنازلي
+function drawCountdown() {
+  ctx.fillStyle = 'rgba(30,18,8,.55)'; ctx.fillRect(0, 0, W, H);
+  const m = T('mods')[game.mod];
+  card(340, 190, 600, 340, 26, '#fffaf0', '#e4572e');
+  txt(game.mod === 'sudden' ? m[0] : T('roundN', game.round), 640, 240, 26, '#8a6a4a', 'center', 800);
+  if (game.mod !== 'sudden') txtFit(m[0], 640, 288, 44, '#b23a1e', 'center', 800, 560);
+  txtFit(m[1], 640, game.mod === 'sudden' ? 300 : 336, 20, '#3b2a20', 'center', 600, 560);
+  const n = Math.min(3, Math.ceil(game.countT)), f = game.countT - Math.floor(game.countT);
+  txt(String(n), 640, 440, 96 + 30 * f, '#e4572e', 'center', 800);
+}
+
+function renderPlay() {
+  game.players.forEach((p, i) => {
+    const ox = i * HALF;
+    const ov = render3D(p);                         // المنظور الأول في كانفاس جانبية
+    ctx.save();
+    ctx.beginPath(); ctx.rect(ox, 0, HALF, H); ctx.clip();
+    // رجّة الكاميرا لما يتزق
+    const sh = p.stunT > 0 ? 14 * p.stunT / STUN_TIME : 0;
+    ctx.fillStyle = '#2b1d14'; ctx.fillRect(ox, HUD_H, HALF, VH);
+    ctx.drawImage(viewCv, ox + Math.sin(game.t * 70) * sh, HUD_H + Math.cos(game.t * 55) * sh * 0.6);
+    drawHUD(p, ox);
+    ctx.save(); ctx.translate(ox, HUD_H);
+    if (game.mod === 'blackout') drawBlackout();
+    if (!p.mini) drawViewOverlays(p, ov);
+    ctx.save(); ctx.translate(0, 12);
+    if (p.mini === 'dough') drawDough(p);
+    else if (p.mini === 'toppings') drawToppings(p);
+    else if (p.mini === 'bake') drawBake(p);
+    ctx.restore();
+    if (p.toast) pill(p.toast.text, VW / 2, 66, 18, p.toast.color, '#fff');
+    ctx.restore();
+    if (p.flourT > 0) drawFlour(ox, p.flourT);
+    ctx.restore();
+  });
+  // الفاصل بين النصين + رقم الراوند ومفاجأته
+  ctx.fillStyle = '#5b3a21'; ctx.fillRect(HALF - 3, 0, 6, H);
+  const modName = T('mods')[game.mod][0];
+  const badge = game.mod === 'sudden' ? modName : T('roundBadge', game.round, ROUNDS) + ' · ' + modName;
+  pill(badge, HALF, H - 24, 17, '#5b3a21', '#fff3df');
+  if (game.countT > 0) drawCountdown();
+  else if (game.goT > 0) txt(T('go'), HALF, 300, 110 + 40 * (0.9 - game.goT), 'rgba(228,87,46,' + Math.min(1, game.goT * 2) + ')', 'center', 800);
+  if (game.roundOver) {
+    card(HALF - 210, 318, 420, 84, 18, '#8a3a1e');
+    txt(game.timeLeft <= 0 ? T('timeUp') : T('roundOver'), HALF, 361, 40, '#fff', 'center', 800);
+  }
+  if (game.paused) drawPause();
+}
+
+// ============================ 11) رسم شاشات القوايم ============================
+function renderWelcome() {
+  drawMenuBg();
+  drawPizza(640, 150, 95, game.t * 0.7, FULL_PIZZA);
+  txt('Pizza Spin', 640, 318, 84, '#b23a1e', 'center', 800);
+  txt(T('sub'), 640, 380, 22, '#6b4a2e', 'center', 600);
+  [['en', 'English'], ['ar', 'العربية']].forEach(([code, label], i) => {
+    const x = 640 - 168 + i * 172, y = 410, w = 164, h = 42, on = game.lang === code;
+    if (on) focusFrame(x, y, w, h, 12, '#ffb703');
+    ctx.fillStyle = on ? '#6b4a2e' : '#fff3df'; rr(x, y, w, h, 12); ctx.fill();
+    ctx.strokeStyle = '#6b4a2e'; ctx.lineWidth = 2; rr(x, y, w, h, 12); ctx.stroke();
+    txt(label, x + w / 2, y + h / 2 + 1, 20, on ? '#fff' : '#6b4a2e', 'center', 800);
+  });
+  txt(T('langHint'), 640, 474, 15, '#8a6a4a', 'center', 600);
+  button(330, 498, 620, 66, T('start'), true, 28);
+  // تشخيص الدراعات: عشان نعرف اللعبة شايفة إيه
+  const pads = connectedPads();
+  if (!padApi) txt(T('noApi'), 640, 598, 18, '#b23a1e', 'center', 700);
+  else if (!pads.length) txt(T('noPads'), 640, 598, 18, '#b23a1e', 'center', 700);
+  else {
+    txt(T('pads', pads.length), 640, 594, 18, '#4f7a34', 'center', 700);
+    pads.slice(0, 4).forEach((o, k) => {
+      const name = o.s.id.replace(/\s*\(.*$/, '').slice(0, 44) || 'Controller';
+      txt('#' + (o.i + 1) + '  ' + name, 640, 620 + k * 20, 14, '#8a6a4a', 'center', 600);
+    });
+  }
+}
+
+function renderBind() {
+  drawMenuBg();
+  const [p1, p2] = game.players;
+  txt(T('bindTitle'), 640, 78, 44, '#8a3a1e', 'center', 800);
+  const both = p1.pad !== null && p2.pad !== null;
+  game.players.forEach((p, i) => {
+    const x = i === 0 ? 110 : 690, y = 140, w = 480, h = 370;
+    const active = !both && ((i === 0 && p1.pad === null) || (i === 1 && p1.pad !== null && p2.pad === null));
+    if (active) focusFrame(x, y, w, h, 22, p.accent);
+    card(x, y, w, h, 22, '#fffaf0', p.pad !== null ? p.accent : '#c9a777');
+    txt(pname(p), x + w / 2, y + 56, 36, p.accent, 'center', 800);
+    drawPadIcon(x + w / 2, y + 180, 1.7, p.pad !== null ? p.accent : '#b9aa92');
+    if (p.pad !== null) txt(T('bound', p.pad + 1), x + w / 2, y + 312, 25, '#3aa655', 'center', 800);
+    else if (active) txt(T('bindPress'), x + w / 2, y + 312, 27, '#3b2a20', 'center', 800);
+    else txt(T('bindWait'), x + w / 2, y + 312, 24, '#a8977c', 'center', 700);
+  });
+  if (game.bindMsgT > 0) {
+    txt(T('bindSame'), 640 + Math.sin(game.t * 50) * Math.min(6, game.bindMsgT * 6), 548, 23, '#c8362b', 'center', 800);
+  }
+  if (both) button(430, 575, 420, 66, T('bindGo'), true, 28);
+  txt(T('back'), 640, 680, 18, '#8a6a4a', 'center', 700);
+}
+
+function renderCharSelect() {
+  drawMenuBg();
+  txt(T('charTitle'), 640, 72, 44, '#8a3a1e', 'center', 800);
+  game.players.forEach((p, i) => {
+    const other = game.players[1 - i];
+    const x = i === 0 ? 110 : 690, y = 125, w = 480, h = 480;
+    card(x, y, w, h, 22, '#fffaf0', p.accent);
+    txt(pname(p), x + w / 2, y + 44, 32, p.accent, 'center', 800);
+    for (let c = 0; c < 2; c++) {
+      const atStart = c === 0;
+      const cx = (atStart === rtl()) ? x + 260 : x + 30, cy = y + 85, cw = 190, ch = 260;
+      const sel = p.charIdx === c;
+      const taken = other.charConfirmed && other.charIdx === c;
+      if (sel && !p.charConfirmed) focusFrame(cx, cy, cw, ch, 16, p.accent);
+      ctx.fillStyle = sel && p.charConfirmed ? '#e9f6e6' : '#fff3df';
+      rr(cx, cy, cw, ch, 16); ctx.fill();
+      ctx.strokeStyle = sel ? p.accent : '#d9c3a0'; ctx.lineWidth = sel ? 4 : 2;
+      rr(cx, cy, cw, ch, 16); ctx.stroke();
+      ctx.globalAlpha = taken ? 0.35 : 1;
+      drawChar(CHARS[c], cx + cw / 2, cy + 125, 3.2, p.accent);
+      ctx.globalAlpha = 1;
+      txt(T('chars')[c], cx + cw / 2, cy + 228, 28, '#3b2a20', 'center', 800);
+      if (taken) { ctx.fillStyle = '#8a6a4a'; rr(cx + 45, cy + 12, 100, 30, 8); ctx.fill(); txt(T('taken'), cx + cw / 2, cy + 28, 16, '#fff', 'center', 700); }
+    }
+    if (p.charConfirmed) txt(T('ready', T('chars')[p.charIdx]), x + w / 2, y + 392, 28, '#3aa655', 'center', 800);
+    else txt(T('charPick'), x + w / 2, y + 392, 21, '#6b4a2e', 'center', 700);
+    if (p.charNote > 0) txtFit(T('charAuto'), x + w / 2, y + 436, 19, '#c8362b', 'center', 700, w - 40);
+  });
+  txt(T('back'), 640, 660, 18, '#8a6a4a', 'center', 700);
+  drawDisconnectBanner();
+}
+
+// القواعد: عمود "اطبخ" وعمود "اتخانق"
+function renderRules() {
+  drawMenuBg();
+  txt(T('rulesTitle'), 640, 54, 42, '#8a3a1e', 'center', 800);
+  card(100, 88, 1080, 502, 22, '#fffaf0', '#c9a777');
+  const colW = 500, colA = rtl() ? 660 : 120, colB = rtl() ? 120 : 660;
+  const colStart = (x) => (rtl() ? x + colW : x);
+  const colText = (x) => (rtl() ? x + colW - 40 : x + 40);
+  // اطبخ
+  txt(T('cookTitle'), colStart(colA), 124, 26, '#e4572e', alStart(), 800);
+  let y = 164;
+  T('cook').forEach((s, i) => {
+    ctx.fillStyle = '#e4572e'; circle(rtl() ? colA + colW - 14 : colA + 14, y, 14);
+    txt(String(i + 1), rtl() ? colA + colW - 14 : colA + 14, y + 1, 16, '#fff', 'center', 800);
+    y += para(s, colText(colA), y, colW - 50, 16, 21, '#3b2a20', alStart(), 600) + 11;
+  });
+  // اتخانق
+  txt(T('fightTitle'), colStart(colB), 124, 26, '#2a9d8f', alStart(), 800);
+  y = 164;
+  const icons = ['B', null, 'X', null];
+  T('fight').forEach((s, i) => {
+    const ix = rtl() ? colB + colW - 14 : colB + 14;
+    if (icons[i]) glyph(ix, y, icons[i], 13);
+    else { ctx.fillStyle = '#2a9d8f'; circle(ix, y, 6); }
+    y += para(s, colText(colB), y, colW - 50, 16, 21, '#3b2a20', alStart(), 600) + 14;
+  });
+  ctx.fillStyle = '#e8d9bd'; ctx.fillRect(140, 530, 1000, 2);
+  txtFit(T('rulesScore'), 640, 560, 18, '#6b4a2e', 'center', 700, 1000);
+  button(470, 610, 340, 66, T('rulesGo'), true, 30);
+  txt(T('back'), sideStart(100, 1180, 90), 644, 18, '#8a6a4a', 'center', 700);
+  drawDisconnectBanner();
+}
+
+function renderRoundResult() {
+  drawMenuBg();
+  const sudden = game.round > ROUNDS;
+  txt(sudden ? T('resSudden') : T('resTitle', game.round, ROUNDS), 640, 44, 38, '#8a3a1e', 'center', 800);
+  txt(T('mods')[game.mod][0], 640, 80, 18, '#8a6a4a', 'center', 700);
+  const [a, b] = game.players;
+  const lead = a.scores.total === b.scores.total ? -1 : (a.scores.total > b.scores.total ? 0 : 1);
+  const maxes = [30, 30, 20, 20, (game.mod === 'rush' ? 20 : 10) + 3 * CRAFT_BONUS];
+  const craftKeys = ['toppings', 'dough', 'bake'];
+  game.players.forEach((p, i) => {
+    const x = i === 0 ? 70 : 670, y = 104, w = 540, h = 496, sc = p.scores, x1 = x + w;
+    card(x, y, w, h, 22, '#fffaf0', p.accent);
+    drawChar(CHARS[p.charIdx], sideStart(x, x1, 66), y + 58, 1.6, p.accent);
+    txt(pname(p), sideStart(x, x1, 114), y + 40, 29, p.accent, alStart(), 800);
+    const sub = !sc.served ? T('resNoPizza') : orderName(game.order) + (sc.stolen ? ' · ' + T('resStolen') : '');
+    txtFit(sub, sideStart(x, x1, 114), y + 74, 17, sc.stolen ? '#c8362b' : '#8a6a4a', alStart(), 700, 250);
+    if (lead === i) {
+      const bx = rtl() ? x + 22 : x1 - 22 - 150;
+      ctx.fillStyle = '#ffb703'; rr(bx, y + 26, 150, 34, 10); ctx.fill();
+      txtFit(T('resWon'), bx + 75, y + 44, 17, '#5b3a21', 'center', 800, 136);
+    }
+    const vals = [sc.toppings, sc.dough, sc.bake, sc.speed, sc.bonus + sc.craft];
+    const barX = rtl() ? x + 150 : x + 180, barW = 210;
+    T('resRows').forEach((label, k) => {
+      const ry = y + 126 + k * 38, frac = Math.min(1, vals[k] / maxes[k]);
+      txtFit(label, sideStart(x, x1, 40), ry, 19, '#3b2a20', alStart(), 700, 130);
+      ctx.fillStyle = '#efe2c8'; rr(barX, ry - 7, barW, 14, 7); ctx.fill();
+      if (vals[k] > 0) {
+        ctx.fillStyle = k === 4 ? '#ffb703' : p.accent;
+        rr(rtl() ? barX + barW * (1 - frac) : barX, ry - 7, Math.max(14, barW * frac), 14, 7); ctx.fill();
+      }
+      txt(k === 4 ? '+' + vals[k] : T('of', vals[k], maxes[k]), sideEnd(x, x1, 40), ry, 18, '#6b4a2e', alEnd(), 700);
+      // نجمة "الأحسن" في مبارزة الصنعة
+      if (k < 3 && sc.awards[craftKeys[k]]) pill('★ +' + CRAFT_BONUS, rtl() ? barX + 32 : barX + barW - 32, ry, 13, '#ffb703', '#5b3a21');
+    });
+    ctx.fillStyle = '#e8d9bd'; ctx.fillRect(x + 36, y + 312, w - 72, 2);
+    txt(T('resRound'), sideStart(x, x1, 40), y + 348, 23, '#3b2a20', alStart(), 800);
+    txt(String(sc.total), sideEnd(x, x1, 40), y + 348, 34, p.accent, alEnd(), 800);
+    if (sc.mult > 1) pill(T('resDouble'), sideEnd(x, x1, 130), y + 348, 16, '#ffb703', '#5b3a21');
+    txt(T('resTotal'), sideStart(x, x1, 40), y + 394, 21, '#6b4a2e', alStart(), 700);
+    txt(String(p.total), sideEnd(x, x1, 40), y + 394, 27, '#3b2a20', alEnd(), 800);
+    if (p.bubble) {
+      const lines = wrapText(T('resCustomer', p.bubble.text), w - 70, 16, 600);
+      lines.slice(0, 2).forEach((l, k) => txt(l, x + w / 2, y + 438 + k * 22, 16, '#8a6a4a', 'center', 600));
+    }
+  });
+  const tied = game.round === ROUNDS && a.total === b.total;
+  button(430, 622, 420, 64, game.round < ROUNDS ? T('resNext') : tied ? T('resTie') : T('resFinal'), true, 26);
+  drawDisconnectBanner();
+}
+
+// شاشة الفايز + جدول إحصائيات المبارزة
+function renderWinner() {
+  drawMenuBg();
+  const cols = ['#e4572e', '#2a9d8f', '#ffb703', '#2f7fd1', '#c8362b'];
+  for (let i = 0; i < 70; i++) {
+    const x = rnd(i) * W, sp = 60 + rnd(i + 100) * 90;
+    const y = ((game.t * sp + rnd(i + 200) * H) % (H + 40)) - 20;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(game.t * (1 + rnd(i + 300) * 3) + i);
+    ctx.fillStyle = cols[i % cols.length]; ctx.fillRect(-6, -3, 12, 6);
+    ctx.restore();
+  }
+  const [a, b] = game.players;
+  const tie = a.total === b.total;
+  const win = a.total >= b.total ? a : b;
+  card(170, 52, 940, 508, 28, '#fffaf0', tie ? '#c9a777' : win.accent);
+  // ناحية الفايز
+  const lx = rtl() ? 880 : 400;
+  if (tie) {
+    txt(T('tie'), lx, 120, 52, '#8a3a1e', 'center', 800);
+    drawChar(CHARS[a.charIdx], lx - 90, 290, 3.2, a.accent);
+    drawChar(CHARS[b.charIdx], lx + 90, 290, 3.2, b.accent);
+    txtFit(T('tieNote'), lx, 450, 20, '#8a6a4a', 'center', 700, 400);
+  } else {
+    txt(T('winTitle'), lx, 106, 38, '#8a3a1e', 'center', 800);
+    drawPizza(lx, 262, 100, game.t * 0.5, FULL_PIZZA);
+    drawChar(CHARS[win.charIdx], lx, 278, 3.4, win.accent);
+    txt(pname(win), lx, 410, 50, win.accent, 'center', 800);
+    txt(T('winTotal', win.total), lx, 466, 28, '#3b2a20', 'center', 800);
+  }
+  // جدول الإحصائيات
+  const tx0 = rtl() ? 210 : 640, tx1 = tx0 + 430;
+  const c1 = rtl() ? tx0 + 110 : tx1 - 110, c2 = rtl() ? tx0 + 30 : tx1 - 30;
+  drawChar(CHARS[a.charIdx], c1, 112, 0.9, a.accent);
+  drawChar(CHARS[b.charIdx], c2, 112, 0.9, b.accent);
+  const rows = [[a.total, b.total], [a.stats.rounds, b.stats.rounds], [a.stats.firsts, b.stats.firsts],
+                [a.stats.shoves, b.stats.shoves], [a.stats.steals, b.stats.steals], [a.stats.perfects, b.stats.perfects]];
+  T('statRows').forEach((label, k) => {
+    const y = 176 + k * 58;
+    ctx.fillStyle = k % 2 ? '#fff3df' : '#f7ead0'; rr(tx0, y - 24, 430, 48, 10); ctx.fill();
+    txtFit(label, sideStart(tx0, tx1, 18), y, 20, '#3b2a20', alStart(), 700, 230);
+    const [va, vb] = rows[k];
+    txt(String(va), c1, y, va > vb ? 26 : 22, va > vb ? a.accent : '#6b4a2e', 'center', 800);
+    txt(String(vb), c2, y, vb > va ? 26 : 22, vb > va ? b.accent : '#6b4a2e', 'center', 800);
+  });
+  button(rtl() ? 660 : 340, 596, 280, 68, T('again'), game.winnerIdx === 0, 26);
+  button(rtl() ? 340 : 660, 596, 280, 68, T('exit'), game.winnerIdx === 1, 26);
+  drawDisconnectBanner();
+}
+
+function drawDisconnectBanner() {
+  const missing = game.players.filter(p => p.pad !== null && !padOK(p));
+  if (!missing.length) return;
+  ctx.fillStyle = '#c8362b'; rr(300, 16, 680, 40, 12); ctx.fill();
+  txtFit(T('discBanner', missingNames(missing)), 640, 37, 19, '#fff', 'center', 800, 650);
+}
+
+function render() {
+  ctx = mainCtx;                    // أمان: لو أي رسم جانبي اتقطع، نرجع للكانفاس الأساسية
+  ctx.setTransform(viewScale, 0, 0, viewScale, 0, 0);
+  ctx.direction = rtl() ? 'rtl' : 'ltr';
+  ctx.lineJoin = 'round';
+  switch (game.screen) {
+    case 'welcome':     renderWelcome(); break;
+    case 'bind':        renderBind(); break;
+    case 'charselect':  renderCharSelect(); break;
+    case 'rules':       renderRules(); break;
+    case 'play':        renderPlay(); break;
+    case 'roundResult': renderRoundResult(); break;
+    case 'winner':      renderWinner(); break;
+  }
+}
+
+// ============================ 12) الحلقة الرئيسية ============================
+buildAssets();
+
+function tick(dt) {
+  game.t += dt;
+  game.screenTime += dt;
+  pollGamepads();       // navigator.getGamepads() كل فريم
+  update(dt);
+  render();
+}
+
+let lastTime = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, Math.max(0, (now - lastTime) / 1000));
+  lastTime = now;
+  tick(dt);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// للفحص من الكونسول فقط
+window.PizzaSpin = { game, tick };
+</script>
+</body>
+</html>

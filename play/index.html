@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pizza Spin</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #2b1d14; }
+  .msg { box-sizing: border-box; min-height: 100%; display: grid; place-content: center; gap: 14px; padding: 32px 24px; text-align: center; color: #fbf3e2; font: 500 17px/1.5 "Segoe UI", Tahoma, system-ui, sans-serif; }
+  .msg h1 { margin: 0; color: #ffc145; font-size: 34px; }
+  .msg a { color: #ffc145; }
+</style>
+</head>
+<body>
+<script>
+/* Pizza Spin, ready to play with a keyboard by one person.
+   pizza-spin.html is the game exactly as it was made (two players, two controllers). This page loads it and adds
+   keys.js in front of it, which turns the keyboard into a controller and adds a computer as the second player. */
+(function () {
+  var q = location.search;
+  if (/[?&]mode=pads\b/.test(q)) { location.replace('pizza-spin.html'); return; }
+  var touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
+  var ar = /^ar\b/i.test(navigator.language || '') || /[?&]lang=ar\b/.test(q);
+  if (touchOnly && !/[?&]force\b/.test(q)) {
+    document.body.innerHTML = '<div class="msg"' + (ar ? ' dir="rtl"' : '') + '><h1>Pizza Spin</h1><p>' +
+      (ar ? 'هذه اللعبة تحتاج لوحة مفاتيح أو يد تحكم. افتحها من الكمبيوتر لتلعب.' : 'This game needs a keyboard or a game controller. Open it on a computer to play.') +
+      '</p><p><a href="../#pizza">' + (ar ? '← العودة إلى صور اللعبة' : '← Back to the screenshots') + '</a></p></div>';
+    return;
+  }
+  fetch('pizza-spin.html').then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (html) {
+    html = html.replace('<body>', '<body>\n<script src="keys.js"><\/script>');
+    document.open(); document.write(html); document.close();
+  }).catch(function () { location.replace('pizza-spin.html'); });
+})();
+</script>
+</body>
+</html>

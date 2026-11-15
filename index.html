@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fares Elzouhiry — Websites from another dimension</title>
-<meta name="description" content="Fares Elzouhiry, front-end developer. Real-time 3D websites and web apps in English and Arabic: Alliance Investment, a live attendance dashboard, a university app and TSUB Global Services.">
+<meta name="description" content="Fares Elzouhiry, front-end developer. Websites, apps, presentations and games in English and Arabic: Alliance Investment, a live attendance dashboard, a university app, the BBQ Fest site, the Sport Barbecue presentation and the Pizza Spin game.">
 <meta name="theme-color" content="#030306">
 <link rel="canonical" href="https://fareselzouhiry.github.io/Fares-Elzouhiry/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fares Elzouhiry">
 <meta property="og:title" content="Fares Elzouhiry — Websites from another dimension">
-<meta property="og:description" content="Real-time 3D websites and web apps in English and Arabic: Alliance Investment, a live attendance dashboard, a university app and TSUB Global Services.">
+<meta property="og:description" content="Websites, apps, presentations and games in English and Arabic: Alliance Investment, a live attendance dashboard, a university app, the BBQ Fest site, the Sport Barbecue presentation and the Pizza Spin game.">
 <meta property="og:url" content="https://fareselzouhiry.github.io/Fares-Elzouhiry/">
 <meta property="og:image" content="https://fareselzouhiry.github.io/Fares-Elzouhiry/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -20,6 +20,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Readex+Pro:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600&display=swap">
+<script>
+/* before the first paint: the visitor's language (so nothing flashes in the wrong one) and the opening */
+(function (d) {
+  var q = (location.search.match(/[?&]lang=(ar|en)\b/) || [])[1], s = null;
+  try { s = localStorage.getItem('fe-lang'); } catch (e) {}
+  var l = q || s || (/^ar\b/i.test([].concat(navigator.languages || [], navigator.language || '')[0] || '') ? 'ar' : 'en');
+  d.dataset.lang = l; d.lang = l; d.dir = l === 'ar' ? 'rtl' : 'ltr';
+  d.classList.add('js-open', 'opening');
+})(document.documentElement);
+</script>
 <style>
 :root {
   --bg: #030306;
@@ -85,8 +95,13 @@ html[dir="rtl"] .dots { right: auto; left: max(16px, env(safe-area-inset-left, 0
 .dots button { width: 22px; height: 22px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
 .dots i { width: 6px; height: 6px; border-radius: 50%; background: rgb(255 255 255 / .28); transition: transform .3s, background .3s; }
 .dots button.on i { background: var(--dot, var(--acc)); transform: scale(1.7); box-shadow: 0 0 12px var(--dot, var(--acc)); }
+/* each dot says where it goes when pointed at */
+.dots button { position: relative; }
+.dots button::after { content: attr(aria-label); position: absolute; right: calc(100% + 8px); top: 50%; translate: 0 -50%; padding: 5px 10px; border-radius: 6px; background: rgb(12 13 18 / .92); border: 1px solid var(--line); color: var(--fg); font: 500 .78rem/1.2 var(--display); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; }
+html[dir="rtl"] .dots button::after { right: auto; left: calc(100% + 8px); }
+@media (hover: hover) { .dots button:hover::after, .dots button:focus-visible::after { opacity: 1; } }
 @media (max-width: 760px) { .tl .nm, .bl, .tr .opt { display: none; } }
-@media (max-width: 760px), (max-aspect-ratio: 1/1) { .dots { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); transform: none; flex-direction: row; right: 50%; translate: 50% 0; } html[dir="rtl"] .dots { left: auto; right: 50%; } .dots button { width: 18px; } }
+@media (max-width: 760px), (max-aspect-ratio: 1/1) { .dots { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); transform: none; flex-direction: row; right: 50%; translate: 50% 0; } html[dir="rtl"] .dots { left: auto; right: 50%; } .dots button { width: 18px; } .dots button::after { right: auto; left: 50%; top: auto; bottom: calc(100% + 6px); translate: -50% 0; } html[dir="rtl"] .dots button::after { left: 50%; } }
 
 /* sections: each is exactly one screen */
 main { position: relative; z-index: 10; }
@@ -95,9 +110,10 @@ main { position: relative; z-index: 10; }
 .kick { color: var(--fg2); }
 .kick::before { content: ""; display: inline-block; width: 24px; height: 1px; background: var(--acc); vertical-align: middle; margin-inline-end: 12px; }
 
-.hero { align-items: flex-end; }
-.hero-in { margin: 0 var(--pad) clamp(70px, 13vh, 140px); max-width: 640px; }
-.hero h1 { margin-top: 18px; font-size: clamp(2.6rem, 6.4vw, 6rem); font-weight: 500; line-height: .98; letter-spacing: -.045em; }
+/* the first screen fits between the top bar and the bottom, whatever the window's height */
+.hero { align-items: center; padding: 76px 0 64px; box-sizing: border-box; }
+.hero-in { margin: 0 var(--pad); max-width: 640px; }
+.hero h1 { margin-top: 14px; font-size: clamp(2.4rem, min(6.2vw, 8.6vh), 6rem); font-weight: 500; line-height: .98; letter-spacing: -.045em; }
 html[data-lang="ar"] .hero h1 { letter-spacing: 0; line-height: 1.2; }
 .hero h1 em { font-style: normal; background: linear-gradient(90deg, #8be9ff, #c4b5fd 50%, #f0abfc); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero .sub { margin-top: 20px; color: var(--fg2); font-size: clamp(1rem, 1.3vw, 1.15rem); max-width: 30em; }
@@ -108,12 +124,31 @@ html[data-lang="ar"] .hero h1 { letter-spacing: 0; line-height: 1.2; }
 html[dir="rtl"] .hint { right: auto; left: var(--pad); }
 .hint b { color: var(--acc); font-weight: 500; transition: opacity .4s; }
 .hint svg { width: 16px; height: 16px; flex: none; color: var(--acc); }
+/* the work by kind on the first screen: four cards, each with its projects, one tap to any of them */
+.cats { margin-top: clamp(20px, 3.4vh, 32px); }
+.cats ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-width: 600px; }
+.kc { padding: 10px 12px 12px; border-radius: 12px; border: 1px solid var(--line); border-top: 2px solid var(--k); background: linear-gradient(rgb(255 255 255 / .045), rgb(255 255 255 / .015)); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.kc p { display: flex; align-items: center; gap: 7px; color: var(--k); font-size: .66rem; }
+.kc p svg, .kt svg, .kn svg, .o-cats svg { width: 15px; height: 15px; flex: none; }
+.kc div { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.kc a { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--line); background: rgb(255 255 255 / .03); color: var(--fg2); text-decoration: none; font-size: .84rem; white-space: nowrap; transition: color .2s, border-color .2s, background .2s; }
+.kc a::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); flex: none; }
+.kc a:hover, .kc a:focus-visible { color: var(--fg); border-color: var(--c); background: rgb(255 255 255 / .08); }
+/* "scroll" cue at the bottom of the first screen */
+.cue { position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); translate: -50% 0; display: none; flex-direction: column; align-items: center; gap: 8px; color: var(--fg3); text-decoration: none; font-size: .6rem; }
+.cue i { width: 1px; height: 34px; background: linear-gradient(var(--acc), transparent); animation: cue 1.8s var(--ease) infinite; transform-origin: top; }
+@keyframes cue { 0% { transform: scaleY(0); opacity: 1; } 70% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
+html.gl .cue { display: flex; }
 .coarse { display: none; }
 @media (pointer: coarse) { .hint .fine { display: none; } .hint .coarse { display: inline; } }
 
 .txt { width: min(440px, 34vw); margin-inline-start: var(--pad); }
-.idx { color: var(--fg2); }
+.idx { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; color: var(--fg2); }
 .idx b { color: var(--acc); font-weight: 500; }
+/* the kind of work, on every project: Websites 1/2, Apps 2/2 … */
+.kt { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 8px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--k) 45%, transparent); background: color-mix(in srgb, var(--k) 12%, transparent); color: var(--k); }
+html[dir="rtl"] .kt { padding: 5px 8px 5px 10px; }
+.kt b { color: var(--fg3); font-weight: 500; margin-inline-start: 2px; }
 .proj h2 { margin-top: 16px; font-size: clamp(2.2rem, 4.2vw, 3.9rem); font-weight: 500; line-height: 1; letter-spacing: -.04em; }
 html[data-lang="ar"] .proj h2 { letter-spacing: 0; line-height: 1.2; }
 .desc { margin-top: 16px; color: var(--fg2); font-size: 1.05rem; line-height: 1.6; }
@@ -170,10 +205,17 @@ html.gl .on .fade:nth-child(6) { transition-delay: .3s; }
 /* phones and narrow windows: the work fills the top, the words sit underneath */
 @media (max-width: 760px), (max-aspect-ratio: 1/1) {
   .sec { align-items: flex-end; }
+  .hero { padding: 0; }
   .hero-in { flex: 1; min-width: 0; margin: 0 20px calc(env(safe-area-inset-bottom, 0px) + 46px); }
   .hero h1 { font-size: clamp(2.4rem, 11vw, 3.4rem); }
   .hero .sub { margin-top: 14px; }
   .go { margin-top: 20px; }
+  .cats { margin-top: 16px; }
+  .cats ul { display: flex; overflow-x: auto; scrollbar-width: none; margin-inline: -20px; padding-inline: 20px; max-width: none; scroll-snap-type: x proximity; }
+  .cats ul::-webkit-scrollbar { display: none; }
+  .kc { flex: none; scroll-snap-align: start; padding: 8px 10px 10px; }
+  .kc a { padding: 6px 10px; font-size: .8rem; }
+  .cue { display: none !important; }
   .hint { position: static; margin-bottom: 14px; }
   .txt { flex: 1; min-width: 0; width: auto; margin: 0 20px calc(env(safe-area-inset-bottom, 0px) + 40px); }
   .idx { font-size: .64rem; }
@@ -250,9 +292,49 @@ html[dir="rtl"] .g-nav svg { transform: scaleX(-1); }
 html.locked { overflow: hidden; }
 @media (max-width: 700px) { .g-stage { padding: 0; } .g-nav { display: none; } .g-fig img { max-height: calc(100svh - 250px); } }
 
+/* the kinds of work in the top bar; the one on screen lights up */
+.tr .kn { display: inline-flex; align-items: center; gap: 7px; }
+.tr .kn svg { color: var(--k); opacity: .75; transition: opacity .2s; }
+.tr .kn.on { color: var(--fg); background: color-mix(in srgb, var(--k) 14%, transparent); }
+.tr .kn.on svg, .tr .kn:hover svg { opacity: 1; }
+.tr .sep { width: 1px; height: 18px; background: var(--line); margin: 0 6px; }
+@media (max-width: 1100px) { .tr .kn span { display: none; } }
+/* the dots are grouped by kind of work */
+.dots button.g { margin-top: 8px; }
+@media (max-width: 760px), (max-aspect-ratio: 1/1) { .dots button.g { margin: 0 0 0 6px; } html[dir="rtl"] .dots button.g { margin: 0 6px 0 0; } }
+
+/* the opening */
+.open { position: fixed; inset: 0; z-index: 100; display: none; place-items: center; background: radial-gradient(80% 70% at 50% 50%, #0b0b16, var(--bg)); transition: opacity .7s var(--ease), visibility .7s; cursor: pointer; }
+html.js-open .open { display: grid; }
+.open.out { opacity: 0; visibility: hidden; pointer-events: none; }
+.open.out .o-in { transform: scale(1.06); }
+.o-in { display: grid; justify-items: center; gap: 18px; padding: 24px; text-align: center; transition: transform .7s var(--ease); }
+.o-logo { width: 64px; height: 64px; overflow: visible; }
+.o-logo * { stroke-dasharray: 1; stroke-dashoffset: 1; animation: o-draw .9s var(--ease) forwards; }
+.o-logo rect + rect { animation-delay: .2s; }
+.o-logo path { animation-delay: .4s; }
+@keyframes o-draw { to { stroke-dashoffset: 0; } }
+.o-name { font: 500 clamp(1.6rem, 4.4vw, 2.8rem)/1.1 var(--display); letter-spacing: .32em; text-transform: uppercase; opacity: 0; animation: o-name 1s .35s var(--ease) forwards; }
+html[data-lang="ar"] .o-name { font-family: var(--ar); letter-spacing: 0; }
+@keyframes o-name { from { opacity: 0; letter-spacing: .7em; filter: blur(8px); } to { opacity: 1; letter-spacing: .14em; filter: none; } }
+html[data-lang="ar"] .o-name { animation-name: o-name-ar; }
+@keyframes o-name-ar { from { opacity: 0; filter: blur(8px); transform: scale(1.08); } to { opacity: 1; filter: none; transform: none; } }
+.o-cats { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.o-cats li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--k) 40%, transparent); color: var(--k); background: color-mix(in srgb, var(--k) 8%, transparent); opacity: 0; transform: translateY(10px); animation: o-up .5s var(--ease) forwards; }
+.o-cats li:nth-child(1) { animation-delay: 1s; } .o-cats li:nth-child(2) { animation-delay: 1.18s; } .o-cats li:nth-child(3) { animation-delay: 1.36s; } .o-cats li:nth-child(4) { animation-delay: 1.54s; }
+@keyframes o-up { to { opacity: 1; transform: none; } }
+.o-bar { width: min(240px, 60vw); height: 1px; margin-top: 8px; background: var(--line); position: relative; overflow: hidden; }
+.o-bar::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #8be9ff, #c4b5fd, #f0abfc); transform: scaleX(0); transform-origin: left; animation: o-bar 2.3s .1s cubic-bezier(.4, 0, .2, 1) forwards; }
+html[dir="rtl"] .o-bar::after { transform-origin: right; }
+@keyframes o-bar { to { transform: scaleX(1); } }
+.o-skip { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); color: var(--fg3); font-size: .62rem; opacity: 0; animation: o-up .4s .8s forwards; }
+/* the first screen's words wait for the opening to finish */
+html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !important; transition: none !important; }
+
 @media (prefers-reduced-motion: reduce) {
-  .grain, .live, .acts .pri::before { animation: none; }
+  .grain, .live, .acts .pri::before, .cue i { animation: none; }
   html.gl .fade { transition: opacity .3s; transform: none; }
+  .o-logo *, .o-name, .o-cats li, .o-bar::after, .o-skip { animation-duration: .01s !important; animation-delay: 0s !important; }
 }
 </style>
 </head>
@@ -261,6 +343,21 @@ html.locked { overflow: hidden; }
 <div class="vig" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 <div class="cur" id="cur" aria-hidden="true"></div>
+<!-- the opening: the logo draws itself, the name settles, the four kinds of work light up, then the page appears -->
+<div class="open" id="open" aria-hidden="true">
+  <div class="o-in">
+    <svg class="o-logo" viewBox="0 0 26 26" fill="none"><rect x="1" y="1" width="24" height="24" stroke="#8be9ff" stroke-width=".9" pathLength="1"/><rect x="7.5" y="7.5" width="11" height="11" stroke="#c4b5fd" stroke-width=".9" pathLength="1"/><path d="M1 1l6.5 6.5M25 1l-6.5 6.5M1 25l6.5-6.5M25 25l-6.5-6.5" stroke="#f0abfc" stroke-width=".9" pathLength="1"/></svg>
+    <p class="o-name"><span class="en">Fares Elzouhiry</span><span class="ar">فارس الزهيري</span></p>
+    <ul class="o-cats mono">
+      <li style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span></li>
+      <li style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span></li>
+      <li style="--k:#f9a8d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض تقديمية</span></li>
+      <li style="--k:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></li>
+    </ul>
+    <i class="o-bar"></i>
+  </div>
+  <span class="o-skip mono"><span class="en">Click to skip</span><span class="ar">اضغط للتخطي</span></span>
+</div>
 
 <header>
   <div class="hud tl">
@@ -270,7 +367,11 @@ html.locked { overflow: hidden; }
     </a>
   </div>
   <nav class="hud tr mono" aria-label="Main">
-    <a class="opt" href="#alliance"><span class="en">Work</span><span class="ar">الأعمال</span></a>
+    <a class="opt kn" href="#alliance" data-to="1" data-k="web" style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span></a>
+    <a class="opt kn" href="#doctor" data-to="3" data-k="app" style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span></a>
+    <a class="opt kn" href="#bbqpres" data-to="5" data-k="pres" style="--k:#f9a8d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض</span></a>
+    <a class="opt kn" href="#pizza" data-to="6" data-k="game" style="--k:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></a>
+    <i class="sep opt" aria-hidden="true"></i>
     <a href="#contact"><span class="en">Contact</span><span class="ar">تواصل</span></a>
     <button class="lang" type="button" id="lang" aria-label="Switch language"><span class="en" lang="ar">عربي</span><span class="ar" lang="en">EN</span></button>
   </nav>
@@ -278,11 +379,13 @@ html.locked { overflow: hidden; }
 <div class="hud bl mono" aria-hidden="true"><i class="live"></i><span id="status">Loading</span></div>
 <nav class="dots" id="dots" aria-label="Sections">
   <button type="button" data-to="0" aria-label="Start"><i></i></button>
-  <button type="button" data-to="1" aria-label="Alliance Investment" style="--dot:#e9c46a"><i></i></button>
-  <button type="button" data-to="2" aria-label="Doctor Dashboard" style="--dot:#ff4d5a"><i></i></button>
-  <button type="button" data-to="3" aria-label="University App" style="--dot:#ff6b7a"><i></i></button>
-  <button type="button" data-to="4" aria-label="TSUB Global" style="--dot:#42d3a0"><i></i></button>
-  <button type="button" data-to="5" aria-label="Contact"><i></i></button>
+  <button type="button" class="g" data-to="1" aria-label="Websites · Alliance Investment" style="--dot:#e9c46a"><i></i></button>
+  <button type="button" data-to="2" aria-label="Websites · BBQ Fest" style="--dot:#ff5a36"><i></i></button>
+  <button type="button" class="g" data-to="3" aria-label="Apps · Doctor Dashboard" style="--dot:#ff4d5a"><i></i></button>
+  <button type="button" data-to="4" aria-label="Apps · University App" style="--dot:#ff6b7a"><i></i></button>
+  <button type="button" class="g" data-to="5" aria-label="Presentations · Sport Barbecue" style="--dot:#ff8a2b"><i></i></button>
+  <button type="button" class="g" data-to="6" aria-label="Games · Pizza Spin" style="--dot:#ffc145"><i></i></button>
+  <button type="button" class="g" data-to="7" aria-label="Contact"><i></i></button>
 </nav>
 
 <main>
@@ -291,14 +394,23 @@ html.locked { overflow: hidden; }
       <p class="hint mono fade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2M18.5 2v4h-4M5.5 22v-4h4"/></svg><b><span class="en">4D tesseract</span><span class="ar">مكعّب رباعي الأبعاد</span></b><span class="fine"><span class="en">· drag to rotate</span><span class="ar">· اسحب لتديره</span></span><span class="coarse"><span class="en">· swipe sideways to spin</span><span class="ar">· اسحب يمينًا ويسارًا لتديره</span></span></p>
       <p class="kick mono fade"><span class="en">Fares Elzouhiry — Front-end developer</span><span class="ar">فارس الزهيري — مطوّر واجهات أمامية</span></p>
       <h1 class="fade"><span class="en">Websites from <em>another dimension.</em></span><span class="ar">مواقع من <em>بُعدٍ آخر.</em></span></h1>
-      <p class="sub fade"><span class="en">Real-time 3D, bilingual, designed and coded by hand.</span><span class="ar">ثلاثية الأبعاد ولحظية وبلغتين، مصممة ومبرمجة يدويًا.</span></p>
-      <a class="go mono fade" href="#alliance"><span class="en">See the work</span><span class="ar">شاهد الأعمال</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
+      <p class="sub fade"><span class="en">Websites, apps, presentations and games — in English and Arabic, designed and coded by hand.</span><span class="ar">مواقع وتطبيقات وعروض تقديمية وألعاب — بالعربية والإنجليزية، مصممة ومبرمجة يدويًا.</span></p>
+      <!-- the work, by kind: one tap to any project -->
+      <nav class="cats fade" aria-label="Projects by category">
+        <ul>
+          <li class="kc" style="--k:#7dd3fc"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span></p><div><a href="#alliance" data-to="1" style="--c:#e9c46a"><span class="en">Alliance Investment</span><span class="ar">تحالف للاستثمار</span></a><a href="#bbqfest" data-to="2" style="--c:#ff5a36">BBQ Fest</a></div></li>
+          <li class="kc" style="--k:#c4b5fd"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span></p><div><a href="#doctor" data-to="3" style="--c:#ff4d5a"><span class="en">Doctor Dashboard</span><span class="ar">لوحة الدكتور</span></a><a href="#uni" data-to="4" style="--c:#ff6b7a"><span class="en">University App</span><span class="ar">تطبيق الجامعة</span></a></div></li>
+          <li class="kc" style="--k:#f9a8d4"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض تقديمية</span></p><div><a href="#bbqpres" data-to="5" style="--c:#ff8a2b">Sport Barbecue</a></div></li>
+          <li class="kc" style="--k:#fde047"><p class="mono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></p><div><a href="#pizza" data-to="6" style="--c:#ffc145">Pizza Spin</a></div></li>
+        </ul>
+      </nav>
     </div>
+    <a class="cue mono" href="#alliance" aria-hidden="true" tabindex="-1"><span class="en">Scroll</span><span class="ar">مرّر</span><i></i></a>
   </section>
 
   <section class="sec proj" id="alliance" style="--acc:#e9c46a">
     <div class="txt">
-      <p class="idx mono fade"><b>01</b> / 04 — <span class="en">Company website · Riyadh</span><span class="ar">موقع شركة · الرياض</span></p>
+      <p class="idx mono fade"><span class="kt" style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span><b>1/2</b></span> <span class="en">Company website · Riyadh</span><span class="ar">موقع شركة · الرياض</span></p>
       <h2 class="fade"><span class="en scr">Alliance Investment</span><span class="ar">تحالف للاستثمار</span></h2>
       <p class="desc fade"><span class="en">A six-language site that opens on a live 3D globe of a 16-country network.</span><span class="ar">موقع بست لغات يبدأ بكرة أرضية حيّة لشبكة من 16 دولة.</span></p>
       <ul class="tags mono fade"><li><span class="en">6 languages</span><span class="ar">6 لغات</span></li><li><span class="en">24 pages</span><span class="ar">24 صفحة</span></li><li><span class="en">WebGL globe</span><span class="ar">كرة WebGL</span></li></ul>
@@ -321,9 +433,33 @@ html.locked { overflow: hidden; }
     </div>
   </section>
 
+  <section class="sec proj" id="bbqfest" style="--acc:#ff5a36">
+    <div class="txt">
+      <p class="idx mono fade"><span class="kt" style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span><b>2/2</b></span> <span class="en">Festival website · Riyadh</span><span class="ar">موقع مهرجان · الرياض</span></p>
+      <h2 class="fade"><span class="en scr">BBQ Fest</span><span class="ar">BBQ Fest</span></h2>
+      <p class="desc fade"><span class="en">The website for a five-day BBQ festival in Riyadh: warm paper, stamps and a price list shaped like a menu — with a 3D map of the whole festival.</span><span class="ar">موقع مهرجان شواء لمدة خمسة أيام في الرياض: ورق دافئ وأختام وقائمة أسعار على شكل منيو — مع مخطط ثلاثي الأبعاد للمهرجان كله.</span></p>
+      <ul class="tags mono fade"><li><span class="en">Light design</span><span class="ar">تصميم فاتح</span></li><li><span class="en">Sponsor packages</span><span class="ar">باقات الرعاية</span></li><li><span class="en">3D site map</span><span class="ar">مخطط ثلاثي الأبعاد</span></li></ul>
+      <div class="acts fade">
+        <a class="pri" href="https://fareselzouhiry.github.io/bbq-fest/model-2.html" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/bbq-fest/model-2.html" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/bbq-fest</span></a>
+        <button type="button" data-gal="bbqfest"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
+        <a href="https://github.com/FaresElzouhiry/bbq-fest" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div class="strip fade">
+        <p class="mono"><b><span class="en">3 designs for the client</span><span class="ar">3 تصميمات للعميل</span></b> · <span class="en">the light one won</span><span class="ar">فاز التصميم الفاتح</span></p>
+        <ol>
+          <li><button type="button" data-gal="festdesigns" data-gi="0" aria-label="Design 2: Butcher paper, chosen"><img src="img/xs/fest-m2.jpg" width="400" height="250" alt="" loading="lazy"><span class="win">02 ★</span></button></li>
+          <li><button type="button" data-gal="festdesigns" data-gi="1" aria-label="Design 1: Embers"><img src="img/xs/fest-m1.jpg" width="400" height="250" alt="" loading="lazy"><span>01</span></button></li>
+          <li><button type="button" data-gal="festdesigns" data-gi="2" aria-label="Design 3: The tour"><img src="img/xs/fest-m3.jpg" width="400" height="250" alt="" loading="lazy"><span>03</span></button></li>
+          <li><button type="button" data-gal="festdesigns" data-gi="3" aria-label="3D map"><img src="img/xs/fest-map.jpg" width="400" height="250" alt="" loading="lazy"><span>3D MAP</span></button></li>
+        </ol>
+      </div>
+      <img class="shot" src="img/stage/bbqfest.jpg" width="1600" height="1000" alt="BBQ Fest home page in the light design: a red grill on warm paper" loading="lazy" data-gal="bbqfest">
+    </div>
+  </section>
+
   <section class="sec proj" id="doctor" style="--acc:#ff4d5a">
     <div class="txt">
-      <p class="idx mono fade"><b>02</b> / 04 — <span class="en">Live attendance · Juster</span><span class="ar">حضور مباشر · Juster</span></p>
+      <p class="idx mono fade"><span class="kt" style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span><b>1/2</b></span> <span class="en">Live attendance · Juster</span><span class="ar">حضور مباشر · Juster</span></p>
       <h2 class="fade"><span class="en scr">Doctor Dashboard</span><span class="ar">لوحة الدكتور</span></h2>
       <p class="desc fade"><span class="en">Students scan the doctor's QR code and appear in the list instantly — only from inside the hall.</span><span class="ar">يمسح الطلاب رمز QR الخاص بالدكتور فيظهرون في القائمة فورًا — من داخل القاعة فقط.</span></p>
       <ul class="tags mono fade"><li>QR</li><li><span class="en">GPS check</span><span class="ar">تحقق GPS</span></li><li><span class="en">Live feed</span><span class="ar">حضور مباشر</span></li></ul>
@@ -347,7 +483,7 @@ html.locked { overflow: hidden; }
 
   <section class="sec proj" id="uni" style="--acc:#ff6b7a">
     <div class="txt">
-      <p class="idx mono fade"><b>03</b> / 04 — <span class="en">Student app · Juster</span><span class="ar">تطبيق للطلاب · Juster</span></p>
+      <p class="idx mono fade"><span class="kt" style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span><b>2/2</b></span> <span class="en">Student app · Juster</span><span class="ar">تطبيق للطلاب · Juster</span></p>
       <h2 class="fade"><span class="en scr">University App</span><span class="ar">تطبيق الجامعة</span></h2>
       <p class="desc fade"><span class="en">The university in a student's pocket: live schedule, tasks and focus rooms. Works offline.</span><span class="ar">الجامعة في جيب الطالب: الجدول لحظة بلحظة، والمهام، وغرف المذاكرة. يعمل دون إنترنت.</span></p>
       <ul class="tags mono fade"><li>PWA</li><li><span class="en">Offline</span><span class="ar">دون إنترنت</span></li><li><span class="en">112 commits</span><span class="ar">112 تعديلًا</span></li></ul>
@@ -369,26 +505,50 @@ html.locked { overflow: hidden; }
     </div>
   </section>
 
-  <section class="sec proj" id="tsub" style="--acc:#42d3a0">
+  <section class="sec proj" id="bbqpres" style="--acc:#ff8a2b">
     <div class="txt">
-      <p class="idx mono fade"><b>04</b> / 04 — <span class="en">Company website · Riyadh</span><span class="ar">موقع شركة · الرياض</span></p>
-      <h2 class="fade"><span class="en scr">TSUB Global</span><span class="ar">TSUB Global</span></h2>
-      <p class="desc fade"><span class="en">A cinematic site linking Saudi Arabia and Bangladesh, built around a 3D globe and the logo's ribbons.</span><span class="ar">موقع سينمائي يربط السعودية وبنغلاديش، مبني حول كرة أرضية ثلاثية الأبعاد وأشرطة الشعار.</span></p>
-      <ul class="tags mono fade"><li>WebGL</li><li><span class="en">Scroll story</span><span class="ar">قصة بالتمرير</span></li><li>KSA · BD</li></ul>
+      <p class="idx mono fade"><span class="kt" style="--k:#f9a8d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض تقديمية</span><b>1/1</b></span> <span class="en">Sponsor deck · Riyadh 2027</span><span class="ar">عرض للرعاة · الرياض 2027</span></p>
+      <h2 class="fade"><span class="en scr">Sport Barbecue</span><span class="ar">Sport Barbecue</span></h2>
+      <p class="desc fade"><span class="en">A 27-slide sponsor deck set in a 3D night stadium: the camera flies like a drone, and a screen above the pitch shows each slide.</span><span class="ar">عرض للرعاة من 27 شريحة داخل استاد ليلي ثلاثي الأبعاد: الكاميرا تطير كطائرة درون، وشاشة فوق الملعب تعرض كل شريحة.</span></p>
+      <ul class="tags mono fade"><li><span class="en">27 slides</span><span class="ar">27 شريحة</span></li><li><span class="en">3D stadium</span><span class="ar">استاد ثلاثي الأبعاد</span></li><li>AR · EN</li></ul>
       <div class="acts fade">
-        <a class="pri" href="https://fareselzouhiry.github.io/TSUB/" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/TSUB/" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/TSUB</span></a>
-        <button type="button" data-gal="tsub"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
+        <a class="pri" href="https://fareselzouhiry.github.io/web/models/3/" target="_blank" rel="noopener"><span class="en">Open presentation</span><span class="ar">افتح العرض</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/web/models/3/" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/web/models/3</span></a>
+        <button type="button" data-gal="bbqpres"><span class="en">All slides</span><span class="ar">كل الشرائح</span></button>
+        <a href="https://github.com/FaresElzouhiry/web" target="_blank" rel="noopener">GitHub</a>
       </div>
       <div class="strip fade">
-        <p class="mono"><b><span class="en">Pages</span><span class="ar">الصفحات</span></b></p>
+        <p class="mono"><b><span class="en">Slides</span><span class="ar">الشرائح</span></b></p>
         <ol>
-          <li><button type="button" data-gal="tsub" data-gi="0" aria-label="Home"><img src="img/xs/tsub-hero.jpg" width="400" height="250" alt="" loading="lazy"><span>HOME</span></button></li>
-          <li><button type="button" data-gal="tsub" data-gi="2" aria-label="Vision 2030"><img src="img/xs/tsub-market.jpg" width="400" height="250" alt="" loading="lazy"><span>2030</span></button></li>
-          <li><button type="button" data-gal="tsub" data-gi="3" aria-label="Services"><img src="img/xs/tsub-model.jpg" width="400" height="250" alt="" loading="lazy"><span>SERVICES</span></button></li>
-          <li><button type="button" data-gal="tsub" data-gi="4" aria-label="Reach"><img src="img/xs/tsub-reach.jpg" width="400" height="250" alt="" loading="lazy"><span>REACH</span></button></li>
+          <li><button type="button" data-gal="bbqpres" data-gi="0" aria-label="Cover"><img src="img/xs/pres-cover.jpg" width="400" height="250" alt="" loading="lazy"><span>COVER</span></button></li>
+          <li><button type="button" data-gal="bbqpres" data-gi="2" aria-label="Numbers"><img src="img/xs/pres-numbers.jpg" width="400" height="250" alt="" loading="lazy"><span>NUMBERS</span></button></li>
+          <li><button type="button" data-gal="bbqpres" data-gi="4" aria-label="Experiences"><img src="img/xs/pres-exp.jpg" width="400" height="250" alt="" loading="lazy"><span>EXPERIENCES</span></button></li>
+          <li><button type="button" data-gal="bbqpres" data-gi="6" aria-label="Event zones"><img src="img/xs/pres-zones.jpg" width="400" height="250" alt="" loading="lazy"><span>ZONES</span></button></li>
         </ol>
       </div>
-      <img class="shot" src="img/stage/tsub.jpg" width="1600" height="1000" alt="TSUB home page with the globe and ribbons" loading="lazy" data-gal="tsub">
+      <img class="shot" src="img/stage/bbqpres.jpg" width="1600" height="1000" alt="The cover of the Sport Barbecue presentation in a 3D night stadium" loading="lazy" data-gal="bbqpres">
+    </div>
+  </section>
+
+  <section class="sec proj" id="pizza" style="--acc:#ffc145">
+    <div class="txt">
+      <p class="idx mono fade"><span class="kt" style="--k:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span><b>1/1</b></span> <span class="en">1 or 2 players</span><span class="ar">لاعب أو لاعبان</span></p>
+      <h2 class="fade"><span class="en scr">Pizza Spin</span><span class="ar">Pizza Spin</span></h2>
+      <p class="desc fade"><span class="en">A cooking duel: knead, top and bake a pizza faster than your rival. Play it right here with the keyboard, or with two controllers for two players.</span><span class="ar">مبارزة طبخ: اعجن وزيّن واخبز البيتزا أسرع من منافسك. العبها هنا بلوحة المفاتيح، أو بيدَي تحكم للاعبَين.</span></p>
+      <ul class="tags mono fade"><li><span class="en">Keyboard · 1 player</span><span class="ar">لوحة المفاتيح · لاعب واحد</span></li><li><span class="en">Controllers · 2 players</span><span class="ar">يدا تحكم · لاعبان</span></li><li><span class="en">One file, no libraries</span><span class="ar">ملف واحد بلا مكتبات</span></li></ul>
+      <div class="acts fade">
+        <a class="pri" href="play/index.html" target="_blank" rel="noopener"><span class="en">Play</span><span class="ar">العب</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="play/index.html" target="_blank" rel="noopener"><i></i><span class="en">Plays with the keyboard · nothing to install</span><span class="ar">تُلعب بلوحة المفاتيح · بلا تثبيت</span></a>
+        <button type="button" data-gal="pizza"><span class="en">See it played</span><span class="ar">شاهد اللعب</span></button>
+      </div>
+      <div class="strip fade">
+        <p class="mono"><b><span class="en">Screens</span><span class="ar">الشاشات</span></b></p>
+        <ol>
+          <li><button type="button" data-gal="pizza" data-gi="0" aria-label="Title screen"><img src="img/xs/pizza-title.jpg" width="400" height="250" alt="" loading="lazy"><span>START</span></button></li>
+          <li><button type="button" data-gal="pizza" data-gi="1" aria-label="Characters"><img src="img/xs/pizza-chars.jpg" width="400" height="250" alt="" loading="lazy"><span>CHEFS</span></button></li>
+          <li><button type="button" data-gal="pizza" data-gi="2" aria-label="How to win"><img src="img/xs/pizza-rules.jpg" width="400" height="250" alt="" loading="lazy"><span>RULES</span></button></li>
+          <li><button type="button" data-gal="pizza" data-gi="3" aria-label="The duel"><img src="img/xs/pizza-play.jpg" width="400" height="250" alt="" loading="lazy"><span>DUEL</span></button></li>
+        </ol>
+      </div>
+      <img class="shot" src="img/stage/pizza.jpg" width="1600" height="1000" alt="Pizza Spin split screen: two chefs in the same kitchen" loading="lazy" data-gal="pizza">
     </div>
   </section>
 
@@ -433,7 +593,9 @@ html.locked { overflow: hidden; }
   var asked = (location.search.match(/[?&]lang=(ar|en)\b/) || [])[1], saved = null;
   // an older version of the site saved Arabic for every visitor, so that key is dropped rather than trusted
   try { saved = localStorage.getItem('fe-lang'); localStorage.removeItem('fares-lang'); } catch (e) {}
-  setLang(asked || saved || 'en', false);
+  // a visitor whose browser is set to Arabic gets Arabic straight away
+  var browserAr = [].concat(navigator.languages || [], navigator.language || '')[0];
+  setLang(asked || saved || (/^ar\b/i.test(browserAr || '') ? 'ar' : 'en'), false);
   document.getElementById('lang').addEventListener('click', function () { setLang(root.dataset.lang === 'ar' ? 'en' : 'ar', true); });
 
   /* copy the email */
@@ -492,15 +654,40 @@ html.locked { overflow: hidden; }
       { s: 'uni-schedule', p: 1, c: T('The schedule, with a line marking the current time.', 'الجدول، مع خط يوضح الوقت الحالي.') },
       { s: 'uni-study', p: 1, c: T('Focus rooms with a Pomodoro timer and a leaderboard.', 'غرف مذاكرة بمؤقت Pomodoro ولوحة متصدرين.') }
     ]},
-    tsub: { t: T('TSUB Global Services'), link: ['https://fareselzouhiry.github.io/TSUB/', LIVE], items: [
-      { s: 'tsub-hero', c: T('The opening: a 3D globe wrapped in the logo’s ribbons.', 'البداية: كرة أرضية ثلاثية الأبعاد تلتف حولها أشرطة الشعار.') },
-      { s: 'tsub-m-hero', p: 1, c: T('On a phone.', 'على الجوال.') },
-      { s: 'tsub-market', c: T('Vision 2030 and the business-services opportunity.', 'رؤية 2030 وفرصة خدمات الأعمال.') },
-      { s: 'tsub-model', c: T('Four service pillars across the business lifecycle.', 'أربع ركائز للخدمات عبر دورة حياة الأعمال.') },
-      { s: 'tsub-reach', c: T('The Saudi Arabia – Bangladesh corridor.', 'ممر السعودية – بنغلاديش.') }
+    bbqfest: { t: T('BBQ Fest'), link: ['https://fareselzouhiry.github.io/bbq-fest/model-2.html', LIVE], items: [
+      { s: 'fest-m2', c: T('The home page: a red grill on warm paper, a ticket, and a countdown to opening day.', 'الصفحة الرئيسية: شواية حمراء على ورق دافئ، وتذكرة، وعدّاد حتى يوم الافتتاح.') },
+      { s: 'fest-m-home', p: 1, c: T('On a phone.', 'على الجوال.') },
+      { s: 'fest-w-story', c: T('The festival in numbers, and its story told in snapshots.', 'المهرجان بالأرقام، وقصته بالصور.') },
+      { s: 'fest-w-exp', c: T('Every experience gets a photo, pinned like a print.', 'لكل تجربة صورة مثبّتة كأنها مطبوعة.') },
+      { s: 'fest-w-price', c: T('Sponsorship packages, laid out like a menu.', 'باقات الرعاية، معروضة كمنيو.') },
+      { s: 'fest-w-sponsor', c: T('Each package opens with what the sponsor gets.', 'كل باقة تفتح بما يحصل عليه الراعي.') }
+    ]},
+    festdesigns: { t: T('BBQ Fest — three designs', 'BBQ Fest — ثلاثة تصميمات'), link: ['https://fareselzouhiry.github.io/bbq-fest/', T('See all three', 'شاهد الثلاثة')], items: [
+      { s: 'fest-m2', t: T('02 · Butcher paper — chosen', '02 · ورق الجزّار — المختار'), c: T('Light and printed: warm paper, stamps and a price list shaped like a menu. It became the website.', 'فاتح ومطبوع: ورق دافئ وأختام وقائمة أسعار على شكل منيو. وصار هو الموقع.') },
+      { s: 'fest-m1', t: T('01 · Embers', '01 · جمر'), c: T('Dark and cinematic: the red grill, flame lines and a countdown.', 'داكن وسينمائي: الشواية الحمراء وخطوط اللهب وعدّاد تنازلي.') },
+      { s: 'fest-m3', t: T('03 · The tour', '03 · الجولة'), c: T('Fully 3D: scrolling flies the camera from one zone of the festival to the next.', 'ثلاثي الأبعاد بالكامل: التمرير يطير بالكاميرا من منطقة في المهرجان إلى أخرى.') },
+      { s: 'fest-map', t: T('3D map', 'المخطط ثلاثي الأبعاد'), c: T('The whole festival in 3D, by day, sunset or night. Tap any booth to see its type, size and price.', 'المهرجان كله بثلاثة أبعاد، نهارًا أو غروبًا أو ليلًا. اضغط على أي جناح لترى نوعه ومساحته وقيمته.') },
+      { s: 'fest-pick', c: T('The page where the client picked the design.', 'الصفحة التي اختار منها العميل التصميم.') }
+    ]},
+    bbqpres: { t: T('Sport Barbecue — presentation', 'Sport Barbecue — العرض التقديمي'), link: ['https://fareselzouhiry.github.io/web/models/3/', T('Open the presentation', 'افتح العرض')], items: [
+      { s: 'pres-cover', c: T('The cover: a night stadium in 3D, the logo on the pitch.', 'الغلاف: استاد ليلي ثلاثي الأبعاد، والشعار على أرض الملعب.') },
+      { s: 'pres-m-cover', p: 1, c: T('On a phone, the stadium sits above each slide.', 'على الجوال، يظهر الاستاد فوق كل شريحة.') },
+      { s: 'pres-numbers', c: T('The event in numbers, also shown on the screen above the pitch.', 'الفعالية بالأرقام، وتظهر أيضًا على الشاشة فوق الملعب.') },
+      { s: 'pres-concept', c: T('The concept: grill, move, meet.', 'الفكرة: شواء، حركة، لقاء.') },
+      { s: 'pres-exp', c: T('The experiences; the camera flies to the running track.', 'التجارب، والكاميرا تطير إلى مضمار الجري.') },
+      { s: 'pres-journey', c: T('The visitor journey, step by step.', 'رحلة الزائر، خطوة بخطوة.') },
+      { s: 'pres-zones', c: T('The event zones.', 'مناطق الفعالية.') },
+      { s: 'pres-program', c: T('The program, by category.', 'البرنامج، حسب الفئة.') }
+    ]},
+    pizza: { t: T('Pizza Spin'), link: ['play/index.html', T('Play now', 'العب الآن')], items: [
+      { s: 'pizza-title', c: T('The start screen, in English or Arabic.', 'شاشة البداية، بالإنجليزية أو العربية.') },
+      { s: 'pizza-chars', c: T('Each player picks a chef.', 'كل لاعب يختار طاهيه.') },
+      { s: 'pizza-rules', c: T('Cook, then fight: shove your rival, blind them with flour or make them slip on oil.', 'اطبخ ثم نافس: ادفع منافسك أو أعمِه بالدقيق أو اجعله يتزحلق على الزيت.') },
+      { s: 'pizza-play', c: T('Split screen: two chefs, one kitchen, the same order.', 'شاشة مقسومة: طاهيان في مطبخ واحد وطلب واحد.') },
+      { s: 'pizza-play2', c: T('Every round has a twist, and the last one counts double.', 'لكل جولة مفاجأة، والجولة الأخيرة بنقاط مضاعفة.') }
     ]}
   };
-  var PROJ = ['alliance', 'doctor', 'uni', 'tsub'];
+  var PROJ = ['alliance', 'bbqfest', 'doctor', 'uni', 'bbqpres', 'pizza'];
 
   var gal = document.getElementById('gal'), gImg = document.getElementById('g-img'), gCap = document.getElementById('g-cap'), gT = document.getElementById('g-t'), gN = document.getElementById('g-n');
   var gLink = document.getElementById('g-link'), gLt = document.getElementById('g-lt'), gThumbs = document.getElementById('g-thumbs');
@@ -566,8 +753,29 @@ html.locked { overflow: hidden; }
     open(el.dataset.gal, +(el.dataset.gi || 0));
   });
 
+  /* the opening: about two and a half seconds, or until the visitor clicks, taps, scrolls or presses a key */
+  var opening = document.getElementById('open'), opened = false, onOpened = [];
+  // the click that skipped the opening must not also press whatever was underneath it
+  var skipT = -1e9;
+  addEventListener('click', function (e) { if (performance.now() - skipT < 600) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+  function finishOpening() {
+    if (opened) return; opened = true;
+    root.classList.remove('opening');
+    if (opening) { opening.classList.add('out'); setTimeout(function () { opening.remove(); }, 800); }
+    onOpened.forEach(function (f) { f(); });
+  }
+  if (!opening || !root.classList.contains('js-open')) opened = true;
+  else {
+    setTimeout(finishOpening, reduce ? 600 : 2700);
+    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) {
+      addEventListener(ev, function (e) { if (!opened) { finishOpening(); skipT = performance.now(); if (ev === 'wheel' || ev === 'keydown') e.preventDefault(); e.stopImmediatePropagation(); } }, { capture: true, passive: false });
+    });
+  }
+
   /* sections: which one is on screen */
   var secs = [].slice.call(document.querySelectorAll('.sec')), dots = [].slice.call(document.querySelectorAll('#dots button')), active = -1;
+  // the kind of work each section belongs to; the top bar lights up the one on screen
+  var KIND = [null, 'web', 'web', 'app', 'app', 'pres', 'game', null], kinds = [].slice.call(document.querySelectorAll('.kn'));
   function nearest() { var y = scrollY + innerHeight * .5, best = 0; secs.forEach(function (el, i) { if (y >= el.offsetTop) best = i; }); return best; }
   function markSections() {
     var k = nearest();
@@ -575,7 +783,8 @@ html.locked { overflow: hidden; }
     active = k;
     secs.forEach(function (el, i) { el.classList.toggle('on', i === k); });
     dots.forEach(function (b, i) { b.classList.toggle('on', i === k); });
-    scramble(secs[k].querySelector('.scr'));
+    kinds.forEach(function (a) { a.classList.toggle('on', a.dataset.k === KIND[k]); });
+    if (opened) scramble(secs[k].querySelector('.scr'));
     return k;
   }
   var goal = 0, goalT = -1e9;
@@ -586,6 +795,10 @@ html.locked { overflow: hidden; }
   // while a move is still under way, the next step counts from where it is going
   function stepBy(d) { go((performance.now() - goalT < 700 ? goal : nearest()) + d); }
   dots.forEach(function (b) { b.addEventListener('click', function () { go(+b.dataset.to); }); });
+  // the category cards on the first screen and the kinds in the top bar (in the plain page these stay ordinary links)
+  [].forEach.call(document.querySelectorAll('.cats a[data-to], .kn[data-to]'), function (a) {
+    a.addEventListener('click', function (e) { if (!root.classList.contains('gl')) return; e.preventDefault(); go(+a.dataset.to); });
+  });
 
   // Browsers snap a short wheel scroll back to where it started, so in 3D mode the wheel is read here:
   // one notch, or one trackpad swipe, moves exactly one section. A trackpad keeps sending smaller and
@@ -669,6 +882,10 @@ html.locked { overflow: hidden; }
     '    if (q.w >= 1.0 && q.w < 2.0) { float e = q.w - 1.0 - fract(uTime * .2); fx = exp(-e * e * 140.0) * 2.4; }\n' +
     '    else if (q.w > 2.5 && q.w < 3.5) { float e = q.y - uScan; fx = exp(-e * e * 70.0) * 1.7; }\n' +
     '    else if (q.w > 3.5 && q.w < 4.5) { float a = atan(q.y, q.x), h = mod(-uTime * 1.25, 6.2832); float d = abs(mod(a - h + 3.1416, 6.2832) - 3.1416); fx = exp(-d * d * 5.0) * 2.0; }\n' +
+    // embers and steam: rise, drift and fade, each on its own clock (the fraction of w)
+    '    else if (q.w > 4.5 && q.w < 6.0) { float u = fract(uTime * .3 + q.w * 7.31); p.y += u * 1.4; p.x += sin(uTime * 1.6 + q.w * 40.0) * .06 * u; fx = -u * .95; }\n' +
+    // flames: lick sideways more toward the tips, and flicker
+    '    else if (q.w > 6.0 && q.w < 7.0) { float hh = clamp(p.y + .5, 0.0, 2.0); p.x += sin(uTime * 7.0 + p.y * 6.0 + q.w * 23.0) * .045 * hh; p.y += sin(uTime * 5.0 + q.w * 31.0) * .03 * hh; fx = .35 * sin(uTime * 11.0 + q.w * 57.0); }\n' +
     '  }\n' +
     '  return (M * vec4(p, 1.0)).xyz; }\n' +
     'void main() {\n' +
@@ -826,23 +1043,64 @@ html.locked { overflow: hidden; }
     for (; k < M; k++) { var pt = pts[(R() * pts.length) | 0]; put(t, k, pt[0] + (R() - .5) * .008, pt[1] + (R() - .5) * .008, (R() - .5) * .04, 0, 245, 246, 250, 210); }
     return seal(t);
   }
-  // TSUB: three ribbons, white, green and red, rising from one point around a dim globe
-  function rib(u, ph) { var th = Math.PI * (1 - u * 1.08), a = ph + u * 1.9, r = 1.12 + .22 * Math.sin(Math.PI * u); return [r * Math.sin(th) * Math.cos(a), r * Math.cos(th), r * Math.sin(th) * Math.sin(a)]; }
-  function shRibbons() {
-    var t = blank(), nG = M * .22 | 0, k = 0, cols = [[238, 240, 246], [30, 205, 105], [240, 60, 62]];
-    for (; k < nG; k++) { var c = CELLS[(R() * CELLS.length) | 0], v = sph(c[0] + (R() - .5) * 1.8, c[1] + (R() - .5) * 1.7, .93); put(t, k, v[0], v[1], v[2], 0, 50, 160, 175, 120); }
-    var per = (M - nG) / 3 | 0;
-    for (var j = 0; j < 3; j++) {
-      var ph = j * 2.094 + .4;
-      for (var q = 0; q < per && k < M; q++, k++) {
-        var u = Math.pow(R(), .9), s = R() * 2 - 1, c0 = rib(u, ph), c1 = rib(Math.min(1.02, u + .01), ph);
-        var Tv = nrm([c1[0] - c0[0], c1[1] - c0[1], c1[2] - c0[2]]), Nv = nrm(c0), Bv = nrm(cross(Tv, Nv)), tw = u * 2.4 + j;
-        var dir = nrm([Bv[0] * Math.cos(tw) + Nv[0] * Math.sin(tw) * .3, Bv[1] * Math.cos(tw) + Nv[1] * Math.sin(tw) * .3, Bv[2] * Math.cos(tw) + Nv[2] * Math.sin(tw) * .3]);
-        var wd = .18 * Math.pow(Math.sin(Math.PI * Math.min(1, u * 1.04)), .65), col = cols[j], f = .55 + .45 * (1 - Math.abs(s));
-        put(t, k, c0[0] + dir[0] * s * wd, c0[1] + dir[1] * s * wd, c0[2] + dir[2] * s * wd, 0, col[0] * f, col[1] * f, col[2] * f, 255);
-      }
+  // BBQ Fest: a red kettle grill, its grate, flames licking up through it and embers rising
+  function shGrill() {
+    var t = blank(), k = 0, nB = M * .22 | 0, nG = M * .12 | 0, nF = M * .5 | 0, GY = -.5, RB = 1.05;
+    for (; k < nB; k++) { // the bowl: the lower half of a sphere, squashed, under the grate
+      var th = R() * 6.283, z = -R(), rr = Math.sqrt(1 - z * z), f = .45 + .55 * R(), lit = .55 + .45 * Math.max(0, Math.cos(th - 1.9));
+      put(t, k, rr * Math.cos(th) * RB, GY + z * .8, rr * Math.sin(th) * RB, 0, 235 * f * lit, 40 * f * lit, 32 * f * lit, 230);
     }
-    for (; k < M; k++) put(t, k, 0, -1.1, 0, 0, 0, 0, 0, 0);
+    for (var q = 0; q < nG; q++, k++) { // the grate: a rim and nine bars
+      var x, z2;
+      if (R() < .3) { var a = R() * 6.283; x = Math.cos(a) * RB; z2 = Math.sin(a) * RB; }
+      else { var bar = ((R() * 9) | 0) - 4, zb = bar * .22, half = Math.sqrt(Math.max(0, RB * RB - zb * zb)); x = (R() * 2 - 1) * half; z2 = zb; }
+      put(t, k, x, GY + (R() - .5) * .012, z2, 0, 190, 190, 200, 200);
+    }
+    var tongues = [[-.55, .95, .2], [-.2, 1.45, -.1], [.18, 1.25, .15], [.52, .9, -.05], [0, 1.65, .05], [-.38, 1.1, -.25], [.36, 1.05, .3]];
+    for (q = 0; q < nF; q++, k++) { // flames: tapered tongues, white-gold at the root, red at the tip
+      var tg = tongues[(R() * tongues.length) | 0], v = Math.pow(R(), .8), wd = .21 * Math.pow(1 - v, .7) * (.6 + .4 * Math.sin(Math.PI * Math.min(1, v * 3))) + .01;
+      var fx = tg[0] + (R() * 2 - 1) * wd + Math.sin(v * 4 + tg[0] * 9) * .07 * v, fy = GY + .03 + v * tg[1], fz = tg[2] + (R() * 2 - 1) * wd * .8;
+      var r0 = 255, g0 = v < .25 ? 225 - v * 200 : 175 - v * 150, b0 = v < .2 ? 140 - v * 500 : 30 * (1 - v), al = 255 * (1 - v * .55);
+      put(t, k, fx, fy, fz, 6 + R() * .99, r0, Math.max(30, g0), Math.max(10, b0), al);
+    }
+    for (; k < M; k++) { // embers
+      var ex = (R() * 2 - 1) * .8, ez = (R() * 2 - 1) * .6, hot = R();
+      put(t, k, ex, GY + .1 + R() * .4, ez, 5 + R() * .99, 255, 120 + hot * 90, 40, 255);
+    }
+    return seal(t);
+  }
+  // Sport Barbecue: a stack of slides, the front one reading BBQ and GRILL · MOVE · MEET, with embers drifting up
+  function shDeck() {
+    var t = blank(), k = 0, SW = 2.7, SH = SW * 9 / 16, nEdge = M * .24 | 0, nBg = M * .16 | 0, nT = M * .3 | 0, nS = M * .14 | 0;
+    var big = textPoints('BBQ', '600 230px "Space Grotesk", sans-serif', 2.3), sub = textPoints('GRILL · MOVE · MEET', '600 62px "Space Grotesk", sans-serif', 1.75);
+    var slides = [[-.5, .42, -.75, .35], [-.25, .21, -.38, .6], [0, 0, 0, 1]]; // x, y, z, brightness
+    function edge(sl) { var u = R() * 2 * (SW + SH), x, y; if (u < SW) { x = u - SW / 2; y = SH / 2; } else if (u < SW + SH) { x = SW / 2; y = SH / 2 - (u - SW); } else if (u < 2 * SW + SH) { x = SW / 2 - (u - SW - SH); y = -SH / 2; } else { x = -SW / 2; y = -SH / 2 + (u - 2 * SW - SH); } return [x + sl[0], y + sl[1], sl[2]]; }
+    for (; k < nEdge; k++) { var sl = slides[k % 3], e = edge(sl), b = sl[3]; put(t, k, e[0], e[1], e[2], 0, 255 * b, 138 * b, 43 * b, 230); }
+    for (var q = 0; q < nBg; q++, k++) { var s2 = slides[q % 3]; put(t, k, s2[0] + (R() - .5) * SW, s2[1] + (R() - .5) * SH, s2[2] - .01, 0, 90, 45, 20, 90); }
+    for (q = 0; q < nT; q++, k++) { var p = big[(R() * big.length) | 0], f = .75 + .25 * R(); put(t, k, p[0] + (R() - .5) * .006, p[1] + .16, .02, 0, 205 * f, 82 * f, 18 * f, 255); }
+    for (q = 0; q < nS; q++, k++) { var p2 = sub[(R() * sub.length) | 0]; put(t, k, p2[0], p2[1] * .9 - .42, .02, 0, 240, 238, 232, 210); }
+    for (; k < M; k++) put(t, k, (R() * 2 - 1) * 1.2, -SH / 2 + R() * .3, .1 + R() * .2, 5 + R() * .99, 255, 140 + R() * 80, 40, 255);
+    return seal(t);
+  }
+  // Pizza Spin: a pizza lying flat (it spins in placeOf): crust, sauce, cheese, pepperoni, peppers and the slice cuts, with steam rising
+  function shPizza() {
+    var t = blank(), k = 0, RP = 1.25, nCr = M * .2 | 0, nCh = M * .4 | 0, nPe = M * .18 | 0, nGr = M * .08 | 0, nCut = M * .06 | 0;
+    var pep = [], gr = [], i;
+    for (i = 0; i < 9; i++) { var a = i * 2.39 + .3, rr = i === 0 ? 0 : (i % 2 ? .78 : .45); pep.push([Math.cos(a) * rr, Math.sin(a) * rr]); }
+    for (i = 0; i < 6; i++) { var a2 = i * 1.047 + .5, r2 = i % 2 ? .62 : .3; gr.push([Math.cos(a2) * r2, Math.sin(a2) * r2]); }
+    for (; k < nCr; k++) { // crust: a puffy ring
+      var th = R() * 6.283, b = R() * 6.283, rc = RP - .07 + .08 * Math.cos(b), f = .6 + .4 * R();
+      put(t, k, Math.cos(th) * rc, .06 * Math.sin(b) + .02, Math.sin(th) * rc, 0, 225 * f, 150 * f, 70 * f, 255);
+    }
+    for (i = 0; i < nCh; i++, k++) { // cheese, with sauce showing at the edge
+      var rr2 = Math.sqrt(R()) * (RP - .14), th2 = R() * 6.283, f2 = .7 + .3 * R(), edgeS = rr2 > RP - .26;
+      if (edgeS) put(t, k, Math.cos(th2) * rr2, .01, Math.sin(th2) * rr2, 0, 205 * f2, 45 * f2, 30 * f2, 255);
+      else put(t, k, Math.cos(th2) * rr2, .015, Math.sin(th2) * rr2, 0, 250 * f2, 196 * f2, 72 * f2, 230);
+    }
+    for (i = 0; i < nPe; i++, k++) { var c = pep[i % pep.length], pr = Math.sqrt(R()) * .15, pa = R() * 6.283, f3 = .7 + .3 * R(); put(t, k, c[0] + Math.cos(pa) * pr, .03, c[1] + Math.sin(pa) * pr, 0, 175 * f3, 42 * f3, 32 * f3, 255); }
+    for (i = 0; i < nGr; i++, k++) { var g = gr[i % gr.length], ga = R() * 6.283, gR = .085 + (R() - .5) * .02; put(t, k, g[0] + Math.cos(ga) * gR, .035, g[1] + Math.sin(ga) * gR, 0, 60, 175, 70, 255); }
+    for (i = 0; i < nCut; i++, k++) { var ca = ((i % 8) / 8) * 6.283 + .2, cr = R() * (RP - .1); put(t, k, Math.cos(ca) * cr, .04, Math.sin(ca) * cr, 0, 120, 70, 35, 255); }
+    for (; k < M; k++) { var sa = R() * 6.283, sr = Math.sqrt(R()) * .9; put(t, k, Math.cos(sa) * sr, .1, Math.sin(sa) * sr, 5 + R() * .99, 235, 230, 225, 120); }
     return seal(t);
   }
   // the end: a ringed planet
@@ -894,22 +1152,28 @@ html.locked { overflow: hidden; }
     return tx;
   }
 
-  /* the shapes: 0 the first screen, 1–4 the projects' emblems, 5 the end, 6–9 the projects' real screens */
+  /* the shapes: 0 the first screen, 1–NP the projects' emblems, END the ringed planet, then the projects' real screens */
   // size: point size in world units, vari: random size spread, hard: crisp mosaic dots, nom: footprint used to fit the layout
+  var NP = PROJ.length, END = NP + 1;
   var ST = [
     { n: 'tess', four: 1, size: .0135, vari: 1, hard: 0, nom: [4.3, 4.3] },
     { n: 'globe', size: .0125, vari: 1, hard: 0, nom: [2.9, 2.9] },
+    { n: 'grill', size: .013, vari: 1, hard: 0, nom: [2.6, 2.9] },
     { n: 'qr', size: .012, vari: .8, hard: 0, nom: [3.5, 3.5] },
     { n: 'ring', size: .0125, vari: 1, hard: 0, nom: [2.9, 2.9] },
-    { n: 'ribbons', size: .0135, vari: 1, hard: 0, nom: [2.8, 3.0] },
+    { n: 'deck', size: .012, vari: .8, hard: 0, nom: [3.6, 2.3] },
+    { n: 'pie', size: .013, vari: .9, hard: 0, nom: [2.9, 2.2] },
     { n: 'planet', size: .012, vari: 1, hard: 0, nom: [5.3, 3.0] },
     { n: 'alliance', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [233, 196, 106] },
+    { n: 'bbqfest', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 90, 54] },
     { n: 'doctor', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 77, 90] },
     { n: 'uni', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 107, 122] },
-    { n: 'tsub', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [66, 211, 160] }
+    { n: 'bbqpres', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 138, 43] },
+    { n: 'pizza', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 193, 69] }
   ];
+  function stIdx(n) { for (var i = 0; i < ST.length; i++) if (ST[i].n === n) return i; return -1; }
   var SCATTER = upload(shScatter()), SCAT = { size: .012, vari: 1, hard: 0 };
-  [shTess, shGlobe, shQR, shRing, shRibbons, shPlanet].forEach(function (fn, i) { ST[i].t = upload(fn()); });
+  [shTess, shGlobe, shGrill, shQR, shRing, shDeck, shPizza, shPlanet].forEach(function (fn, i) { ST[i].t = upload(fn()); });
 
   /* ---- maths ---- */
   function persp(fov, asp, n, f) { var t = 1 / Math.tan(fov / 2), nf = 1 / (n - f); return new Float32Array([t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) * nf, -1, 0, 0, 2 * f * n * nf, 0]); }
@@ -988,7 +1252,9 @@ html.locked { overflow: hidden; }
       case 'globe': ry = -46.72 * D2R + t * .14 * sp + yw; rx = .34 + pt; break;
       case 'qr': ry = Math.sin(t * .5 * sp) * .38 + yw; rx = pt; break;
       case 'ring': rx = -.42 + pt; ry = yw; break;
-      case 'ribbons': ry = t * .22 * sp + yw; rx = pt; break;
+      case 'grill': ry = t * .25 * sp + yw; rx = .32 + pt; break;
+      case 'deck': ry = Math.sin(t * .4 * sp) * .3 - .22 + yw; rx = -.06 + pt * .6; break;
+      case 'pie': ry = t * .9 * sp + yw; rx = .78 + pt * .5; break; // it spins
       case 'planet': ry = t * .1 * sp + yw; rx = .4 + pt * .5; rz = -.26; break;
       default: ry = spin.tilt + mx * .1; rx = spin.tiltX + my * .06; // project screens tilt toward the hand
     }
@@ -1012,41 +1278,45 @@ html.locked { overflow: hidden; }
     var m = mixNow(), left = (1 - m) * X.dur;
     if (left > .4) { X.dur = .4 / (1 - m); X.t0 = now - m * X.dur * 1000; }
   }
-  // A project plays a loop: its emblem (the globe, the QR code, the focus timer, the ribbons) for a moment, then
-  // its real screens for longer, then the emblem again. phase 0 = emblem, 1 = screens; it restarts on every arrival.
-  var phase = 0, phaseSec = -1, heldFrom = 0, HOLD = [2200, 5000]; // ms each phase holds once it has formed
-  function sectionShape(i) { return i === 0 ? 0 : i === secs.length - 1 ? 5 : phase ? 5 + i : i; }
+  // A project plays a loop: its emblem (the globe, the QR code, the focus timer, the grill, the slides, the pizza) for a
+  // moment, then its real screens for longer, then the emblem again. phase 0 = emblem, 1 = screens; it restarts on every arrival.
+  var phase = 0, phaseSec = -1, heldFrom = 0, HOLD = [1600, 6000]; // ms each phase holds once it has formed
+  // a project whose screens haven't arrived yet simply keeps its emblem
+  function sectionShape(i) { if (i === 0) return 0; if (i === secs.length - 1) return END; var sc = END + i; return phase && ST[sc].t ? sc : i; }
 
-  /* ---- load the four project screens (wide ones for computers, portrait mockups for phones) ---- */
-  var SHOTS = ['alliance', 'doctor', 'uni', 'tsub'], shotSet = null, loading = null;
+  /* ---- load the project screens (wide ones for computers, portrait mockups for phones) ---- */
+  // Nothing waits for them: the page starts at once and each project shows its screens as soon as they arrive,
+  // the one on screen first.
+  var wantSet = null;
   function loadImg(src) { return new Promise(function (ok, no) { var i = new Image(); i.onload = function () { (i.decode ? i.decode() : Promise.resolve()).catch(function () {}).then(function () { ok(i); }); }; i.onerror = no; i.src = src; }); }
   function loadShots(phone) {
-    var set = phone ? 'm' : 'd'; if (shotSet === set || loading === set) return Promise.resolve();
-    loading = set; var done = 0;
-    return Promise.all(SHOTS.map(function (n) {
-      return loadImg('img/stage/' + (phone ? 'm-' : '') + n + '.jpg').then(function (img) { done++; if (!ready) status.textContent = (root.dataset.lang === 'ar' ? 'جارٍ التحميل ' : 'Loading ') + Math.round(done / 4 * 100) + '%'; return img; });
-    })).then(function (imgs) {
-      if (loading === set) loading = null;
-      if (shotSet && (mob ? 'm' : 'd') !== set) return loadShots(mob);   // the window changed shape while these loaded
-      imgs.forEach(function (img, j) {
-        var st = ST[6 + j], t = shScreen(img);
+    var set = phone ? 'm' : 'd'; if (wantSet === set) return; wantSet = set;
+    var cur = clamp(active - 1, 0, NP - 1), order = PROJ.map(function (n, j) { return j; });
+    order.sort(function (a, b) { return Math.abs(a - cur) - Math.abs(b - cur); });
+    order.forEach(function (j) {
+      loadImg('img/stage/' + (phone ? 'm-' : '') + PROJ[j] + '.jpg').then(function (img) {
+        if (wantSet !== set) return; // the window changed shape while this loaded
+        var st = ST[END + 1 + j], t = shScreen(img);
         freeTarget(st.t); if (st.tex) gl.deleteTexture(st.tex);
         st.t = upload(t); st.size = t.cell * 1.18; st.vari = 0; st.tex = imageTexture(img); st.asp = t.W / t.H; st.nom = [t.W, t.H];
-      });
-      shotSet = set;
-    }, function (err) { if (loading === set) loading = null; throw err; });
+      }, function (err) { console.warn('Could not load the screens of ' + PROJ[j], err); });
+    });
   }
-  var fontsReady = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('600 168px "Space Grotesk"'), document.fonts.load('500 12px "JetBrains Mono"')]).catch(function () {}) : Promise.resolve();
+  var fontsReady = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('600 168px "Space Grotesk"'), document.fonts.load('600 230px "Space Grotesk"'), document.fonts.load('500 12px "JetBrains Mono"')]).catch(function () {}) : Promise.resolve();
   var ready = false, introT = 0, introAt = 0;
   resize();
-  Promise.all([loadShots(mob), fontsReady]).then(function () {
-    freeTarget(ST[3].t); ST[3].t = upload(shRing()); // redrawn now that the display font has loaded
+  markSections();
+  loadShots(mob);
+  // fonts are waited for (briefly) because the timer and the slides write words in particles
+  Promise.race([fontsReady, new Promise(function (ok) { setTimeout(ok, 2500); })]).then(function () {
+    var iR = stIdx('ring'), iD = stIdx('deck');
+    freeTarget(ST[iR].t); ST[iR].t = upload(shRing()); // redrawn now that the display font has loaded
+    freeTarget(ST[iD].t); ST[iD].t = upload(shDeck());
     ready = true; resize();
-    loadShots(mob).catch(function () {}); // in case the window changed shape while loading
     status.innerHTML = 'WebGL2 · ' + N.toLocaleString('en-US') + ' <span class="en">particles</span><span class="ar">جسيم</span>';
     var k = markSections(); phaseSec = k; phase = reduce ? 1 : 0; heldFrom = now;
     X = { a: sectionShape(k), b: sectionShape(k), ra: k, rb: k, t0: now, dur: 1, done: true };
-  }).catch(function (err) { console.warn('Could not load the project screens:', err); plain(); });
+  });
 
   /* ---- draw ---- */
   var last = performance.now(), time = 0, reveal = 0, revealFor = -1, perf = { t: 0, n: 0 };
@@ -1063,7 +1333,7 @@ html.locked { overflow: hidden; }
     // spin keeps going after the hand lets go, then settles; screens ease back to face the visitor
     if (spin.id === null) { spin.yaw += spin.vx; spin.vx *= .94; spin.pitch += spin.vy; spin.vy *= .9; spin.pitch *= .985; spin.tilt *= .9; spin.tiltX *= .9; }
     cursor();
-    if (!ready) { draw(SCATTER, SCATTER, 0, null, null, SCAT, SCAT); return; }
+    if (!ready || !opened) { draw(SCATTER, SCATTER, 0, null, null, SCAT, SCAT); return; } // the particles gather once the opening is done
 
     // each phase holds once it has formed (and for as long as someone is turning the shape), then the other comes back
     if (k !== phaseSec) { phaseSec = k; phase = reduce ? 1 : 0; }
@@ -1100,8 +1370,8 @@ html.locked { overflow: hidden; }
   // the space a project's picture takes on screen (its emblem sits in the same place): clicking it opens the project's screens
   function onShot(x, y) {
     var k = active, rg = REG[k];
-    if (!ready || !rg || k < 1 || k > PROJ.length) return false;
-    var st = ST[5 + k], s = fit(st, rg), u = H / (2 * CZ * Math.tan(FOV / 2)); // pixels per world unit
+    if (!ready || !rg || k < 1 || k > NP) return false;
+    var st = ST[END + k], s = fit(st, rg), u = H / (2 * CZ * Math.tan(FOV / 2)); // pixels per world unit
     var hw = st.nom[0] * s * u / 2, hh = st.nom[1] * s * u / 2, px = W / 2 + rg.x * u, py = H / 2 - rg.y * u;
     return x > px - hw && x < px + hw && y > py - hh && y < py + hh;
   }
@@ -1134,7 +1404,7 @@ html.locked { overflow: hidden; }
   addEventListener('resize', function () {
     if (canvas.clientWidth === W && canvas.clientHeight === H) return;
     resize();
-    if (ready) loadShots(mob).catch(function () {});
+    loadShots(mob);
   });
   onLang.push(resize);
   requestAnimationFrame(frame);
