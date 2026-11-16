@@ -72,7 +72,7 @@ Everything is in `index.html` (HTML, CSS and JavaScript) plus the pictures in `i
 | Sections | CSS scroll snapping (`scroll-snap-type: y mandatory` with `scroll-snap-stop: always`), so a flick never skips a project. The page reads the wheel and the keyboard itself and moves one stop per notch or key; a trackpad's coasting is ignored until a pause or a fresh swipe |
 | Layout | On computers the screen floats to the right of the words (left in Arabic); on phones the engine measures the space between the top bar and the words of the stop on screen and fits the 3D into it |
 | Extras | Film grain, a vignette, a cursor ring that grows over anything clickable (and says "OPEN" over the screen in front), and titles that decode from noise when their section arrives |
-| Speed | Nothing waits for the project pictures: each screen fills in as its picture arrives, the nearest first. Nothing on the page blurs what is behind it (re-blurring a moving 3D scene every frame was the most expensive thing on the page), the chapter card animates only position and opacity, points too faint to see are skipped, and the cursor checks what is under it only when it moves. In testing: 165 frames a second (the screen's refresh rate) on a computer and a phone-sized screen, no frame slower than 12 ms when flying between stops, and above 100 frames a second on a phone slowed down four times. If a device still can't keep up, the page lowers its resolution (down to 0.75× on phones) instead of stuttering |
+| Speed | Nothing waits for the project pictures: each screen fills in as its picture arrives, the nearest first. Nothing on the page blurs what is behind it (re-blurring a moving 3D scene every frame was the most expensive thing on the page), the chapter card animates only position and opacity, points too faint to see are skipped, and the cursor checks what is under it only when it moves. In testing: 165 frames a second (the screen's refresh rate) on a computer and a phone-sized screen, no frame slower than 12 ms when flying between stops, and above 100 frames a second on a phone slowed down four times. The 3D draws at the screen's full sharpness (up to 2× on computers, 2.25× on phones) and the pictures are sampled slightly sharp. Only if a device is slow for two seconds in a row (not counting loading) does it lower its resolution, and it goes back up as soon as there is room again |
 | Fallback | Without WebGL2, or when `index.html` is opened straight from disk, it becomes a plain scrolling page with the same words, page strips and pictures; the gallery still works |
 | Reduced motion | With the system's reduced-motion setting on, the camera jumps between stops instead of flying, and the sway, spin and decoding stop |
 
@@ -81,8 +81,8 @@ Everything is in `index.html` (HTML, CSS and JavaScript) plus the pictures in `i
 ```
 index.html     the whole site
 img/           full-size screenshots (gallery) and og.jpg (link preview)
-img/stage/     the pictures that float in the tunnel: <name>.jpg for computers (1600×1000),
-               m-<name>.jpg for phones (1000×1250)
+img/stage/     the pictures that float in the tunnel: <name>.jpg for computers (2000×1250),
+               m-<name>.jpg for phones (1200×1500)
 img/xs/        thumbnails
 play/          index.html (keyboard, one player) + keys.js, and pizza-spin.html (the original game, untouched)
 serve.ps1      small local server for previewing
@@ -110,7 +110,7 @@ Then open http://localhost:8765
 | The pages shown under a project | The `<div class="strip">` inside its section (shown on phones and in the plain page) |
 | The tunnel | `S` (distance between stops), `DIST` (how far ahead each screen floats) and `FAR` (how far you can see) at the top of the engine; the rings and dust are built right after the shaders |
 | Where a screen waits and where it comes to | `place()` in the engine |
-| A project's picture | `img/stage/<name>.jpg` (1600×1000) and `img/stage/m-<name>.jpg` (1000×1250, for phones) |
+| A project's picture | `img/stage/<name>.jpg` (2000×1250) and `img/stage/m-<name>.jpg` (1200×1500, for phones). Captured at double density so they stay sharp on retina screens; gallery pictures are 2400 wide |
 | Gallery pictures and captions | `GAL` in the script; each picture needs a copy in `img/` and in `img/xs/` |
 | Email | Search for `fa872328@gmail.com` |
 
