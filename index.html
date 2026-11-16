@@ -333,8 +333,124 @@ html[dir="rtl"] .o-bar::after { transform-origin: right; }
 /* the first screen's words wait for the opening to finish */
 html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !important; transition: none !important; }
 
+
+/* ===================== the tunnel =====================
+   Scrolling flies a camera forward through a tunnel of glowing rings. Every project's real screen hangs in space;
+   as you arrive it swings to the front and turns toward you, then the camera flies past it to the next.
+   The words sit low on the screen: a giant outlined number, the name and a line on the left, the buttons on the right.
+   A list of every stop runs down the side, and a bar along the bottom shows how far you are, by kind of work. */
+html { --side: clamp(20px, 3vw, 56px); }
+html.gl .bl { display: none; }
+/* the category you are in: its colour glows behind the tunnel and fades into the next one */
+@property --zc { syntax: '<color>'; inherits: false; initial-value: #8be9ff; }
+.zone { position: fixed; inset: 0; z-index: -1; pointer-events: none; --zc: #8be9ff; transition: --zc 1.2s ease; background: radial-gradient(70% 60% at 50% 46%, color-mix(in srgb, var(--zc) 20%, transparent), transparent 72%), radial-gradient(120% 90% at 50% 120%, color-mix(in srgb, var(--zc) 12%, transparent), transparent 60%); }
+html:not(.gl) .zone { display: none; }
+/* the chapter card */
+.chapter { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; pointer-events: none; opacity: 0; visibility: hidden; --k: #8be9ff; background: radial-gradient(60% 45% at 50% 50%, rgb(3 3 6 / .72), transparent 75%); transition: opacity .5s var(--ease), visibility .5s; }
+.chapter.show { opacity: 1; visibility: visible; }
+/* while the card is up, the project's words wait */
+html.chaptering .sec.on .fade { opacity: 0 !important; transform: translateY(16px) !important; transition-delay: 0s !important; }
+.ch-in { display: grid; justify-items: center; gap: 10px; text-align: center; padding: 0 20px; }
+.ch-n { color: color-mix(in srgb, var(--k) 70%, #fff); }
+.ch-t { display: flex; align-items: center; gap: .22em; font: 600 clamp(3.2rem, 11vw, 10rem)/1 var(--display); letter-spacing: -.05em; color: var(--k); text-shadow: 0 0 60px color-mix(in srgb, var(--k) 45%, transparent); }
+html[data-lang="ar"] .ch-t { font-family: var(--ar); letter-spacing: 0; font-size: clamp(3rem, 9vw, 8.5rem); }
+.ch-t svg { width: .62em; height: .62em; flex: none; stroke-width: 1.4; }
+.ch-c { color: var(--fg2); }
+.ch-c b { color: var(--fg); font-weight: 500; }
+.chapter.show .ch-t { animation: ch-in 1.7s var(--ease) both; }
+.chapter.show .ch-n, .chapter.show .ch-c { animation: ch-up .6s .15s var(--ease) both; }
+@keyframes ch-in { 0% { opacity: 0; filter: blur(18px); transform: scale(1.12); } 30% { opacity: 1; filter: none; transform: none; } 100% { opacity: 1; transform: scale(.97); } }
+@keyframes ch-up { from { opacity: 0; transform: translateY(10px); } }
+/* on every project: the category, louder */
+html.gl .pl::before { content: ""; position: absolute; inset-inline-start: -16px; top: 0; bottom: 0; width: 2px; border-radius: 2px; background: linear-gradient(var(--kc, var(--acc)), transparent); }
+html.gl .idx .kt { padding: 7px 14px 7px 10px; font-size: .74rem; }
+html[dir="rtl"].gl .idx .kt { padding: 7px 10px 7px 14px; }
+html[data-lang="ar"].gl .idx .kt { font-size: .86rem; }
+html.gl .idx .kt svg { width: 18px; height: 18px; }
+html.gl .num { -webkit-text-stroke-color: color-mix(in srgb, var(--kc, #fff) 70%, transparent) !important; }
+.d-k { display: flex; align-items: center; gap: 6px; font-size: .6rem !important; opacity: 1 !important; }
+.d-k::before { content: ""; width: 14px; height: 2px; border-radius: 2px; background: var(--k); }
+@media (max-width: 760px), (max-aspect-ratio: 1/1) { html.gl .pl::before { inset-inline-start: -10px; } }
+.num { display: none; }
+.pl { position: relative; }
+
+/* the depth list */
+.depth { position: fixed; z-index: 20; right: var(--side); top: 50%; translate: 0 -50%; display: none; flex-direction: column; align-items: flex-end; gap: 1px; font-size: .62rem; transition: opacity .5s; }
+html.gl .depth { display: flex; }
+html[dir="rtl"] .depth { right: auto; left: var(--side); align-items: flex-start; }
+.depth button { display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 4px 0; cursor: pointer; color: var(--fg3); font: inherit; letter-spacing: inherit; text-transform: inherit; transition: color .25s; }
+html[data-lang="ar"] .depth button { font-size: .78rem; }
+.depth button b { font-weight: 500; opacity: .6; }
+.depth button::after { content: ""; width: 6px; height: 6px; flex: none; border-radius: 50%; border: 1px solid currentColor; opacity: .5; transition: background .3s, border-color .3s, box-shadow .3s, opacity .3s, transform .3s; }
+.depth button:hover { color: var(--fg2); }
+.depth button.on { color: var(--fg); }
+.depth button.on b { opacity: 1; }
+.depth button.on::after { background: var(--dot); border-color: var(--dot); opacity: 1; transform: scale(1.4); box-shadow: 0 0 12px var(--dot); }
+.d-k { margin: 9px 0 1px; color: var(--k); font-size: .54rem; opacity: .8; }
+html.at-start .depth { opacity: 0; pointer-events: none; }
+
+/* the category bar */
+.chap { position: fixed; z-index: 20; left: var(--side); right: var(--side); bottom: calc(env(safe-area-inset-bottom, 0px) + 34px); height: 1px; background: rgb(255 255 255 / .12); display: none; }
+html.gl .chap { display: block; }
+.c-fill { position: absolute; inset-inline-start: 0; top: -1px; height: 3px; width: 100%; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, #8be9ff, #7dd3fc 12%, #c4b5fd 34%, #f9a8d4 56%, #5eead4 68%, #fde047 90%, #c4b5fd); border-radius: 2px; }
+html[dir="rtl"] .c-fill { transform-origin: right; background: linear-gradient(270deg, #8be9ff, #7dd3fc 12%, #c4b5fd 34%, #f9a8d4 56%, #5eead4 68%, #fde047 90%, #c4b5fd); }
+.c-k { position: absolute; inset-inline-start: var(--at); top: 10px; translate: -50% 0; display: flex; gap: 6px; align-items: center; border: 0; background: none; color: var(--fg3); font: 500 .58rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; padding: 4px; white-space: nowrap; transition: color .25s; }
+html[dir="rtl"] .c-k { translate: 50% 0; }
+html[data-lang="ar"] .c-k { font-family: var(--ar); letter-spacing: 0; font-size: .72rem; }
+.c-k::before { content: ""; position: absolute; top: -13px; left: 50%; width: 1px; height: 7px; background: var(--k); }
+.c-k svg { width: 13px; height: 13px; flex: none; color: var(--k); }
+.c-k.on, .c-k:hover { color: var(--k); }
+
+/* computers: the words low in the two corners, the 3D in front */
+@media (min-width: 761px) and (min-aspect-ratio: 1/1) {
+  html.gl .sec { align-items: stretch; }
+  html.gl .txt { position: absolute; inset: 0; width: auto; margin: 0; pointer-events: none; }
+  html.gl .pl, html.gl .pr { position: absolute; pointer-events: auto; bottom: 96px; }
+  html.gl .pl { left: var(--side); width: min(520px, 36vw); }
+  html.gl .pr { right: calc(var(--side) + 4px); display: flex; flex-direction: column; align-items: flex-end; }
+  html[dir="rtl"].gl .pl { left: auto; right: var(--side); }
+  html[dir="rtl"].gl .pr { right: auto; left: calc(var(--side) + 4px); align-items: flex-start; }
+  html.gl .num { display: block; font: 300 clamp(4.6rem, min(10vw, 17vh), 10rem)/.8 var(--display); letter-spacing: -.06em; color: transparent; -webkit-text-stroke: 1px rgb(255 255 255 / .5); margin-bottom: 14px; }
+  html.gl .proj h2 { font-size: clamp(2.4rem, min(4.6vw, 8vh), 4.8rem); margin-top: 12px; }
+  html.gl .desc { max-width: 30em; }
+  html.gl .tags, html.gl .pr .strip, html.gl .pr .acts .url { display: none; }
+  html.gl .pr .acts { margin: 0; flex-wrap: nowrap; }
+  html.gl .pr .acts a, html.gl .pr .acts button { padding: 14px 22px; font-size: .95rem; }
+  /* the first screen */
+  html.gl .hero { align-items: stretch; padding: 0; }
+  html.gl .hero-in { position: absolute; left: var(--side); bottom: 96px; margin: 0; max-width: min(640px, 46vw); }
+  html[dir="rtl"].gl .hero-in { left: auto; right: var(--side); }
+  html.gl .hero h1 { font-size: clamp(2.6rem, min(5.6vw, 9.5vh), 6.2rem); }
+  html.gl .hero-r { position: absolute; right: var(--side); bottom: 96px; width: min(420px, 31vw); }
+  html[dir="rtl"].gl .hero-r { right: auto; left: var(--side); }
+  html.gl .cats { margin: 0; }
+  html.gl .cats ul { grid-template-columns: 1fr; gap: 4px; max-width: none; }
+  html.gl .kc { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border: 0; border-inline-start: 2px solid var(--k); border-radius: 8px; background: rgb(255 255 255 / .03); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  html.gl .kc p { flex: none; width: 104px; font-size: .6rem; }
+  html.gl .kc div { margin: 0; gap: 4px; flex-wrap: nowrap; min-width: 0; }
+  html.gl .kc a { padding: 3px 8px; font-size: .74rem; }
+  html.gl .hero .hint { position: absolute; left: auto; right: var(--side); top: 86px; bottom: auto; }
+  html[dir="rtl"].gl .hero .hint { right: auto; left: var(--side); }
+  html.gl .contact { padding-bottom: 110px; align-items: center; }
+}
+/* phones: the 3D in the upper half, the words underneath, the bar as icons */
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  .depth { display: none !important; }
+  .chap { left: 22px; right: 22px; bottom: calc(env(safe-area-inset-bottom, 0px) + 26px); }
+  .c-k > span { display: none; }
+  .c-k { top: 6px; }
+  html.gl .txt { margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px); }
+  html.gl .hero { flex-direction: column; justify-content: flex-end; align-items: stretch; padding: 0; }
+  html.gl .hero .hint { order: -1; margin: 0 20px 12px; }
+  html.gl .hero-in { flex: none; margin: 0 20px; }
+  html.gl .hero-r { margin: 0 20px calc(env(safe-area-inset-bottom, 0px) + 66px); }
+  html.gl .contact { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .grain, .live, .acts .pri::before, .cue i { animation: none; }
+  .chapter.show .ch-t, .chapter.show .ch-n, .chapter.show .ch-c { animation: none; }
+  .zone { transition: none; }
   html.gl .fade { transition: opacity .3s; transform: none; }
   .o-logo *, .o-name, .o-cats li, .o-bar::after, .o-skip { animation-duration: .01s !important; animation-delay: 0s !important; }
 }
@@ -370,37 +486,51 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     </a>
   </div>
   <nav class="hud tr mono" aria-label="Main">
-    <a class="opt kn" href="#alliance" data-to="1" data-k="web" style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span></a>
-    <a class="opt kn" href="#doctor" data-to="3" data-k="app" style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span></a>
-    <a class="opt kn" href="#bbqpres" data-to="5" data-k="pres" style="--k:#f9a8d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض</span></a>
-    <a class="opt kn" href="#mhc" data-to="6" data-k="3d" style="--k:#5eead4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D Modeling</span><span class="ar">نمذجة 3D</span></a>
-    <a class="opt kn" href="#pizza" data-to="8" data-k="game" style="--k:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></a>
-    <i class="sep opt" aria-hidden="true"></i>
     <a href="#contact"><span class="en">Contact</span><span class="ar">تواصل</span></a>
     <button class="lang" type="button" id="lang" aria-label="Switch language"><span class="en" lang="ar">عربي</span><span class="ar" lang="en">EN</span></button>
   </nav>
 </header>
 <div class="hud bl mono" aria-hidden="true"><i class="live"></i><span id="status">Loading</span></div>
-<nav class="dots" id="dots" aria-label="Sections">
-  <button type="button" data-to="0" aria-label="Start"><i></i></button>
-  <button type="button" class="g" data-to="1" aria-label="Websites · Alliance Investment" style="--dot:#e9c46a"><i></i></button>
-  <button type="button" data-to="2" aria-label="Websites · BBQ Fest" style="--dot:#ff5a36"><i></i></button>
-  <button type="button" class="g" data-to="3" aria-label="Apps · Doctor Dashboard" style="--dot:#ff4d5a"><i></i></button>
-  <button type="button" data-to="4" aria-label="Apps · University App" style="--dot:#ff6b7a"><i></i></button>
-  <button type="button" class="g" data-to="5" aria-label="Presentations · Sport Barbecue" style="--dot:#ff8a2b"><i></i></button>
-  <button type="button" class="g" data-to="6" aria-label="3D Modeling · MHC Coalline" style="--dot:#f2b84b"><i></i></button>
-  <button type="button" data-to="7" aria-label="3D Modeling · BBQ Fest in 3D" style="--dot:#5eead4"><i></i></button>
-  <button type="button" class="g" data-to="8" aria-label="Games · Pizza Spin" style="--dot:#ffc145"><i></i></button>
-  <button type="button" class="g" data-to="9" aria-label="Contact"><i></i></button>
+<!-- the depth list: every stop along the tunnel, grouped by kind of work -->
+<nav class="depth mono" id="dots" aria-label="Sections">
+    <button type="button" data-to="0" style="--dot:#8be9ff"><b>00</b><span class="en">Intro</span><span class="ar">البداية</span></button>
+    <p class="d-k mono" style="--k:#7dd3fc"><span class="en">Websites</span><span class="ar">مواقع</span></p>
+    <button type="button" data-to="1" style="--dot:#e9c46a"><b>01</b><span><span class="en">Alliance</span><span class="ar">تحالف</span></span></button>
+    <button type="button" data-to="2" style="--dot:#ff5a36"><b>02</b><span>BBQ Fest</span></button>
+    <p class="d-k mono" style="--k:#c4b5fd"><span class="en">Apps</span><span class="ar">تطبيقات</span></p>
+    <button type="button" data-to="3" style="--dot:#ff4d5a"><b>03</b><span><span class="en">Doctor</span><span class="ar">لوحة الدكتور</span></span></button>
+    <button type="button" data-to="4" style="--dot:#ff6b7a"><b>04</b><span><span class="en">University</span><span class="ar">تطبيق الجامعة</span></span></button>
+    <p class="d-k mono" style="--k:#f9a8d4"><span class="en">Presentations</span><span class="ar">عروض</span></p>
+    <button type="button" data-to="5" style="--dot:#ff8a2b"><b>05</b><span>Sport BBQ</span></button>
+    <p class="d-k mono" style="--k:#5eead4"><span class="en">3D Modeling</span><span class="ar">نمذجة 3D</span></p>
+    <button type="button" data-to="6" style="--dot:#f2b84b"><b>06</b><span>MHC</span></button>
+    <button type="button" data-to="7" style="--dot:#5eead4"><b>07</b><span>Fest 3D</span></button>
+    <p class="d-k mono" style="--k:#fde047"><span class="en">Games</span><span class="ar">ألعاب</span></p>
+    <button type="button" data-to="8" style="--dot:#ffc145"><b>08</b><span>Pizza Spin</span></button>
+    <button type="button" data-to="9" style="--dot:#c4b5fd"><b>09</b><span class="en">Contact</span><span class="ar">تواصل</span></button>
 </nav>
+<!-- the category bar: how far along the tunnel you are, with the five kinds of work as stops -->
+<nav class="chap" aria-label="Categories">
+  <i class="c-fill" id="cfill"></i>
+    <button type="button" class="c-k kn" data-k="web" data-to="1" style="--k:#7dd3fc;--at:11.1%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span></button>
+    <button type="button" class="c-k kn" data-k="app" data-to="3" style="--k:#c4b5fd;--at:33.3%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span></button>
+    <button type="button" class="c-k kn" data-k="pres" data-to="5" style="--k:#f9a8d4;--at:55.5%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض</span></button>
+    <button type="button" class="c-k kn" data-k="3d" data-to="6" style="--k:#5eead4;--at:66.6%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D</span><span class="ar">نمذجة 3D</span></button>
+    <button type="button" class="c-k kn" data-k="game" data-to="8" style="--k:#fde047;--at:88.8%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span></button>
+</nav>
+<!-- the colour of the category you are in, glowing behind the tunnel -->
+<div class="zone" id="zone" aria-hidden="true"></div>
+<!-- the chapter card: when you fly into a new category its name fills the screen for a moment -->
+<div class="chapter" id="chapter" aria-hidden="true"><div class="ch-in"><p class="ch-n mono" id="ch-n"></p><p class="ch-t" id="ch-t"></p><p class="ch-c mono" id="ch-c"></p></div></div>
 
 <main>
   <section class="sec hero on" id="top">
-    <div class="hero-in">
-      <p class="hint mono fade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2M18.5 2v4h-4M5.5 22v-4h4"/></svg><b><span class="en">4D tesseract</span><span class="ar">مكعّب رباعي الأبعاد</span></b><span class="fine"><span class="en">· drag to rotate</span><span class="ar">· اسحب لتديره</span></span><span class="coarse"><span class="en">· swipe sideways to spin</span><span class="ar">· اسحب يمينًا ويسارًا لتديره</span></span></p>
+    <div class="hero-in pl">
       <p class="kick mono fade"><span class="en">Fares Elzouhiry — Front-end developer</span><span class="ar">فارس الزهيري — مطوّر واجهات أمامية</span></p>
       <h1 class="fade"><span class="en">Websites from <em>another dimension.</em></span><span class="ar">مواقع من <em>بُعدٍ آخر.</em></span></h1>
       <p class="sub fade"><span class="en">Websites, apps, presentations, 3D modeling and games — in English and Arabic, designed and coded by hand.</span><span class="ar">مواقع وتطبيقات وعروض تقديمية ونمذجة ثلاثية الأبعاد وألعاب — بالعربية والإنجليزية، مصممة ومبرمجة يدويًا.</span></p>
+    </div>
+    <div class="pr hero-r">
       <!-- the work, by kind: one tap to any project -->
       <nav class="cats fade" aria-label="Projects by category">
         <ul>
@@ -412,15 +542,18 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
         </ul>
       </nav>
     </div>
-    <a class="cue mono" href="#alliance" aria-hidden="true" tabindex="-1"><span class="en">Scroll</span><span class="ar">مرّر</span><i></i></a>
+      <p class="hint mono fade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2M21 12a9 9 0 0 1-15.5 6.2M18.5 2v4h-4M5.5 22v-4h4"/></svg><b><span class="en">4D tesseract</span><span class="ar">مكعّب رباعي الأبعاد</span></b><span class="fine"><span class="en">· drag to rotate</span><span class="ar">· اسحب لتديره</span></span><span class="coarse"><span class="en">· swipe sideways to spin</span><span class="ar">· اسحب يمينًا ويسارًا لتديره</span></span></p>
   </section>
 
   <section class="sec proj" id="alliance" style="--acc:#e9c46a">
     <div class="txt">
+    <div class="pl">
       <p class="idx mono fade"><span class="kt" style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span><b>1/2</b></span> <span class="en">Company website · Riyadh</span><span class="ar">موقع شركة · الرياض</span></p>
       <h2 class="fade"><span class="en scr">Alliance Investment</span><span class="ar">تحالف للاستثمار</span></h2>
       <p class="desc fade"><span class="en">A six-language site that opens on a live 3D globe of a 16-country network.</span><span class="ar">موقع بست لغات يبدأ بكرة أرضية حيّة لشبكة من 16 دولة.</span></p>
       <ul class="tags mono fade"><li><span class="en">6 languages</span><span class="ar">6 لغات</span></li><li><span class="en">24 pages</span><span class="ar">24 صفحة</span></li><li><span class="en">WebGL globe</span><span class="ar">كرة WebGL</span></li></ul>
+    </div>
+    <div class="pr">
       <div class="acts fade">
         <a class="pri" href="https://alliance.sa" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://alliance.sa" target="_blank" rel="noopener"><i></i><span class="ltr">alliance.sa</span></a>
         <button type="button" data-gal="alliance"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
@@ -436,16 +569,20 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
           <li><button type="button" data-gal="models" data-gi="5" aria-label="Silk and Gold"><img src="img/xs/alliance-m6.jpg" width="400" height="250" alt="" loading="lazy"><span>06</span></button></li>
         </ol>
       </div>
+    </div>
       <img class="shot" src="img/stage/alliance.jpg" width="1600" height="1000" alt="Alliance Investment home page with the 3D globe" loading="lazy" data-gal="alliance">
     </div>
   </section>
 
   <section class="sec proj" id="bbqfest" style="--acc:#ff5a36">
     <div class="txt">
+    <div class="pl">
       <p class="idx mono fade"><span class="kt" style="--k:#7dd3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/></svg><span class="en">Websites</span><span class="ar">مواقع</span><b>2/2</b></span> <span class="en">Festival website · Riyadh</span><span class="ar">موقع مهرجان · الرياض</span></p>
       <h2 class="fade"><span class="en scr">BBQ Fest</span><span class="ar">BBQ Fest</span></h2>
       <p class="desc fade"><span class="en">The website for a five-day BBQ festival in Riyadh: warm paper, stamps and a price list shaped like a menu — with a 3D map of the whole festival.</span><span class="ar">موقع مهرجان شواء لمدة خمسة أيام في الرياض: ورق دافئ وأختام وقائمة أسعار على شكل منيو — مع مخطط ثلاثي الأبعاد للمهرجان كله.</span></p>
       <ul class="tags mono fade"><li><span class="en">Light design</span><span class="ar">تصميم فاتح</span></li><li><span class="en">Sponsor packages</span><span class="ar">باقات الرعاية</span></li><li><span class="en">3D site map</span><span class="ar">مخطط ثلاثي الأبعاد</span></li></ul>
+    </div>
+    <div class="pr">
       <div class="acts fade">
         <a class="pri" href="https://fareselzouhiry.github.io/bbq-fest/model-2.html" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/bbq-fest/model-2.html" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/bbq-fest</span></a>
         <button type="button" data-gal="bbqfest"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
@@ -460,16 +597,20 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
           <li><button type="button" data-gal="festdesigns" data-gi="3" aria-label="3D map"><img src="img/xs/fest-map.jpg" width="400" height="250" alt="" loading="lazy"><span>3D MAP</span></button></li>
         </ol>
       </div>
+    </div>
       <img class="shot" src="img/stage/bbqfest.jpg" width="1600" height="1000" alt="BBQ Fest home page in the light design: a red grill on warm paper" loading="lazy" data-gal="bbqfest">
     </div>
   </section>
 
   <section class="sec proj" id="doctor" style="--acc:#ff4d5a">
     <div class="txt">
+    <div class="pl">
       <p class="idx mono fade"><span class="kt" style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span><b>1/2</b></span> <span class="en">Live attendance · Juster</span><span class="ar">حضور مباشر · Juster</span></p>
       <h2 class="fade"><span class="en scr">Doctor Dashboard</span><span class="ar">لوحة الدكتور</span></h2>
       <p class="desc fade"><span class="en">Students scan the doctor's QR code and appear in the list instantly — only from inside the hall.</span><span class="ar">يمسح الطلاب رمز QR الخاص بالدكتور فيظهرون في القائمة فورًا — من داخل القاعة فقط.</span></p>
       <ul class="tags mono fade"><li>QR</li><li><span class="en">GPS check</span><span class="ar">تحقق GPS</span></li><li><span class="en">Live feed</span><span class="ar">حضور مباشر</span></li></ul>
+    </div>
+    <div class="pr">
       <div class="acts fade">
         <a class="pri" href="https://fareselzouhiry.github.io/Uni-app/Doctor.html" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/Uni-app/Doctor.html" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/Uni-app</span> <span class="en">· teacher sign-in</span><span class="ar">· يحتاج تسجيل دخول</span></a>
         <button type="button" data-gal="doctor"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
@@ -484,16 +625,20 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
           <li><button type="button" data-gal="doctor" data-gi="4" aria-label="Start a lecture"><img src="img/xs/doctor-setup.jpg" width="240" height="257" alt="" loading="lazy"><span>SETUP</span></button></li>
         </ol>
       </div>
+    </div>
       <img class="shot" src="img/stage/doctor.jpg" width="1600" height="1000" alt="The doctor's live attendance dashboard and a student's phone" loading="lazy" data-gal="doctor">
     </div>
   </section>
 
   <section class="sec proj" id="uni" style="--acc:#ff6b7a">
     <div class="txt">
+    <div class="pl">
       <p class="idx mono fade"><span class="kt" style="--k:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2" width="11" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span class="en">Apps</span><span class="ar">تطبيقات</span><b>2/2</b></span> <span class="en">Student app · Juster</span><span class="ar">تطبيق للطلاب · Juster</span></p>
       <h2 class="fade"><span class="en scr">University App</span><span class="ar">تطبيق الجامعة</span></h2>
       <p class="desc fade"><span class="en">The university in a student's pocket: live schedule, tasks and focus rooms. Works offline.</span><span class="ar">الجامعة في جيب الطالب: الجدول لحظة بلحظة، والمهام، وغرف المذاكرة. يعمل دون إنترنت.</span></p>
       <ul class="tags mono fade"><li>PWA</li><li><span class="en">Offline</span><span class="ar">دون إنترنت</span></li><li><span class="en">112 commits</span><span class="ar">112 تعديلًا</span></li></ul>
+    </div>
+    <div class="pr">
       <div class="acts fade">
         <a class="pri" href="https://fareselzouhiry.github.io/Uni-app/" target="_blank" rel="noopener"><span class="en">Visit site</span><span class="ar">زُر الموقع</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/Uni-app/" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/Uni-app</span></a>
         <button type="button" data-gal="uni"><span class="en">All screens</span><span class="ar">كل الشاشات</span></button>
@@ -508,16 +653,20 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
           <li><button type="button" data-gal="doctor" data-gi="1" aria-label="Check-in"><img class="ph" src="img/xs/uni-scan.jpg" width="160" height="346" alt="" loading="lazy"><span>CHECK-IN</span></button></li>
         </ol>
       </div>
+    </div>
       <img class="shot" src="img/stage/uni.jpg" width="1600" height="1000" alt="Three screens of the university app" loading="lazy" data-gal="uni">
     </div>
   </section>
 
   <section class="sec proj" id="bbqpres" style="--acc:#ff8a2b">
     <div class="txt">
+    <div class="pl">
       <p class="idx mono fade"><span class="kt" style="--k:#f9a8d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12.5l3-3 2 2 4-4"/></svg><span class="en">Presentations</span><span class="ar">عروض تقديمية</span><b>1/1</b></span> <span class="en">Sponsor deck · Riyadh 2027</span><span class="ar">عرض للرعاة · الرياض 2027</span></p>
       <h2 class="fade"><span class="en scr">Sport Barbecue</span><span class="ar">Sport Barbecue</span></h2>
       <p class="desc fade"><span class="en">A 27-slide sponsor deck set in a 3D night stadium: the camera flies like a drone, and a screen above the pitch shows each slide.</span><span class="ar">عرض للرعاة من 27 شريحة داخل استاد ليلي ثلاثي الأبعاد: الكاميرا تطير كطائرة درون، وشاشة فوق الملعب تعرض كل شريحة.</span></p>
       <ul class="tags mono fade"><li><span class="en">27 slides</span><span class="ar">27 شريحة</span></li><li><span class="en">3D stadium</span><span class="ar">استاد ثلاثي الأبعاد</span></li><li>AR · EN</li></ul>
+    </div>
+    <div class="pr">
       <div class="acts fade">
         <a class="pri" href="https://fareselzouhiry.github.io/web/models/3/" target="_blank" rel="noopener"><span class="en">Open presentation</span><span class="ar">افتح العرض</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/web/models/3/" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/web/models/3</span></a>
         <button type="button" data-gal="bbqpres"><span class="en">All slides</span><span class="ar">كل الشرائح</span></button>
@@ -532,16 +681,20 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
           <li><button type="button" data-gal="bbqpres" data-gi="6" aria-label="Event zones"><img src="img/xs/pres-zones.jpg" width="400" height="250" alt="" loading="lazy"><span>ZONES</span></button></li>
         </ol>
       </div>
+    </div>
       <img class="shot" src="img/stage/bbqpres.jpg" width="1600" height="1000" alt="The cover of the Sport Barbecue presentation in a 3D night stadium" loading="lazy" data-gal="bbqpres">
     </div>
   </section>
 
   <section class="sec proj" id="mhc" style="--acc:#f2b84b">
     <div class="txt">
+    <div class="pl">
       <p class="idx mono fade"><span class="kt" style="--k:#5eead4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D Modeling</span><span class="ar">نمذجة ثلاثية الأبعاد</span><b>1/2</b></span> <span class="en">Coal maker · Egypt</span><span class="ar">مصنع فحم · مصر</span></p>
       <h2 class="fade"><span class="en scr">MHC Coalline</span><span class="ar">MHC Coalline</span></h2>
       <p class="desc fade"><span class="en">Six 3D worlds for a charcoal maker, all modeled in code and running live in the browser: glowing coal, a factory line, a bag the client designs, a mountain from the logo.</span><span class="ar">ستة عوالم ثلاثية الأبعاد لمصنع فحم، كلها منمذجة بالكود وتعمل مباشرة في المتصفح: فحم متوهج، وخط مصنع، وكيس يصممه العميل، وجبل من الشعار.</span></p>
       <ul class="tags mono fade"><li><span class="en">6 3D scenes</span><span class="ar">6 مشاهد ثلاثية الأبعاد</span></li><li>three.js</li><li><span class="en">Real-time</span><span class="ar">لحظي</span></li></ul>
+    </div>
+    <div class="pr">
       <div class="acts fade">
         <a class="pri" href="https://fareselzouhiry.github.io/MHC-Coalline/" target="_blank" rel="noopener"><span class="en">See it live</span><span class="ar">شاهده مباشرة</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/MHC-Coalline/" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/MHC-Coalline</span></a>
         <button type="button" data-gal="mhc"><span class="en">All six</span><span class="ar">الستة كلها</span></button>
@@ -556,16 +709,20 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
           <li><button type="button" data-gal="mhc" data-gi="4" aria-label="The mountain"><img src="img/xs/mhc-5.jpg" width="400" height="250" alt="" loading="lazy"><span>MOUNTAIN</span></button></li>
         </ol>
       </div>
+    </div>
       <img class="shot" src="img/stage/mhc.jpg" width="1600" height="1000" alt="Six 3D scenes for MHC Coalline: coal, a factory tunnel, a globe, a coal bag, a mountain and the logo" loading="lazy" data-gal="mhc">
     </div>
   </section>
 
   <section class="sec proj" id="fest3d" style="--acc:#5eead4">
     <div class="txt">
+    <div class="pl">
       <p class="idx mono fade"><span class="kt" style="--k:#5eead4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg><span class="en">3D Modeling</span><span class="ar">نمذجة ثلاثية الأبعاد</span><b>2/2</b></span> <span class="en">Event site · Riyadh</span><span class="ar">موقع فعالية · الرياض</span></p>
       <h2 class="fade"><span class="en scr">BBQ Fest in 3D</span><span class="ar">BBQ Fest مجسّمًا</span></h2>
       <p class="desc fade"><span class="en">The whole festival modeled in 3D: 133 booths, the stage, food trucks, palms and a balloon. From empty land to the full festival, by day, sunset or night — and you can walk inside it.</span><span class="ar">المهرجان كله منمذج بثلاثة أبعاد: 133 جناحًا والمسرح وعربات الطعام والنخيل والمنطاد. من الأرض الفاضية إلى المهرجان كاملًا، نهارًا أو غروبًا أو ليلًا — ويمكنك التجول بداخله.</span></p>
       <ul class="tags mono fade"><li><span class="en">133 booths</span><span class="ar">133 جناحًا</span></li><li><span class="en">Walk inside</span><span class="ar">تجوّل بداخله</span></li><li><span class="en">Day · sunset · night</span><span class="ar">نهار · غروب · ليل</span></li></ul>
+    </div>
+    <div class="pr">
       <div class="acts fade">
         <a class="pri" href="https://fareselzouhiry.github.io/bbq-fest/map-3d.html" target="_blank" rel="noopener"><span class="en">Explore in 3D</span><span class="ar">استكشفه ثلاثي الأبعاد</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/bbq-fest/map-3d.html" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/bbq-fest/map-3d</span></a>
         <button type="button" data-gal="fest3d"><span class="en">All views</span><span class="ar">كل المشاهد</span></button>
@@ -579,16 +736,20 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
           <li><button type="button" data-gal="fest3d" data-gi="6" aria-label="Walking inside"><img src="img/xs/f3d-walk.jpg" width="400" height="250" alt="" loading="lazy"><span>WALK</span></button></li>
         </ol>
       </div>
+    </div>
       <img class="shot" src="img/stage/fest3d.jpg" width="1600" height="1000" alt="The BBQ Fest festival modeled in 3D, seen from above" loading="lazy" data-gal="fest3d">
     </div>
   </section>
 
   <section class="sec proj" id="pizza" style="--acc:#ffc145">
     <div class="txt">
+    <div class="pl">
       <p class="idx mono fade"><span class="kt" style="--k:#fde047"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-2a4 4 0 0 1 4-4z"/><path d="M7 10.5v3M5.5 12h3M16 11h.01M18 13h.01"/></svg><span class="en">Games</span><span class="ar">ألعاب</span><b>1/1</b></span> <span class="en">1 or 2 players</span><span class="ar">لاعب أو لاعبان</span></p>
       <h2 class="fade"><span class="en scr">Pizza Spin</span><span class="ar">Pizza Spin</span></h2>
       <p class="desc fade"><span class="en">A cooking duel: knead, top and bake a pizza faster than your rival. Play it right here with the keyboard, or with two controllers for two players.</span><span class="ar">مبارزة طبخ: اعجن وزيّن واخبز البيتزا أسرع من منافسك. العبها هنا بلوحة المفاتيح، أو بيدَي تحكم للاعبَين.</span></p>
       <ul class="tags mono fade"><li><span class="en">Keyboard · 1 player</span><span class="ar">لوحة المفاتيح · لاعب واحد</span></li><li><span class="en">Controllers · 2 players</span><span class="ar">يدا تحكم · لاعبان</span></li><li><span class="en">One file, no libraries</span><span class="ar">ملف واحد بلا مكتبات</span></li></ul>
+    </div>
+    <div class="pr">
       <div class="acts fade">
         <a class="pri" href="play/index.html" target="_blank" rel="noopener"><span class="en">Play</span><span class="ar">العب</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="play/index.html" target="_blank" rel="noopener"><i></i><span class="en">Plays with the keyboard · nothing to install</span><span class="ar">تُلعب بلوحة المفاتيح · بلا تثبيت</span></a>
         <button type="button" data-gal="pizza"><span class="en">See it played</span><span class="ar">شاهد اللعب</span></button>
@@ -602,6 +763,7 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
           <li><button type="button" data-gal="pizza" data-gi="3" aria-label="The duel"><img src="img/xs/pizza-play.jpg" width="400" height="250" alt="" loading="lazy"><span>DUEL</span></button></li>
         </ol>
       </div>
+    </div>
       <img class="shot" src="img/stage/pizza.jpg" width="1600" height="1000" alt="Pizza Spin split screen: two chefs in the same kitchen" loading="lazy" data-gal="pizza">
     </div>
   </section>
@@ -845,7 +1007,7 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
   }
 
   /* sections: which one is on screen */
-  var secs = [].slice.call(document.querySelectorAll('.sec')), dots = [].slice.call(document.querySelectorAll('#dots button')), active = -1;
+  var secs = [].slice.call(document.querySelectorAll('.sec')), dots = [].slice.call(document.querySelectorAll('#dots button[data-to]')), active = -1;
   // the kind of work each section belongs to; the top bar lights up the one on screen
   var KIND = [null, 'web', 'web', 'app', 'app', 'pres', '3d', '3d', 'game', null], kinds = [].slice.call(document.querySelectorAll('.kn'));
   function nearest() { var y = scrollY + innerHeight * .5, best = 0; secs.forEach(function (el, i) { if (y >= el.offsetTop) best = i; }); return best; }
@@ -856,6 +1018,7 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     secs.forEach(function (el, i) { el.classList.toggle('on', i === k); });
     dots.forEach(function (b, i) { b.classList.toggle('on', i === k); });
     kinds.forEach(function (a) { a.classList.toggle('on', a.dataset.k === KIND[k]); });
+    scene(k);
     if (opened) scramble(secs[k].querySelector('.scr'));
     return k;
   }
@@ -867,6 +1030,44 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
   // while a move is still under way, the next step counts from where it is going
   function stepBy(d) { go((performance.now() - goalT < 700 ? goal : nearest()) + d); }
   dots.forEach(function (b) { b.addEventListener('click', function () { go(+b.dataset.to); }); });
+  /* the tunnel's words: a giant number on every project, and the start and end of the tunnel marked on the page */
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  secs.forEach(function (el, i) {
+    var pl = el.querySelector('.pl');
+    if (!pl || i === 0 || i === secs.length - 1) return;
+    var n = document.createElement('span'); n.className = 'num fade'; n.setAttribute('aria-hidden', 'true'); n.textContent = pad2(i);
+    pl.insertBefore(n, pl.firstChild);
+  });
+  /* the kinds of work, made obvious: each has its colour, which tints the tunnel; flying into a new kind shows its
+     name across the screen as a chapter card; every project wears its kind's colour */
+  var KCOL = { web: '#7dd3fc', app: '#c4b5fd', pres: '#f9a8d4', '3d': '#5eead4', game: '#fde047' };
+  var KNAME = { web: T('Websites', 'مواقع'), app: T('Apps', 'تطبيقات'), pres: T('Presentations', 'عروض تقديمية'), '3d': T('3D Modeling', 'نمذجة ثلاثية الأبعاد'), game: T('Games', 'ألعاب') };
+  var KORDER = ['web', 'app', 'pres', '3d', 'game'];
+  var zone = document.getElementById('zone'), chapter = document.getElementById('chapter'), shownKind = null, chapterT = 0;
+  secs.forEach(function (el, i) { if (KIND[i]) el.style.setProperty('--kc', KCOL[KIND[i]]); });
+  function showChapter(kind) {
+    var n = KIND.filter(function (x) { return x === kind; }).length, ar = root.dataset.lang === 'ar', icon = document.querySelector('.c-k[data-k="' + kind + '"] svg');
+    chapter.style.setProperty('--k', KCOL[kind]);
+    document.getElementById('ch-n').textContent = (ar ? 'الفصل ' : 'Chapter ') + pad2(KORDER.indexOf(kind) + 1) + ' / ' + pad2(KORDER.length);
+    var t = document.getElementById('ch-t'); t.textContent = '';
+    if (icon) t.appendChild(icon.cloneNode(true));
+    t.appendChild(document.createTextNode(L(KNAME[kind])));
+    document.getElementById('ch-c').textContent = ar ? (n === 1 ? 'مشروع واحد' : n === 2 ? 'مشروعان' : n + ' مشاريع') : n + (n === 1 ? ' project' : ' projects');
+    chapter.classList.remove('show'); void chapter.offsetWidth; chapter.classList.add('show'); root.classList.add('chaptering');
+    clearTimeout(chapterT); chapterT = setTimeout(function () { chapter.classList.remove('show'); root.classList.remove('chaptering'); }, reduce ? 1200 : 1900);
+  }
+  function scene(k) {
+    root.classList.toggle('at-start', k === 0);
+    root.classList.toggle('at-end', k === secs.length - 1);
+    var kind = KIND[k];
+    zone.style.setProperty('--zc', kind ? KCOL[kind] : (k === 0 ? '#8be9ff' : '#c4b5fd'));
+    if (kind && kind !== shownKind) {
+      // the card waits for the opening, and for the camera to get going
+      if (opened) showChapter(kind); else onOpened.push(function () { if (KIND[active] === kind) showChapter(kind); });
+    }
+    shownKind = kind || null;
+  }
+
   // the category cards on the first screen and the kinds in the top bar (in the plain page these stay ordinary links)
   [].forEach.call(document.querySelectorAll('.cats a[data-to], .kn[data-to]'), function (a) {
     a.addEventListener('click', function (e) { if (!root.classList.contains('gl')) return; e.preventDefault(); go(+a.dataset.to); });
@@ -916,402 +1117,141 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     if (cur.dataset.t !== label) cur.dataset.t = label;
   }
 
-  /* ================= the particle engine (raw WebGL2) ================= */
-  var canvas = document.getElementById('gl'), status = document.getElementById('status');
+  /* ================= the tunnel (raw WebGL2, no library) ================= */
+  // The page is a tunnel. Each section is a stop along it, S units apart; scrolling flies the camera from stop to stop.
+  // At every stop something floats DIST units ahead: the tesseract at the entrance, each project's real screen, the
+  // ringed planet at the end. A project's screen waits off to the side of the tunnel; as the camera arrives it swings
+  // to the front and turns toward the visitor, then drifts back to the side as the camera flies past.
+  var canvas = document.getElementById('gl'), status = document.getElementById('status'), cfill = document.getElementById('cfill');
   var gl = null;
-  if (location.protocol !== 'file:') try { gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, powerPreference: 'high-performance' }); } catch (e) { gl = null; }
+  if (location.protocol !== 'file:') try { gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true, depth: false, powerPreference: 'high-performance' }); } catch (e) { gl = null; }
   function plain() { root.classList.remove('gl'); canvas.remove(); status.textContent = ''; secs.forEach(function (el) { el.classList.add('on'); }); }
   if (!gl) { plain(); return; }
   root.classList.add('gl');
 
   var small = Math.min(screen.width, screen.height) < 700 || innerWidth < 700;
-  var TW = 256, TH = small ? 96 : 160, N = TW * TH, NS = Math.round(N * .06), M = N - NS;
-  status.textContent = (root.dataset.lang === 'ar' ? 'جارٍ التحميل' : 'Loading');
+  var D2R = Math.PI / 180, S = 13, DIST = 6.5, NS = secs.length, FAR = 95;
+  function zOf(i) { return -i * S; }
+  var seed = 7; function R() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
 
   /* ---- shaders ---- */
   var VS = '#version 300 es\n' +
-    'precision highp float; precision highp sampler2D;\n' +
-    'uniform sampler2D uPA, uPB, uCA, uCB; uniform int uTW;\n' +
-    'uniform float uMix, uTime, uSwirl, uPx, uScan;\n' +
-    'uniform mat4 uMA, uMB, uV, uP; uniform vec4 uRot, uA, uB;\n' +
-    'out vec4 vC; out float vB; out float vH;\n' +
-    'float hash(float n) { return fract(sin(n * 12.9898) * 43758.5453); }\n' +
-    'vec3 swirl(vec3 p, float t) { return vec3(sin(p.y * 2.1 + t) + sin(p.z * 1.7 - t * .7), sin(p.z * 2.3 + t * .9) + sin(p.x * 1.9 + t * .5), sin(p.x * 2.5 - t * .8) + sin(p.y * 1.3 + t * .6)) * .5; }\n' +
+    'precision highp float;\n' +
+    'layout(location = 0) in vec4 aP; layout(location = 1) in vec4 aC; layout(location = 2) in float aS;\n' +
+    'uniform mat4 uM, uV, uP; uniform vec4 uRot; uniform float uFour, uPx, uTime, uFar, uBoost;\n' +
+    'out vec4 vC; out float vA;\n' +
     'vec4 rot4(vec4 p) {\n' +
     '  float c = cos(uRot.x), s = sin(uRot.x); p = vec4(c * p.x - s * p.w, p.y, p.z, s * p.x + c * p.w);\n' +
     '  c = cos(uRot.y); s = sin(uRot.y); p = vec4(p.x, c * p.y - s * p.w, p.z, s * p.y + c * p.w);\n' +
     '  c = cos(uRot.z); s = sin(uRot.z); p = vec4(p.x, p.y, c * p.z - s * p.w, s * p.z + c * p.w);\n' +
     '  c = cos(uRot.w); s = sin(uRot.w); p = vec4(c * p.x - s * p.z, p.y, s * p.x + c * p.z, p.w);\n' +
     '  return p; }\n' +
-    // a target's position for this particle in world space, plus any light effect it carries
-    'vec3 place(vec4 q, mat4 M, vec4 T, out float fx, out float star) {\n' +
-    '  fx = 0.0; star = q.w < -5.0 ? 1.0 : 0.0;\n' +
-    '  if (star > .5) return q.xyz;\n' +
-    '  vec3 p;\n' +
-    '  if (T.x > .5) { vec4 r = rot4(q); p = r.xyz * (1.75 / (2.75 - r.w)); }\n' +
-    '  else {\n' +
-    '    p = q.xyz;\n' +
-    '    if (q.w >= 1.0 && q.w < 2.0) { float e = q.w - 1.0 - fract(uTime * .2); fx = exp(-e * e * 140.0) * 2.4; }\n' +
-    '    else if (q.w > 2.5 && q.w < 3.5) { float e = q.y - uScan; fx = exp(-e * e * 70.0) * 1.7; }\n' +
-    '    else if (q.w > 3.5 && q.w < 4.5) { float a = atan(q.y, q.x), h = mod(-uTime * 1.25, 6.2832); float d = abs(mod(a - h + 3.1416, 6.2832) - 3.1416); fx = exp(-d * d * 5.0) * 2.0; }\n' +
-    // embers and steam: rise, drift and fade, each on its own clock (the fraction of w)
-    '    else if (q.w > 4.5 && q.w < 6.0) { float u = fract(uTime * .3 + q.w * 7.31); p.y += u * 1.4; p.x += sin(uTime * 1.6 + q.w * 40.0) * .06 * u; fx = -u * .95; }\n' +
-    // flames: lick sideways more toward the tips, and flicker
-    '    else if (q.w > 6.0 && q.w < 7.0) { float hh = clamp(p.y + .5, 0.0, 2.0); p.x += sin(uTime * 7.0 + p.y * 6.0 + q.w * 23.0) * .045 * hh; p.y += sin(uTime * 5.0 + q.w * 31.0) * .03 * hh; fx = .35 * sin(uTime * 11.0 + q.w * 57.0); }\n' +
-    '  }\n' +
-    '  return (M * vec4(p, 1.0)).xyz; }\n' +
     'void main() {\n' +
-    '  int id = gl_VertexID; ivec2 uv = ivec2(id % uTW, id / uTW);\n' +
-    '  vec4 qa = texelFetch(uPA, uv, 0), qb = texelFetch(uPB, uv, 0);\n' +
-    '  float fa, fb, sa, sb;\n' +
-    '  vec3 pa = place(qa, uMA, uA, fa, sa), pb = place(qb, uMB, uB, fb, sb);\n' +
-    '  float r = hash(float(id) * .7311 + 1.3);\n' +
-    // each particle leaves a little before or after its neighbours, so one shape flows into the next
-    '  float m = smoothstep(0.0, 1.0, clamp((uMix - r * .35) / .65, 0.0, 1.0));\n' +
-    '  vec3 p = mix(pa, pb, m);\n' +
-    '  float tr = 4.0 * m * (1.0 - m);\n' +
-    '  p += swirl(p * 1.1 + r * 5.0, uTime * .5) * (tr * .6 * uSwirl);\n' +
-    '  p += swirl(p * 2.2 + r * 9.0, uTime * .35) * (.006 * uSwirl);\n' +
-    '  vec4 mv = uV * vec4(p, 1.0);\n' +
+    '  vec3 p = aP.xyz; float tw = 1.0;\n' +
+    // the tesseract turns through the fourth dimension and is projected into 3D; everything else just twinkles
+    '  if (uFour > .5) { vec4 r = rot4(aP); p = r.xyz * (1.75 / (2.75 - r.w)); }\n' +
+    '  else tw = .72 + .28 * sin(uTime * 1.3 + aP.w * 6.2832);\n' +
+    '  vec4 mv = uV * uM * vec4(p, 1.0);\n' +
     '  gl_Position = uP * mv;\n' +
-    '  float st = sa * sb;\n' +
-    '  float sz = mix(uA.y * mix(1.0, .45 + r * 1.1, uA.z), uB.y * mix(1.0, .45 + r * 1.1, uB.z), m);\n' +
-    '  sz = mix(sz, .022 + r * .03, st);\n' +
-    '  gl_PointSize = clamp(sz * uPx / -mv.z, 1.0, 48.0);\n' +
-    '  vC = mix(texelFetch(uCA, uv, 0), texelFetch(uCB, uv, 0), m);\n' +
-    '  vB = mix(1.0 + mix(fa, fb, m) + tr * .5, .55 + .45 * sin(uTime * 1.4 + r * 40.0), st);\n' +
-    '  vH = mix(uA.w, uB.w, m) * (1.0 - st);\n' +
+    '  float d = max(.05, -mv.z);\n' +
+    '  vA = (1.0 - smoothstep(uFar * .5, uFar, d)) * smoothstep(.5, 2.4, d) * tw * (1.0 + uBoost);\n' +
+    '  gl_PointSize = clamp(aS * uPx / d, 1.0, 40.0);\n' +
+    '  vC = aC;\n' +
     '}';
   var FS = '#version 300 es\n' +
-    'precision highp float;\n' +
-    'in vec4 vC; in float vB; in float vH; out vec4 o;\n' +
-    'void main() {\n' +
-    '  vec2 d = gl_PointCoord - .5; float r2 = dot(d, d);\n' +
-    '  if (r2 > .25) discard;\n' +
-    '  float soft = 1.0 - smoothstep(0.0, .25, r2), hard = 1.0 - smoothstep(.17, .25, r2);\n' +
-    '  float a = mix(soft, hard, vH);\n' +
-    '  o = vec4(vC.rgb * vC.a * vB * a, 1.0);\n' +
-    '}';
+    'precision highp float; in vec4 vC; in float vA; out vec4 o;\n' +
+    'void main() { vec2 d = gl_PointCoord - .5; float r2 = dot(d, d); if (r2 > .25) discard; float a = 1.0 - smoothstep(.0, .25, r2); o = vec4(vC.rgb * vC.a * vA * a, 1.0); }';
+  // a project's screen: rounded corners, a thin glowing edge in its colour, a scan of light when it arrives
+  var K = 1.08; // the quad is a little larger than the picture so the glow can spill past its edge
   var QVS = '#version 300 es\n' +
-    'in vec2 aP; uniform mat4 uM, uV, uP; uniform vec2 uS; out vec2 vUv;\n' +
-    'void main() { vUv = aP + .5; gl_Position = uP * uV * uM * vec4(aP * uS, 0.0, 1.0); }';
+    'layout(location = 0) in vec2 aQ; uniform mat4 uM, uV, uP; uniform vec2 uS; out vec2 vUv; out float vD;\n' +
+    'void main() { vUv = aQ + .5; vec4 mv = uV * uM * vec4(aQ * uS, 0.0, 1.0); vD = -mv.z; gl_Position = uP * mv; }';
   var QFS = '#version 300 es\n' +
     'precision highp float;\n' +
-    'uniform sampler2D uT; uniform float uR, uAsp; uniform vec3 uAc; in vec2 vUv; out vec4 o;\n' +
+    'uniform sampler2D uT; uniform float uAsp, uA, uScan, uHot, uFar, uHas, uK; uniform vec3 uAc; in vec2 vUv; in float vD; out vec4 o;\n' +
     'float box(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }\n' +
     'void main() {\n' +
-    '  vec2 p = (vUv - .5) * vec2(uAsp, 1.0);\n' +
-    '  float inside = 1.0 - smoothstep(-.003, .003, box(p, vec2(uAsp, 1.0) * .5, .03));\n' +
-    // the picture appears from the top down behind a bright scan line
-    '  float edge = 1.0 - (uR * 1.2 - .1);\n' +
-    '  float shown = smoothstep(edge - .015, edge + .015, vUv.y);\n' +
-    '  float e = (vUv.y - edge) * 60.0, line = exp(-e * e) * (1.0 - smoothstep(.95, 1.0, uR));\n' +
-    '  vec2 off = vec2(line * .008, 0.0);\n' +
-    '  vec3 c = vec3(texture(uT, vUv + off).r, texture(uT, vUv).g, texture(uT, vUv - off).b);\n' +
-    '  c += uAc * line * 1.4;\n' +
-    '  c *= .97 + .03 * sin(vUv.y * 1100.0);\n' +
-    '  o = vec4(c, inside * clamp(max(shown, line), 0.0, 1.0));\n' +
+    '  vec2 c0 = (vUv - .5) * uK, p = c0 * vec2(uAsp, 1.0);\n' +
+    '  float sd = box(p, vec2(uAsp, 1.0) * .5, .035);\n' +
+    '  float inside = 1.0 - smoothstep(-.002, .002, sd);\n' +
+    '  float glow = exp(-max(sd, 0.0) * 34.0) * (1.0 - inside) * (.25 + .75 * uHot);\n' +
+    '  float rim = exp(-abs(sd) * 260.0) * (.5 + .5 * uHot);\n' +
+    '  vec2 uv = c0 + .5;\n' +
+    '  vec3 c = mix(vec3(.035, .04, .055), texture(uT, uv).rgb, uHas);\n' +
+    '  float e = (uv.y - (1.0 - uScan)) * 46.0, line = exp(-e * e) * step(.001, uScan) * step(uScan, .999);\n' +
+    '  c += uAc * line * 1.3;\n' +
+    '  float fog = (1.0 - smoothstep(uFar * .45, uFar, vD)) * smoothstep(1.2, 3.2, vD);\n' +
+    '  vec3 col = c * inside + uAc * (rim + glow);\n' +
+    '  float a = clamp(inside + rim + glow * .7, 0.0, 1.0) * uA * fog;\n' +
+    '  o = vec4(col, a);\n' +
     '}';
   function shader(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
   function program(vs, fs) { var p = gl.createProgram(); gl.attachShader(p, shader(gl.VERTEX_SHADER, vs)); gl.attachShader(p, shader(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; }
   var P1, P2, U1 = {}, U2 = {};
   try { P1 = program(VS, FS); P2 = program(QVS, QFS); }
   catch (err) { console.warn('WebGL2 shaders failed, showing the plain page:', err); plain(); return; }
-  ['uPA', 'uPB', 'uCA', 'uCB', 'uTW', 'uMix', 'uTime', 'uSwirl', 'uPx', 'uScan', 'uMA', 'uMB', 'uV', 'uP', 'uRot', 'uA', 'uB'].forEach(function (n) { U1[n] = gl.getUniformLocation(P1, n); });
-  ['uM', 'uV', 'uP', 'uS', 'uT', 'uR', 'uAsp', 'uAc'].forEach(function (n) { U2[n] = gl.getUniformLocation(P2, n); });
-  var vaoPts = gl.createVertexArray();
+  ['uM', 'uV', 'uP', 'uRot', 'uFour', 'uPx', 'uTime', 'uFar', 'uBoost'].forEach(function (n) { U1[n] = gl.getUniformLocation(P1, n); });
+  ['uM', 'uV', 'uP', 'uS', 'uT', 'uAsp', 'uA', 'uScan', 'uHot', 'uFar', 'uHas', 'uK', 'uAc'].forEach(function (n) { U2[n] = gl.getUniformLocation(P2, n); });
+
+  /* ---- point clouds: position (xyz + a fourth value), colour, size ---- */
+  function cloud(n) { return { p: new Float32Array(n * 4), c: new Uint8Array(n * 4), s: new Float32Array(n), n: 0 }; }
+  function add(o, x, y, z, w, r, g, b, a, s) { var k = o.n++, i = k * 4; o.p[i] = x; o.p[i + 1] = y; o.p[i + 2] = z; o.p[i + 3] = w; o.c[i] = r; o.c[i + 1] = g; o.c[i + 2] = b; o.c[i + 3] = a; o.s[k] = s; }
+  function vao(o) {
+    var v = gl.createVertexArray(); gl.bindVertexArray(v);
+    [[o.p, 0, 4, gl.FLOAT, false], [o.c, 1, 4, gl.UNSIGNED_BYTE, true], [o.s, 2, 1, gl.FLOAT, false]].forEach(function (a) {
+      var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, a[0].subarray(0, o.n * a[2]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(a[1]); gl.vertexAttribPointer(a[1], a[2], a[3], a[4], 0, 0);
+    });
+    gl.bindVertexArray(null);
+    return { v: v, n: o.n };
+  }
+  var KC = { web: [125, 211, 252], app: [196, 181, 253], pres: [249, 168, 212], '3d': [94, 234, 212], game: [253, 224, 71] }, NEUTRAL = [139, 233, 255];
+  function kindNear(z) { var i = clamp(Math.round(-(z - DIST) / S), 0, NS - 1); return KIND[i]; }
+  // the tunnel itself: rings every few units, coloured by the kind of work you are passing; a bright triple ring marks
+  // the gate into each kind; and dust drifting all along it
+  var zStart = 14, zEnd = zOf(NS - 1) - 30, q = small ? .6 : 1;
+  var TC = cloud(200000);
+  for (var z = zStart; z > zEnd; z -= 1.75) {
+    var kc = KC[kindNear(z)] || NEUTRAL, n = (230 * q) | 0, r0 = 8 + .35 * Math.sin(z * .7);
+    for (var j = 0; j < n; j++) { var a = j / n * 6.2832 + z * .05, f = .55 + .45 * R(); add(TC, Math.cos(a) * r0, Math.sin(a) * r0 * .9, z + (R() - .5) * .06, R(), kc[0] * f, kc[1] * f, kc[2] * f, 200, .085); }
+  }
+  [1, 3, 5, 6, 8].forEach(function (i) {
+    var kc = KC[KIND[i]], zg = zOf(i) + S * .45;
+    for (var g = 0; g < 3; g++) for (var j = 0; j < (420 * q | 0); j++) { var a = R() * 6.2832, rr = 6.4 + g * .32; add(TC, Math.cos(a) * rr, Math.sin(a) * rr * .9, zg - g * .25, R(), kc[0], kc[1], kc[2], 230, .07); }
+  });
+  for (var d = 0; d < (small ? 4200 : 8000); d++) {
+    var a2 = R() * 6.2832, rr2 = 1.6 + Math.sqrt(R()) * 13, b = 150 + R() * 105;
+    add(TC, Math.cos(a2) * rr2, Math.sin(a2) * rr2 * .85, zEnd + R() * (zStart - zEnd), R(), b * .82, b * .9, b, 150, .028 + R() * .03);
+  }
+  var TUN = vao(TC);
+  // the tesseract at the entrance: the 32 edges of a four-dimensional cube
+  var X = cloud(small ? 6000 : 11000), XN = small ? 6000 : 11000, pal = [[110, 231, 255], [170, 140, 255], [245, 120, 210], [120, 170, 255]], V4 = [], E4 = [];
+  for (var i4 = 0; i4 < 16; i4++) V4.push([(i4 & 1) ? 1 : -1, (i4 & 2) ? 1 : -1, (i4 & 4) ? 1 : -1, (i4 & 8) ? 1 : -1]);
+  for (i4 = 0; i4 < 16; i4++) for (var j4 = i4 + 1; j4 < 16; j4++) { var x4 = i4 ^ j4; if (x4 && !(x4 & (x4 - 1))) E4.push([i4, j4, Math.round(Math.log(x4) / Math.LN2)]); }
+  for (var k4 = 0; k4 < XN; k4++) {
+    if (R() < .08) { var vv = V4[k4 % 16]; add(X, vv[0], vv[1], vv[2], vv[3], 255, 255, 255, 170, .05); continue; }
+    var e4 = E4[k4 % 32], A4 = V4[e4[0]], B4 = V4[e4[1]], u4 = R(), c4 = pal[e4[2]], f4 = .38 + .26 * R();
+    add(X, A4[0] + (B4[0] - A4[0]) * u4, A4[1] + (B4[1] - A4[1]) * u4, A4[2] + (B4[2] - A4[2]) * u4, A4[3] + (B4[3] - A4[3]) * u4, c4[0] * f4, c4[1] * f4, c4[2] * f4, 255, .036);
+  }
+  var TESS = vao(X);
+  // the ringed planet at the end of the tunnel
+  var PL = cloud(small ? 7000 : 12000), PN = small ? 7000 : 12000;
+  for (var p = 0; p < PN; p++) {
+    if (p < PN * .46) { var th = R() * 6.283, zz = 2 * R() - 1, rr = Math.sqrt(1 - zz * zz), band = .5 + .5 * Math.sin(zz * 10 + Math.sin(th * 2) * .5), ff = .45 + .55 * R(); add(PL, rr * Math.cos(th), zz, rr * Math.sin(th), R(), (110 + 40 * band) * ff, (90 + 140 * band) * ff, 255 * ff, 230, .03); }
+    else { var a3 = R() * 6.283, r3 = 1.4 + Math.pow(R(), .85) * .95; if (r3 > 1.86 && r3 < 1.95) r3 += .12; var f3 = .3 + .7 * R(); add(PL, r3 * Math.cos(a3), (R() - .5) * .014, r3 * Math.sin(a3), R(), 200 * f3, 195 * f3, 255 * f3, 200, .026); }
+  }
+  var PLANET = vao(PL);
+  var NPTS = TUN.n + TESS.n + PLANET.n;
+  // one quad for every screen
   var vaoQuad = gl.createVertexArray(); gl.bindVertexArray(vaoQuad);
   var qb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, qb);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-.5, -.5, .5, -.5, -.5, .5, .5, .5]), gl.STATIC_DRAW);
-  var aP = gl.getAttribLocation(P2, 'aP'); gl.enableVertexAttribArray(aP); gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   gl.bindVertexArray(null);
 
-  /* ---- shapes: every shape is N particles; position xyz + a code in w, colour rgba ---- */
-  var seed = 7; function R() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
-  function blank() { return { p: new Float32Array(N * 4), c: new Uint8Array(N * 4) }; }
-  function put(t, k, x, y, z, w, r, g, b, a) { var i = k * 4; t.p[i] = x; t.p[i + 1] = y; t.p[i + 2] = z; t.p[i + 3] = w; t.c[i] = r; t.c[i + 1] = g; t.c[i + 2] = b; t.c[i + 3] = a; }
-  // a few stars that stay put through every shape (w = -9 tells the shader to leave them alone)
-  var STARS = []; for (var k0 = 0; k0 < NS; k0++) { var th0 = R() * 6.283, d0 = 8 + R() * 14; STARS.push([Math.cos(th0) * d0 * (.4 + R()), (R() - .5) * d0 * .9, -4 - R() * 16, 90 + R() * 150]); }
-  function seal(t) { for (var k = 0; k < NS; k++) { var s = STARS[k]; put(t, M + k, s[0], s[1], s[2], -9, s[3] * .8, s[3] * .88, s[3], 255); } return t; }
-
-  var LAND = 'AAAAAACE/wP///8BAHwCAAAAAB8AAAAAAAAAAABgAPjB////AQAwAAAAAABgAAAAAAAAAAAAODlmAPD//wEAAAAA8ACA/wcAHwAAAAAAgAeQAwDg//8BAAAAAAwA8P8CAAAAAAAAAMD9s/wH4P9/AAAAAAAGjP3//wd8AAAAAAAA0IfxPsD/PwAAAB8AAO7//////x8AAQDA/w8DN3iA/x8AAOD/Ifr//////////x8AwP///z/4g/8BAADwv+f/7/////////8IAMD///8/foA/AA8A/Hz9////////////AADA////A/AAHwAAAH///////////////wAAwP///wAOAA4AAIA/////////////pw8AAID+/38AHgEAAACAP/z/////////f2MAAAAA/P//Af4DAAAAAFj9/////////wN4AAAAAPD//w/+AwAAAAAO//////////8AOAAAAAD0//8//w8AAIAB8P//////////AhgAAAAA4P//f/8fAACAgPD///////9//A8IAAAAAKD/////FwAAAMD4////////P/gLAAAAAAAAAAD//zAAAAAA4P/////v/x/gAwAAAAAAAAAA4N9AAAAAAOf//fz/g/9/gAkAAAAAAAAAAMAPAwAAAAD3nz7+/4H/D+AAAAAAAAAAAADAAAAAAAAAzA84/v8B/gNgAAAAAAAAAAAAAAAAAACAAZgHcPz/AAAADAAAAAAAAAAAAAAAAAAAgACAAeD8HwAAAAQAAAAAAAAAAAAAAAAAAIAAGAFg/D8AAAAAAAAAAAAAAAAAAAAAAAAA8AMA//8/AAAAAAAAAAAAAAAAAAAAAAAAAP8DAP//HwAAAAAAAAAAAAAACAAAAAAAAID/j4H//z8AAAAAAAAAAAAAAOADAAAAAACA/7//8f8fAAAAAAAAAAAAAADADwAAAAAAwP//P0D/DwYAAAAAAAAAAAAAoB8AAAAAAOD//38A9Ad4BgAAAAAAAAAAAAA/AAAAAADw//9/AEAGIAIAAAAAAAAAAAAAPgAAAAAA+P///wAYAGAHgAAAAAAAAAAAADwAAQAAAPj///8BGACA7wAAAAAAAAAAAAB8DBgAAAD4////AQwAAH8AAAAAAAAAAAAA+AcSAAAA+P///4MHAAB+gAAAAAAAAAAAAOAHAAAAAPj////zAQAA/YAAAAAAAAAAAAAAPgAAAAD4////dwAAAPiBAAAAAAAAAAAAADAAAAAA+P///x8AAADogQAAAAAAAAAAAAAwPAAAAPD////PAQAAwEADAAAAAAAAAAAAgP0DAADg/////wAAAEggAAAAAAAAAAAAAAD+DwAA4P////8AAAMIAAIAAAAAAAAAAAAA/n8AAICP//9/AAAAEDAAAAAAAAAAAAAAAP7/AAAAAP7/PwAAADQYAAAAAAAAAAAAAAD//wAAAAD8/x8AAAAoPAAAAAAAAAAAAAAA//8AAAAA/v8PAAAAOB4AAAAAAAAAAAAAgP//BgAAAP7/BwAAADDeYAEAAAAAAAAAAID//38AAAD8/wMAAABg0MQPAAAAAAAAAACA////AAAA+P8DAAAAQEAAHgEAAAAAAAAAAP///wEAAPj/AwAAAIAHAD4AAAAAAAAAAAD///8BAAD4/wMAAAAAAAJMIAAAAAAAAAAA/v//AAAA8P8HAAAAAAAAAAAAAAAAAAAAAP7/fwAAAPj/hwAAAAAA4AgAAAAAAAAAAAD8/z8AAAD4/4cAAAAAAHQIAAAAAAAAAAAA+P8/AAAA+P/jAAAAAAD+GQAAAAAAAAAAAOD/PwAAAPj/4QAAAAAA/x8AAAAAAAAAAADg/z8AAAD4/2AAAAAAgP8/AAAAAAAAAAAA4P8fAAAA8P9wAAAAAPD/fwAAAAAAAAAAAOD/BwAAAPDHcAAAAAD4//8AAAAAAAAAAADg/wEAAADwQyAAAAAA+P//AQAAAAAAAAAA4P8BAAAAYCAAAAAAAPj//wEAAAAAAAAAAPD/AQAAAEAAAAAAAADw//8BAAAAAAAAAADw/wAAAAAAAAAAAAAA8P//AQAAAAAAAAAA8H8AAAAAAAAAAAAAAPCD/wEAAAAAAAAAAPA/AAAAAAAAAAAAAABwgP8AAAAAAAAAAADwDwAAAAAAAAAAAAAAAAD8AAAAAAAAAAAA+A8AAAAAAAAAAAAAAAAAfAAgAAAAAAAAAPgDAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAD4AAAAAAAAAAAAAAAAAAAgADAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAIAAIAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
-  var KSA = [[36.5, 29.4], [37.9, 31.4], [39.2, 32.1], [42.1, 31.1], [44.7, 29.2], [46.5, 29.1], [47.6, 28.6], [48.6, 27.8], [50.0, 26.4], [50.8, 25.0], [51.6, 24.3], [52.6, 22.9], [55.6, 22.0], [55.2, 20.0], [52.0, 19.0], [49.0, 18.6], [46.6, 17.3], [44.5, 17.4], [43.2, 16.7], [42.6, 17.4], [41.4, 19.0], [39.6, 20.9], [38.9, 22.5], [37.6, 24.3], [36.5, 26.0], [35.2, 28.0], [34.6, 28.2]];
-  function inKSA(px, py) { var c = false; for (var i = 0, j = KSA.length - 1; i < KSA.length; j = i++) { var a = KSA[i], b = KSA[j]; if ((a[1] > py) !== (b[1] > py) && px < (b[0] - a[0]) * (py - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; }
-  var CELLS = (function () { var s = atob(LAND), out = []; for (var j = 0; j < 77; j++) { var lat = 80 - ((2 + 5 * j) / 383) * 138; for (var i = 0; i < 200; i++) if (s.charCodeAt(j * 25 + (i >> 3)) & (1 << (i & 7))) { var lon = ((2 + 5 * i) / 1000) * 360 - 180; out.push([lon, lat, inKSA(lon, lat)]); } } return out; })();
-  var D2R = Math.PI / 180;
-  function sph(lon, lat, r) { var a = lon * D2R, b = lat * D2R; return [r * Math.cos(b) * Math.sin(a), r * Math.sin(b), r * Math.cos(b) * Math.cos(a)]; }
+  /* ---- maths ---- */
   function nrm(v) { var l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; }
   function cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
-
-  function shScatter() { var t = blank(); for (var k = 0; k < M; k++) { var th = R() * 6.283, ph = Math.acos(2 * R() - 1), d = 2.4 + R() * 5; put(t, k, Math.sin(ph) * Math.cos(th) * d, Math.cos(ph) * d * .7, Math.sin(ph) * Math.sin(th) * d - 2, 0, 120, 140, 200, 110); } return seal(t); }
-  // a tesseract: the 32 edges of a 4D cube; the shader turns it through the fourth dimension
-  function shTess() {
-    var t = blank(), V = [], E = [], pal = [[110, 231, 255], [170, 140, 255], [245, 120, 210], [120, 170, 255]];
-    for (var i = 0; i < 16; i++) V.push([(i & 1) ? 1 : -1, (i & 2) ? 1 : -1, (i & 4) ? 1 : -1, (i & 8) ? 1 : -1]);
-    for (i = 0; i < 16; i++) for (var j = i + 1; j < 16; j++) { var x = i ^ j; if (x && !(x & (x - 1))) E.push([i, j, Math.round(Math.log(x) / Math.LN2)]); }
-    for (var k = 0; k < M; k++) {
-      if (R() < .08) { var v = V[k % 16], g = .07 * R() * R(); put(t, k, v[0] + (R() - .5) * g, v[1] + (R() - .5) * g, v[2] + (R() - .5) * g, v[3] + (R() - .5) * g, 255, 255, 255, 150); continue; }
-      var e = E[k % 32], a = V[e[0]], b = V[e[1]], u = R(), q = .012, c = pal[e[2]], f = .2 + .22 * R();
-      put(t, k, a[0] + (b[0] - a[0]) * u + (R() - .5) * q, a[1] + (b[1] - a[1]) * u + (R() - .5) * q, a[2] + (b[2] - a[2]) * u + (R() - .5) * q, a[3] + (b[3] - a[3]) * u + (R() - .5) * q, c[0] * f, c[1] * f, c[2] * f, 255);
-    }
-    return seal(t);
-  }
-  // the Alliance globe: land as light, Saudi Arabia in gold, a line from Riyadh to every country in the network
-  var NET = [[103.79, 36.62], [54.29, 23.9], [51.16, 25.34], [50.54, 26.02], [35.42, 39.0], [-2.48, 53.95], [2.45, 46.6], [10.37, 51.1], [14.11, 47.57], [-3.56, 40.4], [-99.14, 39.54], [137.95, 36.58], [127.87, 36.47], [79.6, 22.89], [25.16, -29.03]];
-  function shGlobe() {
-    var t = blank(), nArc = M * .13 | 0, nAtm = M * .14 | 0, nLand = M - nArc - nAtm, k = 0;
-    for (; k < nLand; k++) {
-      var c = CELLS[(R() * CELLS.length) | 0], v = sph(c[0] + (R() - .5) * 1.8, c[1] + (R() - .5) * 1.7, 1), f = .5 + .5 * R();
-      if (c[2]) put(t, k, v[0], v[1], v[2], 0, 255 * f, 200 * f, 110 * f, 255); else put(t, k, v[0], v[1], v[2], 0, 70 * f, 215 * f, 165 * f, 170);
-    }
-    var hq = sph(46.72, 24.69, 1), per = nArc / NET.length | 0;
-    NET.forEach(function (n) {
-      var b = sph(n[0], n[1], 1), w = Math.acos(Math.max(-1, Math.min(1, hq[0] * b[0] + hq[1] * b[1] + hq[2] * b[2]))), sw = Math.sin(w) || 1, lift = .05 + Math.min(w, 1.25) * .24;
-      for (var q = 0; q < per; q++, k++) {
-        var u = R(), A = Math.sin((1 - u) * w) / sw, B = Math.sin(u * w) / sw, h = 1.006 + Math.sin(Math.PI * u) * lift;
-        put(t, k, (hq[0] * A + b[0] * B) * h, (hq[1] * A + b[1] * B) * h, (hq[2] * A + b[2] * B) * h, 1 + u * .999, 255, 210, 120, 200);
-      }
-    });
-    for (; k < M; k++) { var th = R() * 6.283, ph = Math.acos(2 * R() - 1), rr = 1.02 + R() * .07; put(t, k, Math.sin(ph) * Math.cos(th) * rr, Math.cos(ph) * rr, Math.sin(ph) * Math.sin(th) * rr, 0, 50, 190, 150, 45); }
-    return seal(t);
-  }
-  // a QR code inside a scanner's viewfinder, with a scan line passing over it
-  function shQR() {
-    var t = blank(), n = 29, size = 2.3, u = size / n, mods = [], sd = 11;
-    function rq() { sd = (sd * 9301 + 49297) % 233280; return sd / 233280; }
-    for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) {
-      var F = (i < 7 && j < 7) || (i > n - 8 && j < 7) || (i < 7 && j > n - 8), on;
-      if (F) { var a = i > n - 8 ? i - (n - 7) : i, b = j > n - 8 ? j - (n - 7) : j; on = a === 0 || a === 6 || b === 0 || b === 6 || (a > 1 && a < 5 && b > 1 && b < 5); }
-      else if ((i < 8 && j < 8) || (i > n - 9 && j < 8) || (i < 8 && j > n - 9)) on = false;
-      else on = rq() > .52;
-      if (on) mods.push([i, j, F]);
-    }
-    var nFrame = M * .1 | 0, k = 0;
-    for (; k < M - nFrame; k++) {
-      var md = mods[k % mods.length], x = (md[0] + .08 + R() * .84) * u - size / 2, y = size / 2 - (md[1] + .08 + R() * .84) * u, f = .55 + .45 * R();
-      if (md[2]) put(t, k, x, y, (R() - .5) * .05, 3, 255 * f, 70 * f, 85 * f, 255); else put(t, k, x, y, (R() - .5) * .05, 3, 236 * f, 238 * f, 245 * f, 210);
-    }
-    var hs = size / 2 + .22, L = .42;
-    for (; k < M; k++) { // four corner brackets
-      var cn = k % 4, sxn = cn & 1 ? 1 : -1, syn = cn & 2 ? 1 : -1, along = R() * L, horiz = R() < .5, th = (R() - .5) * .018;
-      var px = horiz ? sxn * (hs - along) : sxn * hs + th, py = horiz ? syn * hs + th : syn * (hs - along);
-      put(t, k, px, py, 0, 0, 255, 90, 100, 255);
-    }
-    return seal(t);
-  }
-  function textPoints(str, font, width) {
-    var c = document.createElement('canvas'), x = c.getContext('2d'); c.width = 720; c.height = 240;
-    x.fillStyle = '#fff'; x.font = font; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(str, 360, 128);
-    var d = x.getImageData(0, 0, 720, 240).data, pts = [], sc = width / 720;
-    for (var y = 0; y < 240; y += 2) for (var xx = 0; xx < 720; xx += 2) if (d[(y * 720 + xx) * 4 + 3] > 120) pts.push([(xx - 360) * sc, (120 - y) * sc]);
-    return pts.length ? pts : [[0, 0]];
-  }
-  // the focus timer: a ring with a running light, minute ticks and 25:00 written in particles
-  function shRing() {
-    var t = blank(), nT = M * .27 | 0, nP = M * .17 | 0, nK = M * .1 | 0, k = 0, pts = textPoints('25:00', '600 168px "Space Grotesk", sans-serif', 1.55);
-    for (; k < nT; k++) { var a = R() * 6.283, b = R() * 6.283, rr = 1.28 + .05 * Math.cos(b); put(t, k, rr * Math.cos(a), rr * Math.sin(a), .05 * Math.sin(b), 0, 120, 50, 60, 255); }
-    for (var q = 0; q < nP; q++, k++) { var a2 = Math.PI / 2 - R() * Math.PI * 1.4, b2 = R() * 6.283, r2 = 1.28 + .075 * Math.cos(b2); put(t, k, r2 * Math.cos(a2), r2 * Math.sin(a2), .075 * Math.sin(b2), 4, 255, 70, 85, 255); }
-    for (q = 0; q < nK; q++, k++) { var ti = (R() * 60) | 0, aa = ti / 60 * 6.283, len = ti % 5 === 0 ? .15 : .07, r3 = 1.12 - R() * len; put(t, k, r3 * Math.cos(aa), r3 * Math.sin(aa), 0, 0, 225, 225, 235, ti % 5 === 0 ? 220 : 130); }
-    for (; k < M; k++) { var pt = pts[(R() * pts.length) | 0]; put(t, k, pt[0] + (R() - .5) * .008, pt[1] + (R() - .5) * .008, (R() - .5) * .04, 0, 245, 246, 250, 210); }
-    return seal(t);
-  }
-  // BBQ Fest: a red kettle grill, its grate, flames licking up through it and embers rising
-  function shGrill() {
-    var t = blank(), k = 0, nB = M * .22 | 0, nG = M * .12 | 0, nF = M * .5 | 0, GY = -.5, RB = 1.05;
-    for (; k < nB; k++) { // the bowl: the lower half of a sphere, squashed, under the grate
-      var th = R() * 6.283, z = -R(), rr = Math.sqrt(1 - z * z), f = .45 + .55 * R(), lit = .55 + .45 * Math.max(0, Math.cos(th - 1.9));
-      put(t, k, rr * Math.cos(th) * RB, GY + z * .8, rr * Math.sin(th) * RB, 0, 235 * f * lit, 40 * f * lit, 32 * f * lit, 230);
-    }
-    for (var q = 0; q < nG; q++, k++) { // the grate: a rim and nine bars
-      var x, z2;
-      if (R() < .3) { var a = R() * 6.283; x = Math.cos(a) * RB; z2 = Math.sin(a) * RB; }
-      else { var bar = ((R() * 9) | 0) - 4, zb = bar * .22, half = Math.sqrt(Math.max(0, RB * RB - zb * zb)); x = (R() * 2 - 1) * half; z2 = zb; }
-      put(t, k, x, GY + (R() - .5) * .012, z2, 0, 190, 190, 200, 200);
-    }
-    var tongues = [[-.55, .95, .2], [-.2, 1.45, -.1], [.18, 1.25, .15], [.52, .9, -.05], [0, 1.65, .05], [-.38, 1.1, -.25], [.36, 1.05, .3]];
-    for (q = 0; q < nF; q++, k++) { // flames: tapered tongues, white-gold at the root, red at the tip
-      var tg = tongues[(R() * tongues.length) | 0], v = Math.pow(R(), .8), wd = .21 * Math.pow(1 - v, .7) * (.6 + .4 * Math.sin(Math.PI * Math.min(1, v * 3))) + .01;
-      var fx = tg[0] + (R() * 2 - 1) * wd + Math.sin(v * 4 + tg[0] * 9) * .07 * v, fy = GY + .03 + v * tg[1], fz = tg[2] + (R() * 2 - 1) * wd * .8;
-      var r0 = 255, g0 = v < .25 ? 225 - v * 200 : 175 - v * 150, b0 = v < .2 ? 140 - v * 500 : 30 * (1 - v), al = 255 * (1 - v * .55);
-      put(t, k, fx, fy, fz, 6 + R() * .99, r0, Math.max(30, g0), Math.max(10, b0), al);
-    }
-    for (; k < M; k++) { // embers
-      var ex = (R() * 2 - 1) * .8, ez = (R() * 2 - 1) * .6, hot = R();
-      put(t, k, ex, GY + .1 + R() * .4, ez, 5 + R() * .99, 255, 120 + hot * 90, 40, 255);
-    }
-    return seal(t);
-  }
-  // Sport Barbecue: a stack of slides, the front one reading BBQ and GRILL · MOVE · MEET, with embers drifting up
-  function shDeck() {
-    var t = blank(), k = 0, SW = 2.7, SH = SW * 9 / 16, nEdge = M * .24 | 0, nBg = M * .16 | 0, nT = M * .3 | 0, nS = M * .14 | 0;
-    var big = textPoints('BBQ', '600 230px "Space Grotesk", sans-serif', 2.3), sub = textPoints('GRILL · MOVE · MEET', '600 62px "Space Grotesk", sans-serif', 1.75);
-    var slides = [[-.5, .42, -.75, .35], [-.25, .21, -.38, .6], [0, 0, 0, 1]]; // x, y, z, brightness
-    function edge(sl) { var u = R() * 2 * (SW + SH), x, y; if (u < SW) { x = u - SW / 2; y = SH / 2; } else if (u < SW + SH) { x = SW / 2; y = SH / 2 - (u - SW); } else if (u < 2 * SW + SH) { x = SW / 2 - (u - SW - SH); y = -SH / 2; } else { x = -SW / 2; y = -SH / 2 + (u - 2 * SW - SH); } return [x + sl[0], y + sl[1], sl[2]]; }
-    for (; k < nEdge; k++) { var sl = slides[k % 3], e = edge(sl), b = sl[3]; put(t, k, e[0], e[1], e[2], 0, 255 * b, 138 * b, 43 * b, 230); }
-    for (var q = 0; q < nBg; q++, k++) { var s2 = slides[q % 3]; put(t, k, s2[0] + (R() - .5) * SW, s2[1] + (R() - .5) * SH, s2[2] - .01, 0, 90, 45, 20, 90); }
-    for (q = 0; q < nT; q++, k++) { var p = big[(R() * big.length) | 0], f = .75 + .25 * R(); put(t, k, p[0] + (R() - .5) * .006, p[1] + .16, .02, 0, 205 * f, 82 * f, 18 * f, 255); }
-    for (q = 0; q < nS; q++, k++) { var p2 = sub[(R() * sub.length) | 0]; put(t, k, p2[0], p2[1] * .9 - .42, .02, 0, 240, 238, 232, 210); }
-    for (; k < M; k++) put(t, k, (R() * 2 - 1) * 1.2, -SH / 2 + R() * .3, .1 + R() * .2, 5 + R() * .99, 255, 140 + R() * 80, 40, 255);
-    return seal(t);
-  }
-  // Pizza Spin: a pizza lying flat (it spins in placeOf): crust, sauce, cheese, pepperoni, peppers and the slice cuts, with steam rising
-  function shPizza() {
-    var t = blank(), k = 0, RP = 1.25, nCr = M * .2 | 0, nCh = M * .4 | 0, nPe = M * .18 | 0, nGr = M * .08 | 0, nCut = M * .06 | 0;
-    var pep = [], gr = [], i;
-    for (i = 0; i < 9; i++) { var a = i * 2.39 + .3, rr = i === 0 ? 0 : (i % 2 ? .78 : .45); pep.push([Math.cos(a) * rr, Math.sin(a) * rr]); }
-    for (i = 0; i < 6; i++) { var a2 = i * 1.047 + .5, r2 = i % 2 ? .62 : .3; gr.push([Math.cos(a2) * r2, Math.sin(a2) * r2]); }
-    for (; k < nCr; k++) { // crust: a puffy ring
-      var th = R() * 6.283, b = R() * 6.283, rc = RP - .07 + .08 * Math.cos(b), f = .6 + .4 * R();
-      put(t, k, Math.cos(th) * rc, .06 * Math.sin(b) + .02, Math.sin(th) * rc, 0, 225 * f, 150 * f, 70 * f, 255);
-    }
-    for (i = 0; i < nCh; i++, k++) { // cheese, with sauce showing at the edge
-      var rr2 = Math.sqrt(R()) * (RP - .14), th2 = R() * 6.283, f2 = .7 + .3 * R(), edgeS = rr2 > RP - .26;
-      if (edgeS) put(t, k, Math.cos(th2) * rr2, .01, Math.sin(th2) * rr2, 0, 205 * f2, 45 * f2, 30 * f2, 255);
-      else put(t, k, Math.cos(th2) * rr2, .015, Math.sin(th2) * rr2, 0, 250 * f2, 196 * f2, 72 * f2, 230);
-    }
-    for (i = 0; i < nPe; i++, k++) { var c = pep[i % pep.length], pr = Math.sqrt(R()) * .15, pa = R() * 6.283, f3 = .7 + .3 * R(); put(t, k, c[0] + Math.cos(pa) * pr, .03, c[1] + Math.sin(pa) * pr, 0, 175 * f3, 42 * f3, 32 * f3, 255); }
-    for (i = 0; i < nGr; i++, k++) { var g = gr[i % gr.length], ga = R() * 6.283, gR = .085 + (R() - .5) * .02; put(t, k, g[0] + Math.cos(ga) * gR, .035, g[1] + Math.sin(ga) * gR, 0, 60, 175, 70, 255); }
-    for (i = 0; i < nCut; i++, k++) { var ca = ((i % 8) / 8) * 6.283 + .2, cr = R() * (RP - .1); put(t, k, Math.cos(ca) * cr, .04, Math.sin(ca) * cr, 0, 120, 70, 35, 255); }
-    for (; k < M; k++) { var sa = R() * 6.283, sr = Math.sqrt(R()) * .9; put(t, k, Math.cos(sa) * sr, .1, Math.sin(sa) * sr, 5 + R() * .99, 235, 230, 225, 120); }
-    return seal(t);
-  }
-  // MHC Coalline: chunks of coal, faceted and lit from one side, with glowing cracks and gold sparks drifting up
-  function shCoal() {
-    // each chunk is a solid cut by a dozen random planes: flat faces, sharp edges; the edges glow like embers
-    var t = blank(), k = 0, nS = M * .04 | 0, rocks = [], L = nrm([-.4, .8, .45]);
-    var spots = [[0, 0, 0, .62], [-1.05, .45, -.2, .32], [1.08, -.35, -.1, .36], [-.82, -.62, .3, .26], [.86, .64, .2, .28]];
-    spots.forEach(function (sp) {
-      var planes = [];
-      for (var i = 0; i < 12; i++) { var th = R() * 6.283, z = 2 * R() - 1, s = Math.sqrt(1 - z * z); planes.push({ n: [s * Math.cos(th), z, s * Math.sin(th)], h: sp[3] * (.75 + R() * .35) }); }
-      rocks.push({ c: [sp[0], sp[1], sp[2]], s: sp[3], p: planes });
-    });
-    var per = (M - nS) / rocks.length | 0;
-    rocks.forEach(function (o) {
-      for (var q = 0; q < per; q++, k++) {
-        var th = R() * 6.283, z = 2 * R() - 1, s = Math.sqrt(1 - z * z), d = [s * Math.cos(th), z, s * Math.sin(th)];
-        var best = 1e9, second = 1e9, face = null;
-        o.p.forEach(function (pl) { var dn = d[0] * pl.n[0] + d[1] * pl.n[1] + d[2] * pl.n[2]; if (dn > .05) { var r = pl.h / dn; if (r < best) { second = best; best = r; face = pl; } else if (r < second) second = r; } });
-        if (!face) { best = o.s; face = { n: d }; }
-        best = Math.min(best, o.s * 1.6);
-        var x = o.c[0] + d[0] * best, y = o.c[1] + d[1] * best, zz = o.c[2] + d[2] * best;
-        var edge = (second - best) / best < .035, lit = Math.max(0, face.n[0] * L[0] + face.n[1] * L[1] + face.n[2] * L[2]);
-        if (edge) put(t, k, x, y, zz, 0, 255, 120 + R() * 70, 30, 255);
-        else { var g = 28 + 120 * Math.pow(lit, 1.6), f = .85 + .3 * R(); put(t, k, x, y, zz, 0, g * f, g * f * .97, g * f * 1.04, 210); }
-      }
-    });
-    for (; k < M; k++) { var e = rocks[(R() * rocks.length) | 0]; put(t, k, e.c[0] + (R() - .5) * e.s, e.c[1] + e.s * .5, e.c[2] + (R() - .5) * e.s, 5 + R() * .99, 255, 150 + R() * 60, 40, 255); }
-    return seal(t);
-  }
-  // BBQ Fest in 3D: a little model of the festival on a sand plate — rows of booths with coloured roofs, the stage, palms and a balloon
-  function shDiorama() {
-    var t = blank(), k = 0, G = -.45, nGround = M * .16 | 0, nBooth = M * .42 | 0, nStage = M * .12 | 0, nPalm = M * .14 | 0;
-    var cols = [[230, 60, 50], [60, 190, 200], [240, 190, 60], [230, 230, 235]];
-    for (; k < nGround; k++) { var gx = (R() - .5) * 2.8, gz = (R() - .5) * 2.0, road = Math.abs(gz - .55) < .07 || Math.abs(gx + .95) < .06, f = .7 + .3 * R(); if (road) put(t, k, gx, G, gz, 0, 60, 60, 66, 230); else put(t, k, gx, G, gz, 0, 205 * f, 160 * f, 110 * f, 140); }
-    var booths = [];
-    for (var i = 0; i < 6; i++) for (var j = 0; j < 4; j++) booths.push([-.8 + i * .26, -.75 + j * .3, cols[(i + j * 2) % 4]]);
-    for (var q = 0; q < nBooth; q++, k++) {
-      var b = booths[q % booths.length], w = .17, h = .16, u = R(), v = R(), face = R(), x, y, z, c, a = 235;
-      if (face < .45) { x = b[0] + (u - .5) * w; z = b[1] + (v - .5) * w; y = G + h + (.5 - Math.abs(u - .5)) * .07; c = b[2]; }       // roof, slightly peaked
-      else { var side = (R() * 4) | 0, e = (u - .5) * w; x = b[0] + (side === 0 ? e : side === 1 ? w / 2 : side === 2 ? e : -w / 2); z = b[1] + (side === 0 ? w / 2 : side === 1 ? e : side === 2 ? -w / 2 : e); y = G + v * h; c = [245, 238, 225]; a = 170; if (v > .82) c = [b[2][0], b[2][1], b[2][2]]; }
-      put(t, k, x, y, z, 0, c[0], c[1], c[2], a);
-    }
-    for (q = 0; q < nStage; q++, k++) { // the stage: a platform and a screen between two towers
-      var p = R(), sx, sy, sz, sc;
-      if (p < .35) { sx = .95 + (R() - .5) * .7; sz = -.55 + (R() - .5) * .3; sy = G + .06; sc = [120, 60, 150]; }
-      else if (p < .8) { sx = .95 + (R() - .5) * .6; sy = G + .1 + R() * .4; sz = -.7; sc = [255, 80, 160]; }
-      else { sx = .95 + (R() < .5 ? -.36 : .36); sy = G + R() * .62; sz = -.7 + (R() - .5) * .04; sc = [220, 220, 230]; }
-      put(t, k, sx, sy, sz, 0, sc[0], sc[1], sc[2], 230);
-    }
-    var palms = [[-1.2, .8], [-.2, .85], [.55, .2], [1.25, .75], [1.2, -.1], [-1.25, -.6]];
-    for (q = 0; q < nPalm; q++, k++) {
-      var pm = palms[q % palms.length], top = G + .55;
-      if (R() < .35) { var tv = R(); put(t, k, pm[0] + Math.sin(tv * 2) * .03, G + tv * .55, pm[1], 0, 140, 95, 55, 255); }
-      else { var fa = ((R() * 7) | 0) / 7 * 6.283 + R() * .1, fl = R() * .3; put(t, k, pm[0] + Math.cos(fa) * fl, top - fl * fl * 1.2, pm[1] + Math.sin(fa) * fl, 0, 50, 170, 70, 255); }
-    }
-    for (; k < M; k++) { // the balloon, red and white stripes, over the corner
-      var bt = R() * 6.283, bz = 2 * R() - 1, bs = Math.sqrt(1 - bz * bz), stripe = Math.floor((bt / 6.283) * 12) % 2;
-      var by = bz > -.85 ? .9 + bz * .26 : .9 - .26 + (bz + .85) * .4;
-      put(t, k, -.95 + bs * Math.cos(bt) * .22, by, -.65 + bs * Math.sin(bt) * .22, 0, stripe ? 240 : 235, stripe ? 60 : 232, stripe ? 55 : 228, 230);
-    }
-    return seal(t);
-  }
-  // the end: a ringed planet
-  function shPlanet() {
-    var t = blank(), nS = M * .46 | 0, k = 0;
-    for (; k < nS; k++) {
-      var th = R() * 6.283, z = 2 * R() - 1, rr = Math.sqrt(1 - z * z), band = .5 + .5 * Math.sin(z * 10 + Math.sin(th * 2) * .5), f = .45 + .55 * R();
-      put(t, k, rr * Math.cos(th), z, rr * Math.sin(th), 0, (110 + 40 * band) * f, (90 + 140 * band) * f, 255 * f, 230);
-    }
-    for (; k < M; k++) {
-      var a = R() * 6.283, r0 = 1.4 + Math.pow(R(), .85) * .95; if (r0 > 1.86 && r0 < 1.95) r0 += .12;
-      var f2 = .3 + .7 * R(); put(t, k, r0 * Math.cos(a), (R() - .5) * .014, r0 * Math.sin(a), 0, 200 * f2, 195 * f2, 255 * f2, 200);
-    }
-    return seal(t);
-  }
-  // a project's real screen, as a mosaic of particles that then gives way to the sharp picture
-  var QW = 3.7;
-  function shScreen(img) {
-    var t = blank(), asp = img.naturalWidth / img.naturalHeight, W = QW, H = W / asp;
-    var cols = Math.floor(Math.sqrt(M * asp)), rows = Math.floor(M / cols);
-    var c = document.createElement('canvas'); c.width = cols; c.height = rows; var x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(img, 0, 0, cols, rows);
-    var d = x.getImageData(0, 0, cols, rows).data, k = 0;
-    for (var r = 0; r < rows; r++) for (var q = 0; q < cols; q++, k++) { var i = (r * cols + q) * 4; put(t, k, ((q + .5) / cols - .5) * W, (.5 - (r + .5) / rows) * H, 0, 0, d[i], d[i + 1], d[i + 2], 255); }
-    for (; k < M; k++) put(t, k, (R() - .5) * W, (R() - .5) * H, 0, 0, 0, 0, 0, 0);
-    t.cell = W / cols; t.W = W; t.H = H;
-    return seal(t);
-  }
-
-  function upload(t) {
-    var pt = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, pt);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, TW, TH, 0, gl.RGBA, gl.FLOAT, t.p);
-    [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(function (p) { gl.texParameteri(gl.TEXTURE_2D, p, gl.NEAREST); });
-    var ct = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, ct);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, TW, TH, 0, gl.RGBA, gl.UNSIGNED_BYTE, t.c);
-    [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(function (p) { gl.texParameteri(gl.TEXTURE_2D, p, gl.NEAREST); });
-    t.pt = pt; t.ct = ct; t.p = null; t.c = null;
-    return t;
-  }
-  function freeTarget(t) { if (t) { gl.deleteTexture(t.pt); gl.deleteTexture(t.ct); } }
-  function imageTexture(img) {
-    var tx = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tx);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, img);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    var aniso = gl.getExtension('EXT_texture_filter_anisotropic'); if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, 8);
-    return tx;
-  }
-
-  /* the shapes: 0 the first screen, 1–NP the projects' emblems, END the ringed planet, then the projects' real screens */
-  // size: point size in world units, vari: random size spread, hard: crisp mosaic dots, nom: footprint used to fit the layout
-  var NP = PROJ.length, END = NP + 1;
-  var ST = [
-    { n: 'tess', four: 1, size: .0135, vari: 1, hard: 0, nom: [4.3, 4.3] },
-    { n: 'globe', size: .0125, vari: 1, hard: 0, nom: [2.9, 2.9] },
-    { n: 'grill', size: .013, vari: 1, hard: 0, nom: [2.6, 2.9] },
-    { n: 'qr', size: .012, vari: .8, hard: 0, nom: [3.5, 3.5] },
-    { n: 'ring', size: .0125, vari: 1, hard: 0, nom: [2.9, 2.9] },
-    { n: 'deck', size: .012, vari: .8, hard: 0, nom: [3.6, 2.3] },
-    { n: 'coal', size: .012, vari: 1, hard: 0, nom: [3.0, 2.4] },
-    { n: 'diorama', size: .0115, vari: .8, hard: 0, nom: [3.2, 2.6] },
-    { n: 'pie', size: .013, vari: .9, hard: 0, nom: [2.9, 2.2] },
-    { n: 'planet', size: .012, vari: 1, hard: 0, nom: [5.3, 3.0] },
-    { n: 'alliance', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [233, 196, 106] },
-    { n: 'bbqfest', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 90, 54] },
-    { n: 'doctor', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 77, 90] },
-    { n: 'uni', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 107, 122] },
-    { n: 'bbqpres', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 138, 43] },
-    { n: 'mhc', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [242, 184, 75] },
-    { n: 'fest3d', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [94, 234, 212] },
-    { n: 'pizza', screen: 1, hard: 1, nom: [QW, QW / 1.6], acc: [255, 193, 69] }
-  ];
-  function stIdx(n) { for (var i = 0; i < ST.length; i++) if (ST[i].n === n) return i; return -1; }
-  var SCATTER = upload(shScatter()), SCAT = { size: .012, vari: 1, hard: 0 };
-  [shTess, shGlobe, shGrill, shQR, shRing, shDeck, shCoal, shDiorama, shPizza, shPlanet].forEach(function (fn, i) { ST[i].t = upload(fn()); });
-
-  /* ---- maths ---- */
   function persp(fov, asp, n, f) { var t = 1 / Math.tan(fov / 2), nf = 1 / (n - f); return new Float32Array([t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) * nf, -1, 0, 0, 2 * f * n * nf, 0]); }
   function look(e, c) {
     var z = nrm([e[0] - c[0], e[1] - c[1], e[2] - c[2]]), x = nrm([z[2], 0, -z[0]]), y = cross(z, x);
@@ -1324,40 +1264,79 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     var m = [[cz * a[0][0] - sz * a[1][0], cz * a[0][1] - sz * a[1][1], cz * a[0][2] - sz * a[1][2]], [sz * a[0][0] + cz * a[1][0], sz * a[0][1] + cz * a[1][1], sz * a[0][2] + cz * a[1][2]], a[2]];
     return new Float32Array([m[0][0] * s, m[1][0] * s, m[2][0] * s, 0, m[0][1] * s, m[1][1] * s, m[2][1] * s, 0, m[0][2] * s, m[1][2] * s, m[2][2] * s, 0, tx, ty, tz, 1]);
   }
+  function mul4(m, v) { return [m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12] * v[3], m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13] * v[3], m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14] * v[3], m[3] * v[0] + m[7] * v[1] + m[11] * v[2] + m[15] * v[3]]; }
+  function mix(a, b, t) { return a + (b - a) * t; }
 
-  /* ---- layout: where the shape sits beside (or above) the words of each section ---- */
-  var FOV = 40 * D2R, CZ = 6, W = 1, H = 1, PR = 1, proj, mob = false, REG = [];
+  /* ---- size ---- */
+  var FOV = 48 * D2R, W = 1, H = 1, PR = 1, proj, mob = false;
   function resize() {
     PR = Math.min(window.devicePixelRatio || 1, small ? 1.75 : 2);
-    W = canvas.clientWidth || innerWidth; H = canvas.clientHeight || innerHeight; // the canvas's own size (no scrollbar)
+    W = canvas.clientWidth || innerWidth; H = canvas.clientHeight || innerHeight;
     canvas.width = Math.round(W * PR); canvas.height = Math.round(H * PR);
     gl.viewport(0, 0, canvas.width, canvas.height);
-    proj = persp(FOV, W / H, .1, 100);
     mob = W < 761 || W / H <= 1; // same breakpoint as the CSS
-    var vhW = 2 * CZ * Math.tan(FOV / 2), vwW = vhW * W / H, rtl = root.dir === 'rtl';
-    function region(l, r, t, b) { return { x: ((l + r) / 2 / W - .5) * vwW, y: (.5 - (t + b) / 2 / H) * vhW, w: Math.max(1, r - l) / W * vwW, h: Math.max(1, b - t) / H * vhW }; }
-    REG = secs.map(function (el, i) {
-      var box = el.querySelector('.txt, .hero-in') || el.querySelector('.kick'), top = el.offsetTop, rc = box.getBoundingClientRect(), bt = rc.top + scrollY - top;
-      if (i === secs.length - 1) bt = el.querySelector('.kick').getBoundingClientRect().top + scrollY - top;
-      if (mob) return region(10, W - 10, 58, Math.max(160, bt - 14));
-      if (i === 0) return rtl ? region(40, W * .62, 60, H - 60) : region(W * .38, W - 40, 60, H - 60);
-      if (i === secs.length - 1) return region(0, W, 40, Math.max(200, bt - 20));
-      return rtl ? region(56, rc.left - 40, 70, H - 70) : region(rc.right + 40, W - 56, 70, H - 70);
+    FOV = (mob ? 64 : 48) * D2R;
+    proj = persp(FOV, W / H, .1, 160);
+  }
+  // phones: the 3D fills the space between the top bar and the words of the section on screen
+  var mobArea = { y: 1.2, h: 3.6 };
+  function measureMob() {
+    if (!mob) return;
+    var i = clamp(Math.round(cam.p), 0, NS - 1), el = secs[i], st = el.getBoundingClientRect().top, bt = H;
+    [].forEach.call(el.querySelectorAll('.txt, .hero-in, .hint, .kick'), function (b) { var r = b.getBoundingClientRect(); if (r.height) bt = Math.min(bt, r.top - st); });
+    var top = 64, bot = Math.max(top + 120, bt - 14), vh = 2 * DIST * Math.tan(FOV / 2);
+    mobArea.y = (.5 - (top + bot) / 2 / H) * vh; mobArea.h = (bot - top) / H * vh * .92;
+  }
+
+  /* ---- the project screens ---- */
+  var SCR = PROJ.map(function (n, j) {
+    var el = secs[j + 1], acc = (getComputedStyle(el).getPropertyValue('--acc').trim() || '#8be9ff').replace('#', '');
+    return { n: n, i: j + 1, tex: null, asp: 1.6, set: null, scan: 1, ac: [parseInt(acc.slice(0, 2), 16) / 255, parseInt(acc.slice(2, 4), 16) / 255, parseInt(acc.slice(4, 6), 16) / 255] };
+  });
+  var blank = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, blank); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([9, 10, 14, 255]));
+  function imageTexture(img) {
+    var tx = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tx);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    var an = gl.getExtension('EXT_texture_filter_anisotropic'); if (an) gl.texParameterf(gl.TEXTURE_2D, an.TEXTURE_MAX_ANISOTROPY_EXT, 8);
+    return tx;
+  }
+  // wide pictures for computers, portrait mockups for phones; the one nearest the camera loads first, nothing waits
+  var wantSet = null;
+  function loadImg(src) { return new Promise(function (ok, no) { var i = new Image(); i.onload = function () { (i.decode ? i.decode() : Promise.resolve()).catch(function () {}).then(function () { ok(i); }); }; i.onerror = no; i.src = src; }); }
+  function loadShots(phone) {
+    var set = phone ? 'm' : 'd'; if (wantSet === set) return; wantSet = set;
+    var cur = clamp(active - 1, 0, SCR.length - 1), order = SCR.slice().sort(function (a, b) { return Math.abs(a.i - 1 - cur) - Math.abs(b.i - 1 - cur); });
+    order.forEach(function (s) {
+      loadImg('img/stage/' + (phone ? 'm-' : '') + s.n + '.jpg').then(function (img) {
+        if (wantSet !== set) return;
+        if (s.tex) gl.deleteTexture(s.tex);
+        s.tex = imageTexture(img); s.asp = img.naturalWidth / img.naturalHeight; s.set = set;
+      }, function (err) { console.warn('Could not load the screens of ' + s.n, err); });
     });
   }
-  function fit(st, rg) { return Math.min(rg.w / st.nom[0], rg.h / st.nom[1], 1.25); }
+  // where a screen floats: off to the side of the tunnel, swinging to the front as the camera reaches its stop
+  function place(s, c, t) {
+    // it swings in as the camera approaches, and gets out of the way quickly once the camera starts to pass it
+    var u = clamp(c <= s.i ? 1 - (s.i - c) * 1.05 : 1 - (c - s.i) * 2.8, 0, 1), e = u * u * (3 - 2 * u), sg = s.i % 2 ? 1 : -1, rtl = root.dir === 'rtl' ? -1 : 1;
+    var xs = sg * (mob ? 3.3 : 5.5), ys = ((s.i * 7) % 3 - 1) * (mob ? 1.5 : 1.3), rys = -sg * .95;
+    var xf = mob ? 0 : 1.3 * rtl, yf = mob ? mobArea.y : .25, ryf = (mob ? 0 : -.16 * rtl) + mx * .14 * e + spin.tilt * e, rxf = my * .08 * e + spin.tiltX * e;
+    var wq = mob ? 3.2 : 4.4, hq = wq / s.asp;
+    if (mob && hq > mobArea.h) { hq = mobArea.h; wq = hq * s.asp; }
+    return { x: mix(xs, xf, e), y: mix(ys, yf, e) + Math.sin(t * .7 + s.i) * .05 * (1 - e * .6), z: zOf(s.i) - DIST, rx: mix(0, rxf, e), ry: mix(rys, ryf, e), e: e, w: wq, h: hq };
+  }
 
-  /* ---- dragging spins the shape ---- */
-  // With a mouse, a drag starts on the empty space around the words (so text can still be selected).
-  // On a touch screen, an up-or-down swipe scrolls as usual; a swipe that starts sideways belongs to the shape
-  // (the sections allow only vertical panning), and from then on it can move in any direction.
-  var spin = { id: null, x: 0, y: 0, moved: 0, vx: 0, vy: 0, yaw: 0, pitch: 0, tilt: 0, tiltX: 0 };
+  /* ---- dragging: turns the tesseract, tilts a screen ---- */
+  var spin = { id: null, x: 0, y: 0, moved: 0, vx: 0, yaw: 0, pitch: 0, tilt: 0, tiltX: 0 };
   addEventListener('pointerdown', function (e) {
     var t = e.target, mouse = e.pointerType === 'mouse';
     if (!gal.hidden || (mouse && e.button !== 0)) return;
-    if (mouse ? !(t.classList && t.classList.contains('sec')) : (t.closest && t.closest('a, button, input, .gal, .strip, .hud, .dots'))) return;
-    if (mouse) e.preventDefault();
-    spin.id = e.pointerId; spin.x = e.clientX; spin.y = e.clientY; spin.moved = 0; spin.vx = spin.vy = 0;
+    if (mouse ? !(t.classList && t.classList.contains('sec')) : (t.closest && t.closest('a, button, input, .gal, .strip, .hud, .depth, .chap'))) return;
+    spin.id = e.pointerId; spin.x = e.clientX; spin.y = e.clientY; spin.moved = 0; spin.vx = 0;
   });
   addEventListener('pointermove', function (e) {
     if (spin.id !== e.pointerId) return;
@@ -1365,186 +1344,96 @@ html.opening .on .fade { opacity: 0 !important; transform: translateY(16px) !imp
     spin.moved += Math.abs(dx) + Math.abs(dy);
     if (spin.moved < 6) return;
     if (!dragging) { dragging = true; root.classList.add('dragging'); }
-    var rtl = root.dir === 'rtl' ? -1 : 1;
-    spin.vx = dx * .0075 * rtl; spin.vy = dy * .005;
-    spin.yaw += spin.vx; spin.pitch = clamp(spin.pitch + spin.vy, -.9, .9);
+    spin.vx = dx * .008; spin.yaw += spin.vx; spin.pitch = clamp(spin.pitch + dy * .005, -.9, .9);
     spin.tilt = clamp(spin.tilt + dx * .004, -.55, .55); spin.tiltX = clamp(spin.tiltX + dy * .003, -.35, .35);
   }, { passive: true });
-  function endSpin(e) {
-    if (spin.id !== e.pointerId) return;
-    spin.id = null; root.classList.remove('dragging');
-    setTimeout(function () { dragging = false; }, 0);
-  }
+  function endSpin(e) { if (spin.id !== e.pointerId) return; spin.id = null; root.classList.remove('dragging'); setTimeout(function () { dragging = false; }, 0); }
   addEventListener('pointerup', endSpin, { passive: true });
   addEventListener('pointercancel', endSpin, { passive: true });
-
-  /* ---- what each shape does on its own, plus the visitor's spin ---- */
   var mx = 0, my = 0, tmx = 0, tmy = 0;
   addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') { tmx = e.clientX / innerWidth * 2 - 1; tmy = e.clientY / innerHeight * 2 - 1; } }, { passive: true });
-  function placeOf(i, rg, t) {
-    var st = ST[i], s = fit(st, rg), sp = reduce ? .15 : 1, rx = 0, ry = 0, rz = 0, yw = spin.yaw, pt = spin.pitch;
-    switch (st.n) {
-      case 'tess': rx = pt * .4; break;
-      case 'globe': ry = -46.72 * D2R + t * .14 * sp + yw; rx = .34 + pt; break;
-      case 'qr': ry = Math.sin(t * .5 * sp) * .38 + yw; rx = pt; break;
-      case 'ring': rx = -.42 + pt; ry = yw; break;
-      case 'grill': ry = t * .25 * sp + yw; rx = .32 + pt; break;
-      case 'deck': ry = Math.sin(t * .4 * sp) * .3 - .22 + yw; rx = -.06 + pt * .6; break;
-      case 'coal': ry = t * .18 * sp + yw; rx = .25 + pt; rz = Math.sin(t * .3 * sp) * .05; break;
-      case 'diorama': ry = t * .16 * sp + yw - .5; rx = .62 + pt * .5; break;
-      case 'pie': ry = t * .9 * sp + yw; rx = .78 + pt * .5; break; // it spins
-      case 'planet': ry = t * .1 * sp + yw; rx = .4 + pt * .5; rz = -.26; break;
-      default: ry = spin.tilt + mx * .1; rx = spin.tiltX + my * .06; // project screens tilt toward the hand
-    }
-    return { m: model(rg.x, rg.y, 0, rx, ry, rz, s), s: s };
-  }
-
-  /* ---- transitions: time-based, so one swipe is enough to change the scene ---- */
-  // a = shape shown, b = shape it is heading to; ra / rb = the sections whose space they use
-  var X = { a: 0, b: 0, ra: 0, rb: 0, t0: 0, dur: 1, done: true }, queued = null, now = performance.now();
-  function mixNow() { return X.done ? 0 : clamp((now - X.t0) / (X.dur * 1000), 0, 1); }
-  function goTo(k, reg, dur) {
-    if (X.done) {
-      if (X.a === k && X.ra === reg) return;
-      X = { a: X.a, b: k, ra: X.ra, rb: reg, t0: now, dur: reduce ? .01 : dur || 1.25, done: false };
-      return;
-    }
-    // already moving: finish this one quickly, then go on to the latest request
-    if (X.b === k && X.rb === reg) { queued = null; return; }
-    if (queued && queued[0] === k && queued[1] === reg) return;
-    queued = [k, reg, dur];
-    var m = mixNow(), left = (1 - m) * X.dur;
-    if (left > .4) { X.dur = .4 / (1 - m); X.t0 = now - m * X.dur * 1000; }
-  }
-  // A project plays a loop: its emblem (the globe, the QR code, the focus timer, the grill, the slides, the pizza) for a
-  // moment, then its real screens for longer, then the emblem again. phase 0 = emblem, 1 = screens; it restarts on every arrival.
-  var phase = 0, phaseSec = -1, heldFrom = 0, HOLD = [1600, 6000]; // ms each phase holds once it has formed
-  // a project whose screens haven't arrived yet simply keeps its emblem
-  function sectionShape(i) { if (i === 0) return 0; if (i === secs.length - 1) return END; var sc = END + i; return phase && ST[sc].t ? sc : i; }
-
-  /* ---- load the project screens (wide ones for computers, portrait mockups for phones) ---- */
-  // Nothing waits for them: the page starts at once and each project shows its screens as soon as they arrive,
-  // the one on screen first.
-  var wantSet = null;
-  function loadImg(src) { return new Promise(function (ok, no) { var i = new Image(); i.onload = function () { (i.decode ? i.decode() : Promise.resolve()).catch(function () {}).then(function () { ok(i); }); }; i.onerror = no; i.src = src; }); }
-  function loadShots(phone) {
-    var set = phone ? 'm' : 'd'; if (wantSet === set) return; wantSet = set;
-    var cur = clamp(active - 1, 0, NP - 1), order = PROJ.map(function (n, j) { return j; });
-    order.sort(function (a, b) { return Math.abs(a - cur) - Math.abs(b - cur); });
-    order.forEach(function (j) {
-      loadImg('img/stage/' + (phone ? 'm-' : '') + PROJ[j] + '.jpg').then(function (img) {
-        if (wantSet !== set) return; // the window changed shape while this loaded
-        var st = ST[END + 1 + j], t = shScreen(img);
-        freeTarget(st.t); if (st.tex) gl.deleteTexture(st.tex);
-        st.t = upload(t); st.size = t.cell * 1.18; st.vari = 0; st.tex = imageTexture(img); st.asp = t.W / t.H; st.nom = [t.W, t.H];
-      }, function (err) { console.warn('Could not load the screens of ' + PROJ[j], err); });
-    });
-  }
-  var fontsReady = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('600 168px "Space Grotesk"'), document.fonts.load('600 230px "Space Grotesk"'), document.fonts.load('500 12px "JetBrains Mono"')]).catch(function () {}) : Promise.resolve();
-  var ready = false, introT = 0, introAt = 0;
-  resize();
-  markSections();
-  loadShots(mob);
-  // fonts are waited for (briefly) because the timer and the slides write words in particles
-  Promise.race([fontsReady, new Promise(function (ok) { setTimeout(ok, 2500); })]).then(function () {
-    var iR = stIdx('ring'), iD = stIdx('deck');
-    freeTarget(ST[iR].t); ST[iR].t = upload(shRing()); // redrawn now that the display font has loaded
-    freeTarget(ST[iD].t); ST[iD].t = upload(shDeck());
-    ready = true; resize();
-    status.innerHTML = 'WebGL2 · ' + N.toLocaleString('en-US') + ' <span class="en">particles</span><span class="ar">جسيم</span>';
-    var k = markSections(); phaseSec = k; phase = reduce ? 1 : 0; heldFrom = now;
-    X = { a: sectionShape(k), b: sectionShape(k), ra: k, rb: k, t0: now, dur: 1, done: true };
-  });
 
   /* ---- draw ---- */
-  var last = performance.now(), time = 0, reveal = 0, revealFor = -1, perf = { t: 0, n: 0 };
+  var cam = { p: -1.3 }, last = performance.now(), time = 0, perf = { t: 0, n: 0 }, curScr = null, hot = 0, view, quadRect = null;
+  resize(); loadShots(mob);
+  status.innerHTML = 'WebGL2 · ' + NPTS.toLocaleString('en-US') + ' <span class="en">particles</span><span class="ar">جسيم</span>';
   gl.disable(gl.DEPTH_TEST);
-  function bindTarget(unitP, unitC, t) { gl.activeTexture(gl.TEXTURE0 + unitP); gl.bindTexture(gl.TEXTURE_2D, t.pt); gl.activeTexture(gl.TEXTURE0 + unitC); gl.bindTexture(gl.TEXTURE_2D, t.ct); }
-  var view = look([0, 0, CZ], [0, 0, 0]);
+  function points(o, m, four) {
+    gl.uniformMatrix4fv(U1.uM, false, m); gl.uniform1f(U1.uFour, four ? 1 : 0);
+    gl.bindVertexArray(o.v); gl.drawArrays(gl.POINTS, 0, o.n);
+  }
   function frame(ts) {
     requestAnimationFrame(frame);
-    now = ts || performance.now();
-    var dt = Math.min(.05, (now - last) / 1000); last = now; time += dt;
+    var now = ts || performance.now(), dt = Math.min(.05, (now - last) / 1000); last = now; time += dt;
     perf.t += dt; perf.n++; if (perf.n >= 90) { if (perf.n / perf.t < 40 && PR > 1) { PR = Math.max(1, PR - .25); canvas.width = Math.round(W * PR); canvas.height = Math.round(H * PR); gl.viewport(0, 0, canvas.width, canvas.height); } perf.t = 0; perf.n = 0; }
     var k = markSections();
-    mx += (tmx - mx) * .06; my += (tmy - my) * .06;
-    // spin keeps going after the hand lets go, then settles; screens ease back to face the visitor
-    if (spin.id === null) { spin.yaw += spin.vx; spin.vx *= .94; spin.pitch += spin.vy; spin.vy *= .9; spin.pitch *= .985; spin.tilt *= .9; spin.tiltX *= .9; }
     cursor();
-    if (!ready || !opened) { draw(SCATTER, SCATTER, 0, null, null, SCAT, SCAT); return; } // the particles gather once the opening is done
+    if (mob && perf.n % 15 === 0) measureMob();
+    mx += (tmx - mx) * .05; my += (tmy - my) * .05;
+    if (spin.id === null) { spin.yaw += spin.vx; spin.vx *= .94; spin.pitch *= .97; spin.tilt *= .92; spin.tiltX *= .92; }
+    // the camera follows the scroll smoothly; before the opening ends it waits just outside the tunnel
+    var target = opened ? scrollY / Math.max(1, innerHeight) : -1.3, prev = cam.p;
+    cam.p += (target - cam.p) * (1 - Math.exp(-dt * (reduce ? 40 : 3.4)));
+    var speed = Math.abs(cam.p - prev) / Math.max(dt, .001);
+    if (cfill) cfill.style.transform = 'scaleX(' + clamp(cam.p / (NS - 1), 0, 1).toFixed(4) + ')';
+    var cz = -cam.p * S, sway = reduce ? 0 : 1;
+    view = look([mx * .55 * sway, -my * .32 * sway + Math.sin(time * .4) * .05 * sway, cz], [mx * .12 * sway, -my * .06 * sway, cz - 12]);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); // see-through: the category's colour glows behind
 
-    // each phase holds once it has formed (and for as long as someone is turning the shape), then the other comes back
-    if (k !== phaseSec) { phaseSec = k; phase = reduce ? 1 : 0; }
-    if (spin.id !== null) heldFrom = now;
-    if (!reduce && k > 0 && k < secs.length - 1 && X.done && X.a === sectionShape(k) && X.ra === k && now - heldFrom > HOLD[phase]) phase = 1 - phase;
-    goTo(sectionShape(k), k, 1.25);
-    var m = mixNow();
-    if (!X.done && m >= 1) { X.done = true; X.a = X.b; X.ra = X.rb; m = 0; heldFrom = now; if (queued) { var q = queued; queued = null; goTo(q[0], q[1], q[2]); m = mixNow(); } }
-    var A = ST[X.a], B = ST[X.b], ra = REG[X.ra], rb = REG[X.rb];
-    var pa = placeOf(X.a, ra, time), pb = placeOf(X.b, rb, time), fromScatter = false;
-    if (introT < 1) { if (!introAt) introAt = now; introT = reduce ? 1 : Math.min(1, (now - introAt) / 2400); if (X.done && introT < 1) { fromScatter = true; m = introT * introT * (3 - 2 * introT); } else introT = 1; heldFrom = now; }
-    var eased = m * m * (3 - 2 * m);
-    if (fromScatter) draw(SCATTER, B.t, m, { m: model(0, 0, 0, 0, 0, 0, 1), s: 1 }, pb, SCAT, B);
-    else draw(A.t, B.t, X.done ? 0 : eased, pa, pb, A, B);
+    // the tunnel, the tesseract and the planet: additive points
+    gl.useProgram(P1); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
+    gl.uniformMatrix4fv(U1.uV, false, view); gl.uniformMatrix4fv(U1.uP, false, proj);
+    gl.uniform1f(U1.uPx, canvas.height / (2 * Math.tan(FOV / 2))); gl.uniform1f(U1.uTime, time); gl.uniform1f(U1.uFar, FAR);
+    gl.uniform1f(U1.uBoost, reduce ? 0 : clamp(speed * .35, 0, 1.4));
+    var sp = reduce ? .2 : 1, rtl = root.dir === 'rtl' ? -1 : 1;
+    gl.uniform4f(U1.uRot, time * .21 * sp + mx * .9 + spin.yaw * 1.3, time * .16 * sp - my * .7 + spin.pitch, time * .11 * sp, time * .07 * sp);
+    points(TUN, model(0, 0, 0, 0, 0, 0, 1), false);
+    gl.uniform1f(U1.uBoost, 0);
+    if (cam.p < 1.6) points(TESS, model(mob ? 0 : 1.95 * rtl, mob ? mobArea.y : .3, zOf(0) - DIST, 0, 0, 0, mob ? Math.min(.95, mobArea.h / 2.9) : .95), true);
+    if (cam.p > NS - 3) points(PLANET, model(0, mob ? mobArea.y : 1.25, zOf(NS - 1) - DIST - 1.2, .4 + spin.pitch * .5, time * .1 * sp + spin.yaw, -.26, mob ? Math.min(.95, mobArea.h / 2.2) : 1.0), false);
 
-    // the sharp picture sweeps in once the mosaic has formed
-    var want = X.done && A.screen && !fromScatter ? X.a : -1;
-    if (want !== revealFor && reveal <= .001) revealFor = want;
-    reveal = clamp(reveal + (want === revealFor && want >= 0 ? dt / (reduce ? .01 : .7) : -dt / .2), 0, 1);
-    if (reveal > 0 && revealFor >= 0) {
-      var S = ST[revealFor], pl = placeOf(revealFor, REG[X.ra], time);
-      gl.useProgram(P2); gl.bindVertexArray(vaoQuad);
-      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      gl.uniformMatrix4fv(U2.uM, false, pl.m); gl.uniformMatrix4fv(U2.uV, false, view); gl.uniformMatrix4fv(U2.uP, false, proj);
-      gl.uniform2f(U2.uS, S.nom[0], S.nom[1]); gl.uniform1f(U2.uR, reveal); gl.uniform1f(U2.uAsp, S.asp);
-      gl.uniform3f(U2.uAc, S.acc[0] / 255, S.acc[1] / 255, S.acc[2] / 255);
-      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, S.tex); gl.uniform1i(U2.uT, 0);
+    // the screens, farthest first, alpha-blended
+    gl.useProgram(P2); gl.bindVertexArray(vaoQuad);
+    gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.uniformMatrix4fv(U2.uV, false, view); gl.uniformMatrix4fv(U2.uP, false, proj);
+    gl.uniform1f(U2.uFar, FAR); gl.uniform1f(U2.uK, K); gl.uniform1i(U2.uT, 0); gl.activeTexture(gl.TEXTURE0);
+    var cur = Math.round(cam.p), here = (cur >= 1 && cur <= SCR.length && Math.abs(cam.p - cur) < .3) ? SCR[cur - 1] : null;
+    if (here !== curScr) { if (here) here.scan = 0; curScr = here; }
+    hot += ((overScreen ? 1 : 0) - hot) * .15;
+    var list = SCR.filter(function (s) { return Math.abs(s.i - cam.p) < 5.2; }).sort(function (a, b) { return a.i < b.i ? 1 : -1; });
+    quadRect = null;
+    list.forEach(function (s) {
+      if (s.scan < 1) s.scan = Math.min(1, s.scan + dt / (reduce ? .01 : .9));
+      var pl = place(s, cam.p, time), m = model(pl.x, pl.y, pl.z, pl.rx, pl.ry, 0, 1);
+      gl.uniformMatrix4fv(U2.uM, false, m); gl.uniform2f(U2.uS, pl.w * K, pl.h * K);
+      gl.uniform1f(U2.uAsp, s.asp); gl.uniform1f(U2.uA, mix(.5, 1, pl.e)); gl.uniform1f(U2.uScan, s.scan); gl.uniform1f(U2.uHot, s === curScr ? .4 + .6 * hot : 0);
+      gl.uniform1f(U2.uHas, s.tex ? 1 : 0); gl.uniform3f(U2.uAc, s.ac[0], s.ac[1], s.ac[2]);
+      gl.bindTexture(gl.TEXTURE_2D, s.tex || blank);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      gl.bindVertexArray(null);
-    }
-    var over = onShot(cx, cy);
+      if (s === curScr) quadRect = screenRect(m, pl.w, pl.h);
+    });
+    gl.bindVertexArray(null);
+    var over = !!(quadRect && cx > quadRect[0] && cx < quadRect[2] && cy > quadRect[1] && cy < quadRect[3]);
     if (over !== overScreen) { overScreen = over; root.classList.toggle('over-shot', over); }
   }
-  // the space a project's picture takes on screen (its emblem sits in the same place): clicking it opens the project's screens
-  function onShot(x, y) {
-    var k = active, rg = REG[k];
-    if (!ready || !rg || k < 1 || k > NP) return false;
-    var st = ST[END + k], s = fit(st, rg), u = H / (2 * CZ * Math.tan(FOV / 2)); // pixels per world unit
-    var hw = st.nom[0] * s * u / 2, hh = st.nom[1] * s * u / 2, px = W / 2 + rg.x * u, py = H / 2 - rg.y * u;
-    return x > px - hw && x < px + hw && y > py - hh && y < py + hh;
+  // where the current screen is on the page, in pixels (to click it and to show "OPEN" on the cursor)
+  function screenRect(m, w, h) {
+    var pv = [], l = 1e9, t = 1e9, r = -1e9, b = -1e9;
+    [[-.5, -.5], [.5, -.5], [-.5, .5], [.5, .5]].forEach(function (q) {
+      var c = mul4(proj, mul4(view, mul4(m, [q[0] * w, q[1] * h, 0, 1]))), x = (c[0] / c[3] * .5 + .5) * W, y = (.5 - c[1] / c[3] * .5) * H;
+      l = Math.min(l, x); r = Math.max(r, x); t = Math.min(t, y); b = Math.max(b, y);
+    });
+    return [l, t, r, b];
   }
-  function draw(ta, tb, m, pa, pb, A, B) {
-    view = look([mx * .22, -my * .14, CZ], [mx * .06, -my * .04, 0]);
-    gl.clearColor(.012, .012, .024, 1); gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.useProgram(P1); gl.bindVertexArray(vaoPts);
-    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
-    bindTarget(0, 2, ta); bindTarget(1, 3, tb);
-    gl.uniform1i(U1.uPA, 0); gl.uniform1i(U1.uPB, 1); gl.uniform1i(U1.uCA, 2); gl.uniform1i(U1.uCB, 3);
-    gl.uniform1i(U1.uTW, TW); gl.uniform1f(U1.uMix, m); gl.uniform1f(U1.uTime, time);
-    gl.uniform1f(U1.uSwirl, reduce ? 0 : 1); gl.uniform1f(U1.uPx, canvas.height / (2 * Math.tan(FOV / 2)));
-    gl.uniform1f(U1.uScan, Math.sin(time * .9) * 1.2);
-    var I = pa || { m: model(0, 0, 0, 0, 0, 0, 1), s: 1 }, J = pb || I;
-    gl.uniformMatrix4fv(U1.uMA, false, I.m); gl.uniformMatrix4fv(U1.uMB, false, J.m);
-    gl.uniformMatrix4fv(U1.uV, false, view); gl.uniformMatrix4fv(U1.uP, false, proj);
-    var sp = reduce ? .2 : 1;
-    // dragging turns the tesseract through the fourth dimension
-    gl.uniform4f(U1.uRot, time * .21 * sp + mx * .9 + spin.yaw * 1.3, time * .16 * sp - my * .7 + spin.pitch, time * .11 * sp, time * .07 * sp);
-    gl.uniform4f(U1.uA, A.four ? 1 : 0, (A.size || .012) * I.s, A.vari || 0, A.hard || 0);
-    gl.uniform4f(U1.uB, B.four ? 1 : 0, (B.size || .012) * J.s, B.vari || 0, B.hard || 0);
-    gl.drawArrays(gl.POINTS, 0, N);
-    gl.bindVertexArray(null);
-  }
-  // clicking or tapping a project's picture opens its screens (a drag that ends on it does not)
+  // clicking or tapping the screen in front opens its pictures (a drag that ends on it does not)
   addEventListener('click', function (e) {
-    if (!gal.hidden || spin.moved > 6 || !(e.target.classList && e.target.classList.contains('sec'))) return;
-    if (onShot(e.clientX, e.clientY)) open(PROJ[active - 1], 0);
+    if (!gal.hidden || spin.moved > 6 || !(e.target.classList && e.target.classList.contains('sec')) || !curScr || !quadRect) return;
+    if (e.clientX > quadRect[0] && e.clientX < quadRect[2] && e.clientY > quadRect[1] && e.clientY < quadRect[3]) open(curScr.n, 0);
   });
   addEventListener('resize', function () {
     if (canvas.clientWidth === W && canvas.clientHeight === H) return;
-    resize();
-    loadShots(mob);
+    resize(); loadShots(mob);
   });
-  onLang.push(resize);
   requestAnimationFrame(frame);
 })();
 </script>

@@ -1,6 +1,6 @@
 # Fares Elzouhiry — Portfolio
 
-**Websites from another dimension.** A one-page portfolio built around a live particle engine written from scratch in WebGL2: about 41,000 points of light (about 25,000 on phones) that start as a tesseract (a cube rotating through the fourth dimension), become an emblem for each project and then assemble into that project's real pages, and end as a ringed planet. The page opens with a short intro animation and is ten screens: an intro, eight projects grouped by kind (websites, apps, a presentation, 3D modeling and a game) and a contact screen.
+**Websites from another dimension.** A one-page portfolio that is a flight through a tunnel, built on a 3D engine written from scratch in WebGL2. Scrolling flies a camera forward through rings of light; every project's real screen floats in space, swings to the front and turns toward you as you arrive, then the camera flies past it to the next. A 4D tesseract waits at the entrance and a ringed planet at the end. The page opens with a short intro animation and has ten stops: an intro, eight projects grouped by kind (websites, apps, a presentation, 3D modeling and a game) and a contact screen.
 
 - **Live site:** https://fareselzouhiry.github.io/Fares-Elzouhiry/
 - **Repository:** https://github.com/FaresElzouhiry/Fares-Elzouhiry
@@ -10,30 +10,35 @@
 
 ---
 
-## The ten screens
+## The ten stops
 
-Every section is exactly one screen. A flick on a phone, one notch of a mouse wheel, one trackpad swipe or one arrow key moves exactly one section, and the scene changes on its own as each section arrives.
+Every section is exactly one screen and one stop along the tunnel. A flick on a phone, one notch of a mouse wheel, one trackpad swipe or one arrow key moves exactly one stop, and the camera flies there.
 
-| # | Section | Link | What the particles become |
+| # | Stop | Link | What floats in front |
 |---|---|---|---|
 | 0 | Intro | `#top` | A **4D tesseract**: the 32 edges of a four-dimensional cube, rotated in four dimensions and projected into 3D |
-| 1 | Websites · Alliance Investment | `#alliance` | A **globe** of the world's land in light, Saudi Arabia in gold, and a line from Riyadh to each of the 15 other network countries with a pulse running out along it → then **the Alliance home page**, with the **six designs made for the CEO** under it (Gateway was chosen and became the website) |
-| 2 | Websites · BBQ Fest | `#bbqfest` | A **red kettle grill** with flames licking up through the grate and embers rising → then **the light "butcher paper" design on two phones** (the design the client chose), with the three designs and the 3D map under it |
-| 3 | Apps · Doctor Dashboard | `#doctor` | A **QR code** inside a scanner's viewfinder, with a scan line passing over it → then **the dashboard and a student's phone** saying "Checked in", with the dashboard's pages under it |
-| 4 | Apps · University App | `#uni` | A **focus timer**: a ring with a light running round it, minute ticks, and "25:00" written in particles → then **three screens of the app**, with its pages under it |
-| 5 | Presentations · Sport Barbecue | `#bbqpres` | **A stack of slides**, the front one reading "BBQ" and "GRILL · MOVE · MEET", with embers drifting up → then **the cover of model 3, the 3D night stadium**, with more slides under it |
-| 6 | 3D Modeling · MHC Coalline | `#mhc` | **Chunks of coal**, each a solid with flat faces whose edges glow like embers, with sparks rising → then **the six 3D scenes** made for the coal maker (ember, factory line, globe, bag, mountain, shards) |
-| 7 | 3D Modeling · BBQ Fest in 3D | `#fest3d` | **A little model of the festival**: rows of booths with coloured roofs, the stage, palms and a red-and-white balloon → then **the festival modeled in 3D**, from above |
-| 8 | Games · Pizza Spin | `#pizza` | **A spinning pizza**: crust, cheese, pepperoni, peppers and slice cuts, with steam rising → then **the game's split screen**, with its screens under it |
+| 1 | Websites · Alliance Investment | `#alliance` | **The Alliance home page**, with the **six designs made for the CEO** in the gallery (Gateway was chosen and became the website) |
+| 2 | Websites · BBQ Fest | `#bbqfest` | **The light "butcher paper" design** (the one the client chose), with the three designs and the 3D map in the gallery |
+| 3 | Apps · Doctor Dashboard | `#doctor` | **The dashboard and a student's phone** saying "Checked in" |
+| 4 | Apps · University App | `#uni` | **Three screens of the app** |
+| 5 | Presentations · Sport Barbecue | `#bbqpres` | **The cover of model 3, the 3D night stadium** |
+| 6 | 3D Modeling · MHC Coalline | `#mhc` | **The six 3D scenes** made for the coal maker (ember, factory line, globe, bag, mountain, shards) |
+| 7 | 3D Modeling · BBQ Fest in 3D | `#fest3d` | **The festival modeled in 3D**, from above |
+| 8 | Games · Pizza Spin | `#pizza` | **The game's split screen** |
 | 9 | Contact | `#contact` | A **ringed planet** — "Let's build something out of this world." |
 
-Each project's emblem holds for about one and a half seconds (and for as long as you're turning it), then its particles assemble into the project's real screens: first as a mosaic (each particle takes the colour of its pixel), then the sharp picture sweeps in behind a bright scan line. The screens stay for about six seconds, then the particles fly back into the emblem, and the loop carries on while you stay on the section. Clicking or tapping the emblem or the picture, **All screens**, or any thumbnail in the strip opens a gallery of that project's pictures with captions.
+While you are at a stop, the next projects can already be seen hanging further down the tunnel. When you arrive, the screen swings to the front, a line of light scans down it, and it tilts gently toward the mouse. Clicking or tapping it, **All screens**, or any thumbnail opens a gallery of that project's pictures with captions.
 
-- **Visit site:** every project has a **Visit site** button as its main action, in the project's colour with a live dot. It opens the real project in a new tab. On computers the address is shown under the buttons (the Doctor Dashboard notes that it asks for a sign-in); on phones the button runs the full width of the screen.
-- **Grab the shape:** with a mouse, drag anywhere in the empty space. On a phone, swipe sideways (up and down still scrolls). Project screens tilt in 3D and ease back.
-- **On phones**, the emblem and then the picture fill the top of the screen (the picture is a portrait mockup: phones and a laptop window), with the name, one line, the buttons and the page strip underneath.
-- **Opening:** every visit starts with a short opening (about two and a half seconds): the logo draws itself, the name settles, and the five kinds of work light up — Websites, Apps, Presentations, 3D Modeling, Games. A click, tap, scroll or key skips it.
-- **Kinds of work:** the projects are grouped and ordered by kind. The first screen shows five cards (Websites, Apps, Presentations, 3D Modeling, Games) with their projects inside; one tap jumps to any project. Every project carries its kind as a tag ("Websites 1/2"), the top bar lists the five kinds and lights up the one on screen, and the dots on the right are grouped the same way and show each section's name when pointed at.
+- **The words:** on a computer they sit low on the screen — a giant outlined number, the kind of work, the name and one line on the left; the buttons on the right. On phones the 3D fills the space above the words. In Arabic everything is mirrored.
+- **Depth list:** down the right side, every stop with its number, grouped under the five kinds of work; the one you are at lights up in its colour. One click flies there.
+- **Category bar:** along the bottom, a bar fills up as you fly, with the five kinds as stops on it (Websites, Apps, Presentations, 3D, Games); the one you are in lights up, and clicking one flies to its first project. On phones the kinds show as icons.
+- **The tunnel's colours:** the rings take the colour of the kind of work you are passing through, and a bright triple ring marks the gate into each kind. Flying faster makes the tunnel glow brighter.
+- **Chapter cards:** the five kinds of work are chapters. Flying into a new one (from the intro into Websites, from Websites into Apps, and so on) fills the screen for a moment with its name, icon, chapter number ("Chapter 02 / 05") and how many projects it holds, in its colour; the project's words wait until it fades.
+- **Every kind has its own colour and atmosphere:** Websites cyan, Apps violet, Presentations pink, 3D Modeling teal, Games yellow. The glow behind the tunnel slowly shifts to the colour of the kind you are in, the rings take it on, and every project wears it: its category tag (bigger, with the icon), its giant number and a thin bar beside its words.
+- **Visit site:** every project has a **Visit site** button as its main action, in the project's colour with a live dot. It opens the real project in a new tab.
+- **Drag:** with a mouse, drag anywhere in the empty space to turn the tesseract or tilt a screen. On a phone, swipe sideways (up and down still scroll).
+- **Opening:** every visit starts with a short opening (about two and a half seconds): the logo draws itself, the name settles, and the five kinds of work light up. Then the camera flies into the tunnel. A click, tap, scroll or key skips it.
+- **Kinds of work:** the projects are grouped and ordered by kind. The first screen shows five cards (Websites, Apps, Presentations, 3D Modeling, Games) with their projects inside; one tap jumps to any project. Every project carries its kind as a tag ("Websites 1/2").
 - **Pizza Spin plays in the browser:** "Play" opens `play/`, which runs the game with the keyboard for one person (W/S walk, A/D turn, Space to use, F shove, E item, Esc pause; the mouse or A/D for the dough). The second chef is the computer: it joins by itself and stays out of the way. The game file itself is unchanged: `play/keys.js` hands it a virtual controller. With two real controllers, "Two players?" in the game opens the original two-player version.
 - **Language:** visitors whose browser is set to Arabic get the Arabic version straight away; everyone else gets English, and the button in the top bar switches.
 
@@ -60,26 +65,23 @@ Everything is in `index.html` (HTML, CSS and JavaScript) plus the pictures in `i
 
 | Part | How it is done |
 |---|---|
-| Particles | 40,960 on computers, 24,576 on phones. Every shape is stored on the graphics card as a texture of positions and a texture of colours; one draw call renders them all |
-| Morphing | The vertex shader reads the particle's place in two shapes and blends between them; each particle starts at a slightly different moment, and a swirl is added mid-flight |
-| Sections | CSS scroll snapping (`scroll-snap-type: y mandatory` with `scroll-snap-stop: always`), so a flick never skips a project. Browsers snap a short wheel scroll back to where it started, so the page reads the wheel and the keyboard itself and moves one section per notch or key; a trackpad's coasting is ignored until a pause or a fresh swipe |
-| Transitions | Time-based, not tied to the scroll: when a section arrives, the particles fly to its emblem in about 1.25 seconds, hold it, then fly into the project's screens, and back again in a loop. If you move on before they land, they finish quickly and carry on to where you are |
+| The tunnel | About 29,000 points on computers (fewer on phones): rings every 1.75 units along the tunnel, coloured by the kind of work they lead to, a triple ring at the gate of each kind, and dust drifting all along it. One draw call; points fade in the distance and right in front of the camera |
+| The camera | Each stop is 13 units further down the tunnel. The camera's position follows the scroll smoothly (it eases toward where the page is), and sways a little with the mouse |
+| The screens | Each project's picture is a textured quad with rounded corners, a thin glowing edge in the project's colour and a scan of light when it arrives. It waits off to the side of the tunnel, swings to the front as the camera approaches, and gets out of the way quickly once the camera starts to pass it. Drawn farthest first, with fog |
 | The fourth dimension | The tesseract's points have four coordinates; the shader rotates them in the XW, YW and ZW planes and projects them into 3D with a perspective divide on W. Dragging turns it through the fourth dimension |
-| Dragging | Pointer events with inertia. The sections allow only vertical panning (`touch-action: pan-y pinch-zoom`), so on a touch screen a swipe that starts sideways belongs to the shape, while up and down still scroll and pinch still zooms |
-| Effects | Light pulses run out along the Alliance lines, a scan line crosses the QR code, and a light runs round the timer ring — all computed per particle in the shader |
-| Screens | Each project picture is sampled into a grid of particles for the mosaic, then drawn sharp on a quad whose shader reveals it top-down with a scan line and a slight colour split. Phones load the portrait pictures (`img/stage/m-*.jpg`), computers the wide ones |
-| Layout | The shapes are sized and placed in the free space beside the text (above it on phones), and mirrored for Arabic. On short phones the one-line description is dropped so the picture keeps its room |
-| Extras | A starfield, film grain, a vignette, a cursor ring that grows over anything clickable (and says "OPEN" over a project's emblem or picture), and titles that decode from noise when their section arrives |
-| Speed | About 100 KB of page; nothing waits for the project pictures — the page starts at once and each project shows its screens as soon as they arrive, the one on screen first; 60 frames a second in testing. If a device can't keep up, the page renders at a lower resolution instead of stuttering |
+| Sections | CSS scroll snapping (`scroll-snap-type: y mandatory` with `scroll-snap-stop: always`), so a flick never skips a project. The page reads the wheel and the keyboard itself and moves one stop per notch or key; a trackpad's coasting is ignored until a pause or a fresh swipe |
+| Layout | On computers the screen floats to the right of the words (left in Arabic); on phones the engine measures the space between the top bar and the words of the stop on screen and fits the 3D into it |
+| Extras | Film grain, a vignette, a cursor ring that grows over anything clickable (and says "OPEN" over the screen in front), and titles that decode from noise when their section arrives |
+| Speed | Nothing waits for the project pictures — each screen fills in as its picture arrives, the nearest first; 60 frames a second in testing. If a device can't keep up, the page renders at a lower resolution instead of stuttering |
 | Fallback | Without WebGL2, or when `index.html` is opened straight from disk, it becomes a plain scrolling page with the same words, page strips and pictures; the gallery still works |
-| Reduced motion | With the system's reduced-motion setting on, the swirl, spins and decoding stop, and each project shows its screens without the fly-in or the loop |
+| Reduced motion | With the system's reduced-motion setting on, the camera jumps between stops instead of flying, and the sway, spin and decoding stop |
 
 ## Files
 
 ```
 index.html     the whole site
 img/           full-size screenshots (gallery) and og.jpg (link preview)
-img/stage/     the pictures the particles assemble into: <name>.jpg for computers (1600×1000),
+img/stage/     the pictures that float in the tunnel: <name>.jpg for computers (1600×1000),
                m-<name>.jpg for phones (1000×1250)
 img/xs/        thumbnails
 play/          index.html (keyboard, one player) + keys.js, and pizza-spin.html (the original game, untouched)
@@ -103,16 +105,15 @@ Then open http://localhost:8765
 | To change | Look for |
 |---|---|
 | Text | Each sentence is written twice: `class="en"` for English and `class="ar"` for Arabic |
-| A project | Its `<section class="sec proj" id="…">` |
-| Where Visit site goes | In each project's section, the `<a class="pri">` button and the `<a class="url">` address line under it; also `link` for that project in `GAL` (the gallery's button) |
-| The pages shown under a project | The `<div class="strip">` inside its section |
-| What the particles become | `ST` in the script (0 the tesseract, 1–6 the projects' emblems, 7 the planet, 8–13 the projects' screens) and the `sh…` functions that build each shape |
-| How long the emblem and the screens hold in each project's loop | `HOLD` in the script (1600 ms for the emblem, 6000 ms for the screens) |
-| How fast a section changes | The `goTo` call in `frame` (1.25 s) |
+| A project | Its `<section class="sec proj" id="…">`, its entry in `PROJ` and `KIND` in the script, a button in the depth list (`<nav class="depth">`) and its picture in `img/stage/` |
+| Where Visit site goes | In each project's section, the `<a class="pri">` button; also `link` for that project in `GAL` (the gallery's button) |
+| The pages shown under a project | The `<div class="strip">` inside its section (shown on phones and in the plain page) |
+| The tunnel | `S` (distance between stops), `DIST` (how far ahead each screen floats) and `FAR` (how far you can see) at the top of the engine; the rings and dust are built right after the shaders |
+| Where a screen waits and where it comes to | `place()` in the engine |
 | A project's picture | `img/stage/<name>.jpg` (1600×1000) and `img/stage/m-<name>.jpg` (1000×1250, for phones) |
 | Gallery pictures and captions | `GAL` in the script; each picture needs a copy in `img/` and in `img/xs/` |
 | Email | Search for `fa872328@gmail.com` |
 
 ## Publishing
 
-GitHub Pages from the `main` branch. Push `index.html` and the whole `img/` folder and the live site updates within a minute or two.
+GitHub Pages from the `main` branch. Push `index.html`, the `play/` folder and the whole `img/` folder and the live site updates within a minute or two.
