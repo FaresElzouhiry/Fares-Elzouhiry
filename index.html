@@ -7,6 +7,15 @@
 <meta name="description" content="Fares Elzouhiry, front-end developer. Websites, apps, presentations, 3D modeling and games in English and Arabic: Alliance Investment, BBQ Fest, a live attendance dashboard, a university app, the Sport Barbecue presentation, the MHC Coalline 3D worlds and the Pizza Spin game.">
 <meta name="theme-color" content="#030306">
 <link rel="canonical" href="https://www.fareselzouhiry.com/">
+<link rel="alternate" hreflang="en" href="https://www.fareselzouhiry.com/">
+<link rel="alternate" hreflang="ar" href="https://www.fareselzouhiry.com/?lang=ar">
+<link rel="alternate" hreflang="x-default" href="https://www.fareselzouhiry.com/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"Person","@id":"https://www.fareselzouhiry.com/#me","name":"Fares Elzouhiry","alternateName":"فارس الزهيري","jobTitle":"Front-end developer","url":"https://www.fareselzouhiry.com/","email":"mailto:fares@fareselzouhiry.com","image":"https://www.fareselzouhiry.com/img/og.jpg","sameAs":["https://github.com/FaresElzouhiry"],"knowsAbout":["HTML","CSS","JavaScript","Three.js","WebGL","Progressive Web Apps"]},
+ {"@type":"WebSite","@id":"https://www.fareselzouhiry.com/#site","name":"Fares Elzouhiry","alternateName":"فارس الزهيري","url":"https://www.fareselzouhiry.com/","inLanguage":["en","ar"],"author":{"@id":"https://www.fareselzouhiry.com/#me"}}
+]}
+</script>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fares Elzouhiry">
 <meta property="og:title" content="Fares Elzouhiry — Websites from another dimension">
@@ -27,6 +36,8 @@
   try { s = localStorage.getItem('fe-lang'); } catch (e) {}
   var l = q || s || (/^ar\b/i.test([].concat(navigator.languages || [], navigator.language || '')[0] || '') ? 'ar' : 'en');
   d.dataset.lang = l; d.lang = l; d.dir = l === 'ar' ? 'rtl' : 'ltr';
+  // the Arabic address is its own page for search engines
+  if (q === 'ar') { var c = document.querySelector('link[rel=canonical]'); if (c) c.href = 'https://www.fareselzouhiry.com/?lang=ar'; }
   d.classList.add('js-open', 'opening');
 })(document.documentElement);
 </script>
