@@ -155,6 +155,12 @@ html[data-lang="ar"] .proj h2 { letter-spacing: 0; line-height: 1.2; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 18px 0 0; }
 .tags li { padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; color: var(--fg2); font-size: .66rem; }
 html[data-lang="ar"] .tags li { font-size: .78rem; }
+.stack { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 14px 0 0; color: var(--fg2); font-size: .7rem; line-height: 1.5; }
+.stack .ltr { text-transform: none; letter-spacing: 0; }
+.stack b { color: var(--acc, var(--fg)); font-weight: 500; letter-spacing: .1em; text-transform: uppercase; font-size: .62rem; }
+html[data-lang="ar"] .stack b { letter-spacing: 0; text-transform: none; font-size: .76rem; }
+.contact .about { margin: 18px auto 0; max-width: 34em; color: var(--fg2); font-size: 1.02rem; line-height: 1.6; }
+.contact .skills { margin: 10px auto 0; max-width: 46em; color: var(--fg3); font-size: .7rem; line-height: 1.6; text-transform: none; letter-spacing: .02em; }
 .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 24px; }
 .acts a, .acts button { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 999px; border: 1px solid rgb(255 255 255 / .16); background: rgb(255 255 255 / .04); text-decoration: none; cursor: pointer; font-size: .92rem; transition: background .25s, border-color .25s; }
 .acts a:hover, .acts button:hover { background: rgb(255 255 255 / .1); border-color: rgb(255 255 255 / .32); }
@@ -462,6 +468,10 @@ html.gl .zone { display: none; }
 /* ---- phones: less on screen, more room for the 3D ---- */
 @media (max-width: 760px), (max-aspect-ratio: 1/1) {
   html.gl .proj .strip, html.gl .hero .hint, html.gl .proj .tags { display: none; }
+  html.gl .stack { display: block; margin-top: 8px; font-size: .62rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html.gl .stack b { margin-inline-end: 8px; }
+  html.gl .contact .about { font-size: .9rem; margin-top: 12px; }
+  html.gl .contact .skills { font-size: .62rem; }
   html.gl .idx { gap: 4px 8px; font-size: .6rem; }
   html.gl .idx .kt { padding: 5px 10px 5px 8px; font-size: .62rem; }
   html[data-lang="ar"].gl .idx .kt { font-size: .74rem; }
@@ -584,6 +594,7 @@ html.gl .zone { display: none; }
       <h2 class="fade"><span class="en scr">Alliance Investment</span><span class="ar">تحالف للاستثمار</span></h2>
       <p class="desc fade"><span class="en">A six-language site that opens on a live 3D globe of a 16-country network.</span><span class="ar">موقع بست لغات يبدأ بكرة أرضية حيّة لشبكة من 16 دولة.</span></p>
       <ul class="tags mono fade"><li><span class="en">6 languages</span><span class="ar">6 لغات</span></li><li><span class="en">24 pages</span><span class="ar">24 صفحة</span></li><li><span class="en">WebGL globe</span><span class="ar">كرة WebGL</span></li></ul>
+      <p class="stack mono fade"><b><span class="en">Built with</span><span class="ar">التقنيات</span></b> <span class="ltr">Three.js · JavaScript · HTML/CSS · 6-language i18n</span></p>
     </div>
     <div class="pr">
       <div class="acts fade">
@@ -613,6 +624,7 @@ html.gl .zone { display: none; }
       <h2 class="fade"><span class="en scr">BBQ Fest</span><span class="ar">BBQ Fest</span></h2>
       <p class="desc fade"><span class="en">The website for a five-day BBQ festival in Riyadh: warm paper, stamps and a price list shaped like a menu — with a 3D map of the whole festival.</span><span class="ar">موقع مهرجان شواء لمدة خمسة أيام في الرياض: ورق دافئ وأختام وقائمة أسعار على شكل منيو — مع مخطط ثلاثي الأبعاد للمهرجان كله.</span></p>
       <ul class="tags mono fade"><li><span class="en">Light design</span><span class="ar">تصميم فاتح</span></li><li><span class="en">Sponsor packages</span><span class="ar">باقات الرعاية</span></li><li><span class="en">3D site map</span><span class="ar">مخطط ثلاثي الأبعاد</span></li></ul>
+      <p class="stack mono fade"><b><span class="en">Built with</span><span class="ar">التقنيات</span></b> <span class="ltr">Three.js · JavaScript · HTML/CSS</span></p>
     </div>
     <div class="pr">
       <div class="acts fade">
@@ -641,6 +653,7 @@ html.gl .zone { display: none; }
       <h2 class="fade"><span class="en scr">Doctor Dashboard</span><span class="ar">لوحة الدكتور</span></h2>
       <p class="desc fade"><span class="en">Students scan the doctor's QR code and appear in the list instantly — only from inside the hall.</span><span class="ar">يمسح الطلاب رمز QR الخاص بالدكتور فيظهرون في القائمة فورًا — من داخل القاعة فقط.</span></p>
       <ul class="tags mono fade"><li>QR</li><li><span class="en">GPS check</span><span class="ar">تحقق GPS</span></li><li><span class="en">Live feed</span><span class="ar">حضور مباشر</span></li></ul>
+      <p class="stack mono fade"><b><span class="en">Built with</span><span class="ar">التقنيات</span></b> <span class="ltr">JavaScript · Geolocation API · QR codes · Google Apps Script</span></p>
     </div>
     <div class="pr">
       <div class="acts fade">
@@ -669,6 +682,7 @@ html.gl .zone { display: none; }
       <h2 class="fade"><span class="en scr">University App</span><span class="ar">تطبيق الجامعة</span></h2>
       <p class="desc fade"><span class="en">The university in a student's pocket: live schedule, tasks and focus rooms. Works offline.</span><span class="ar">الجامعة في جيب الطالب: الجدول لحظة بلحظة، والمهام، وغرف المذاكرة. يعمل دون إنترنت.</span></p>
       <ul class="tags mono fade"><li>PWA</li><li><span class="en">Offline</span><span class="ar">دون إنترنت</span></li><li><span class="en">112 commits</span><span class="ar">112 تعديلًا</span></li></ul>
+      <p class="stack mono fade"><b><span class="en">Built with</span><span class="ar">التقنيات</span></b> <span class="ltr">PWA · Service worker · JavaScript · Google Apps Script</span></p>
     </div>
     <div class="pr">
       <div class="acts fade">
@@ -697,6 +711,7 @@ html.gl .zone { display: none; }
       <h2 class="fade"><span class="en scr">Sport Barbecue</span><span class="ar">Sport Barbecue</span></h2>
       <p class="desc fade"><span class="en">A 27-slide sponsor deck set in a 3D night stadium: the camera flies like a drone, and a screen above the pitch shows each slide.</span><span class="ar">عرض للرعاة من 27 شريحة داخل استاد ليلي ثلاثي الأبعاد: الكاميرا تطير كطائرة درون، وشاشة فوق الملعب تعرض كل شريحة.</span></p>
       <ul class="tags mono fade"><li><span class="en">27 slides</span><span class="ar">27 شريحة</span></li><li><span class="en">3D stadium</span><span class="ar">استاد ثلاثي الأبعاد</span></li><li>AR · EN</li></ul>
+      <p class="stack mono fade"><b><span class="en">Built with</span><span class="ar">التقنيات</span></b> <span class="ltr">Three.js · JavaScript · HTML/CSS</span></p>
     </div>
     <div class="pr">
       <div class="acts fade">
@@ -725,6 +740,7 @@ html.gl .zone { display: none; }
       <h2 class="fade"><span class="en scr">MHC Coalline</span><span class="ar">MHC Coalline</span></h2>
       <p class="desc fade"><span class="en">Six 3D worlds for a charcoal maker, all modeled in code and running live in the browser: glowing coal, a factory line, a bag the client designs, a mountain from the logo.</span><span class="ar">ستة عوالم ثلاثية الأبعاد لمصنع فحم، كلها منمذجة بالكود وتعمل مباشرة في المتصفح: فحم متوهج، وخط مصنع، وكيس يصممه العميل، وجبل من الشعار.</span></p>
       <ul class="tags mono fade"><li><span class="en">6 3D scenes</span><span class="ar">6 مشاهد ثلاثية الأبعاد</span></li><li>three.js</li><li><span class="en">Real-time</span><span class="ar">لحظي</span></li></ul>
+      <p class="stack mono fade"><b><span class="en">Built with</span><span class="ar">التقنيات</span></b> <span class="ltr">Three.js · Post-processing · ES modules</span></p>
     </div>
     <div class="pr">
       <div class="acts fade">
@@ -753,11 +769,13 @@ html.gl .zone { display: none; }
       <h2 class="fade"><span class="en scr">BBQ Fest in 3D</span><span class="ar">BBQ Fest مجسّمًا</span></h2>
       <p class="desc fade"><span class="en">The whole festival modeled in 3D: 133 booths, the stage, food trucks, palms and a balloon. From empty land to the full festival, by day, sunset or night — and you can walk inside it.</span><span class="ar">المهرجان كله منمذج بثلاثة أبعاد: 133 جناحًا والمسرح وعربات الطعام والنخيل والمنطاد. من الأرض الفاضية إلى المهرجان كاملًا، نهارًا أو غروبًا أو ليلًا — ويمكنك التجول بداخله.</span></p>
       <ul class="tags mono fade"><li><span class="en">133 booths</span><span class="ar">133 جناحًا</span></li><li><span class="en">Walk inside</span><span class="ar">تجوّل بداخله</span></li><li><span class="en">Day · sunset · night</span><span class="ar">نهار · غروب · ليل</span></li></ul>
+      <p class="stack mono fade"><b><span class="en">Built with</span><span class="ar">التقنيات</span></b> <span class="ltr">Three.js · JavaScript</span></p>
     </div>
     <div class="pr">
       <div class="acts fade">
         <a class="pri" href="https://fareselzouhiry.github.io/bbq-fest/map-3d.html" target="_blank" rel="noopener"><span class="en">Explore in 3D</span><span class="ar">استكشفه ثلاثي الأبعاد</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="https://fareselzouhiry.github.io/bbq-fest/map-3d.html" target="_blank" rel="noopener"><i></i><span class="ltr">fareselzouhiry.github.io/bbq-fest/map-3d</span></a>
         <button type="button" data-gal="fest3d"><span class="en">All views</span><span class="ar">كل المشاهد</span></button>
+        <a href="https://github.com/FaresElzouhiry/bbq-fest/blob/main/map-3d.html" target="_blank" rel="noopener">GitHub</a>
       </div>
       <div class="strip fade">
         <p class="mono"><b><span class="en">From land to festival</span><span class="ar">من الأرض إلى المهرجان</span></b></p>
@@ -780,11 +798,13 @@ html.gl .zone { display: none; }
       <h2 class="fade"><span class="en scr">Pizza Spin</span><span class="ar">Pizza Spin</span></h2>
       <p class="desc fade"><span class="en">A cooking duel: knead, top and bake a pizza faster than your rival. Play it right here with the keyboard, or with two controllers for two players.</span><span class="ar">مبارزة طبخ: اعجن وزيّن واخبز البيتزا أسرع من منافسك. العبها هنا بلوحة المفاتيح، أو بيدَي تحكم للاعبَين.</span></p>
       <ul class="tags mono fade"><li><span class="en">Keyboard · 1 player</span><span class="ar">لوحة المفاتيح · لاعب واحد</span></li><li><span class="en">Controllers · 2 players</span><span class="ar">يدا تحكم · لاعبان</span></li><li><span class="en">One file, no libraries</span><span class="ar">ملف واحد بلا مكتبات</span></li></ul>
+      <p class="stack mono fade"><b><span class="en">Built with</span><span class="ar">التقنيات</span></b> <span class="ltr">Canvas 2D · Gamepad API · Web Audio · no libraries</span></p>
     </div>
     <div class="pr">
       <div class="acts fade">
         <a class="pri" href="play/index.html" target="_blank" rel="noopener"><span class="en">Play</span><span class="ar">العب</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a class="url mono" href="play/index.html" target="_blank" rel="noopener"><i></i><span class="en">Plays with the keyboard · nothing to install</span><span class="ar">تُلعب بلوحة المفاتيح · بلا تثبيت</span></a>
         <button type="button" data-gal="pizza"><span class="en">See it played</span><span class="ar">شاهد اللعب</span></button>
+        <a href="https://github.com/FaresElzouhiry/Fares-Elzouhiry/blob/main/play/pizza-spin.html" target="_blank" rel="noopener">GitHub</a>
       </div>
       <div class="strip fade">
         <p class="mono"><b><span class="en">Screens</span><span class="ar">الشاشات</span></b></p>
@@ -803,6 +823,8 @@ html.gl .zone { display: none; }
   <section class="sec contact" id="contact">
     <p class="kick mono fade"><span class="en">Contact</span><span class="ar">تواصل</span></p>
     <h2 class="fade"><span class="en scr">Let's build something out of this world.</span><span class="ar">لنبنِ شيئًا من عالم آخر.</span></h2>
+    <p class="about fade"><span class="en">I'm a front-end developer. I design and build websites, web apps and 3D experiences by hand, in English and Arabic. Available for freelance projects and full-time roles.</span><span class="ar">أنا مطوّر واجهات أمامية. أصمّم وأبرمج المواقع وتطبيقات الويب والتجارب ثلاثية الأبعاد بيدي، بالعربية والإنجليزية. متاح لمشاريع حرة ولوظائف بدوام كامل.</span></p>
+    <p class="skills mono fade ltr">HTML · CSS · JavaScript · Three.js · WebGL2 · PWA · Google Apps Script · Git</p>
     <div class="mail fade"><a class="ltr" href="mailto:fa872328@gmail.com" id="email">fa872328@gmail.com</a><button type="button" id="copy"><span class="en">Copy</span><span class="ar">نسخ</span></button></div>
     <div class="acts fade"><a href="https://github.com/FaresElzouhiry" target="_blank" rel="noopener"><span class="ltr">github.com/FaresElzouhiry</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>
   </section>
