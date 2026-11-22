@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>مجمع بلسم الطبي | قدامك العافية · الرياض والدمام</title>
+<meta name="description" content="نموذج مقترح لموقع مجمع بلسم الطبي: طوارئ 24 ساعة، أطفال، باطنة، مخ وأعصاب، قلب وأسنان في الرياض والدمام.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1596d6; --blue-d:#0f78ad; --navy:#0c3553; --sky:#eaf6fd; --sky-2:#d3ecf9;
+  --ink:#0f2233; --muted:#5d7083; --line:#dde9f2; --bg:#f8fbfe; --card:#fff;
+  --red:#e0483e; --red-l:#fdebea; --mint:#e4f6ee; --green:#1d8a5b;
+  --r:20px; --shadow:0 18px 50px -24px rgba(12,53,83,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.7;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,.brand b{font-family:"Readex Pro","IBM Plex Sans Arabic",sans-serif;line-height:1.3}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 22px;border-radius:999px;font-weight:600;font-size:16px;transition:transform .15s,box-shadow .15s,background .15s;cursor:pointer;border:0;font-family:inherit}
+.btn:hover{transform:translateY(-2px)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-b{background:var(--blue);color:#fff;box-shadow:0 12px 30px -12px rgba(21,150,214,.8)}
+.btn-b:hover{background:var(--blue-d)}
+.btn-o{background:#fff;color:var(--navy);border:1.5px solid var(--sky-2)}
+.btn-n{background:var(--navy);color:#fff}
+
+.demo{background:var(--navy);color:#cfe4f2;font-size:13px;text-align:center;padding:7px 12px}
+.demo b{color:#fff;font-weight:600}
+
+header{position:sticky;top:0;z-index:20;background:rgba(248,251,254,.9);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:70px;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;border-radius:50%;background:var(--blue);display:grid;place-items:center;color:#fff;box-shadow:0 10px 24px -10px rgba(21,150,214,.9)}
+.brand b{display:block;font-size:19px;color:var(--navy)}
+.brand small{display:block;font-size:12px;color:var(--muted);margin-top:-2px;letter-spacing:.04em}
+.links{display:flex;gap:26px;font-weight:500;color:var(--muted)}
+.links a:hover{color:var(--blue)}
+.er{display:inline-flex;align-items:center;gap:8px;background:var(--red-l);color:var(--red);font-weight:600;font-size:14px;padding:8px 14px;border-radius:999px}
+.er i{width:8px;height:8px;border-radius:50%;background:var(--red);animation:p 1.6s infinite}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(224,72,62,.5)}70%{box-shadow:0 0 0 9px rgba(224,72,62,0)}100%{box-shadow:0 0 0 0 rgba(224,72,62,0)}}
+
+.hero{position:relative;overflow:hidden;padding:60px 0 72px}
+.hero:before{content:"";position:absolute;inset:-35% -10% auto auto;width:640px;height:640px;border-radius:50%;background:radial-gradient(circle,rgba(21,150,214,.22),transparent 65%)}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;font-family:inherit;font-weight:600;font-size:15px;color:var(--muted);padding:8px 18px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.seglbl{font-size:14px;color:var(--muted);margin-inline-end:10px}
+.hero h1{font-size:clamp(34px,5vw,56px);margin:20px 0 14px}
+.hero h1 em{font-style:normal;color:var(--blue)}
+.hero p.lead{font-size:19px;color:var(--muted);max-width:560px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0 24px}
+.cta a[href^="tel"] span{direction:ltr;unicode-bidi:embed}
+.trust{display:flex;flex-wrap:wrap;gap:20px;color:var(--muted);font-size:15px}
+.trust span{display:flex;align-items:center;gap:8px}
+.trust svg{width:18px;height:18px;color:var(--blue)}
+
+.visual{position:relative;height:430px}
+.vc{position:absolute;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px}
+.vc1{inset:0 0 auto 30px;height:230px;background:linear-gradient(150deg,var(--blue),var(--navy));color:#fff;overflow:hidden}
+.vc1:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;left:-80px;bottom:-140px;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 65%)}
+.vc1 .lbl{font-size:13px;opacity:.85}
+.vc1 h3{font-size:30px;margin:6px 0 4px}
+.vc1 p{opacity:.85;font-size:15px}
+.ecg{position:absolute;left:22px;right:22px;bottom:22px;height:50px}
+.ecg path{stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:420;stroke-dashoffset:420;animation:d 2.6s linear infinite}
+@keyframes d{to{stroke-dashoffset:0}}
+.vc2{bottom:40px;right:0;width:250px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px}
+.tag.g{background:var(--mint);color:var(--green)}
+.tag.b{background:var(--sky);color:var(--blue-d)}
+.vc2 h4{margin:10px 0 2px;font-size:17px}
+.vc2 p{color:var(--muted);font-size:14px}
+.vc3{bottom:0;left:0;width:240px}
+.vc3 h4{margin:8px 0 2px;font-size:16px}
+.vc3 p{color:var(--muted);font-size:13px}
+
+section{padding:84px 0;scroll-margin-top:70px}
+.head{max-width:640px;margin-bottom:40px}
+.eyebrow{font-size:14px;font-weight:600;color:var(--blue)}
+.head h2{font-size:clamp(28px,3.6vw,40px);margin:8px 0 10px}
+.head p{color:var(--muted);font-size:17px}
+
+.deps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.dep{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.dep:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.dep .di{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;margin-bottom:16px;background:var(--sky);color:var(--blue)}
+.dep.red .di{background:var(--red-l);color:var(--red)}
+.dep h3{font-size:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dep h3 .tag{font-family:"IBM Plex Sans Arabic"}
+.dep p{color:var(--muted);font-size:15px;margin:4px 0 14px}
+.dep .where{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;margin-bottom:16px}
+.dep .where svg{width:15px;height:15px;color:var(--blue)}
+.dep .btn{margin-top:auto;padding:11px 16px;font-size:15px;align-self:flex-start}
+
+.offers{background:linear-gradient(180deg,var(--bg),var(--sky) 55%,var(--bg))}
+.ofs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.of{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:6px}
+.of.hero-of{background:linear-gradient(160deg,var(--navy),#0f4a73);color:#fff;border:0}
+.of.hero-of p{color:#c5dceb}
+.of h3{font-size:22px;margin-top:8px}
+.of p{color:var(--muted);font-size:15px}
+.of .free{font-family:"Readex Pro";font-size:40px;font-weight:700;color:var(--green);line-height:1.1;margin:10px 0}
+.of.hero-of .free{color:#7ee0b0}
+.of .btn{margin-top:auto;align-self:flex-start}
+.of .tag{align-self:flex-start}
+.of .meta{font-size:14px;display:flex;gap:6px;align-items:center;margin-top:4px}
+
+.docs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.doc{display:flex;gap:18px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.av{width:64px;height:64px;border-radius:50%;background:var(--sky);color:var(--blue);display:grid;place-items:center;font-family:"Readex Pro";font-weight:700;font-size:22px;flex:none}
+.doc h4{font-size:18px}
+.doc p{color:var(--muted);font-size:15px}
+.doc .btn{margin-inline-start:auto;padding:10px 16px;font-size:14px}
+
+.br{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.bcard{border-radius:28px;padding:34px;background:var(--card);border:1px solid var(--line);position:relative;overflow:hidden}
+.bcard.r{background:var(--navy);color:#fff;border:0}
+.bcard h3{font-size:28px;margin-bottom:6px}
+.bcard>p{color:var(--muted)}
+.bcard.r>p{color:#c5dceb}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+.chips span{font-size:14px;padding:6px 12px;border-radius:999px;background:var(--sky);color:var(--navy);font-weight:500}
+.bcard.r .chips span{background:rgba(255,255,255,.12);color:#fff}
+.bcard .acts{display:flex;flex-wrap:wrap;gap:10px}
+.bcard .num{direction:ltr;unicode-bidi:embed}
+
+footer{border-top:1px solid var(--line);padding:30px 0 110px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+.bar{position:fixed;inset:auto 12px 12px 12px;z-index:30;display:none;gap:8px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);padding:8px;border-radius:20px;box-shadow:0 18px 40px -16px rgba(12,34,51,.45);border:1px solid var(--line)}
+.bar .btn{flex:1;padding:13px 8px;font-size:15px}
+
+@media (max-width:920px){
+  .hero .wrap{grid-template-columns:1fr}
+  .visual{max-width:460px;width:100%;margin:0 auto}
+  .deps,.ofs{grid-template-columns:1fr 1fr}
+  .links{display:none}
+}
+@media (max-width:720px){
+  .hero{padding:32px 0 48px}
+  .hero p.lead{font-size:17px}
+  .cta .btn{flex:1 1 100%}
+  section{padding:60px 0}
+  .nav .er{display:none}
+  .bar{display:flex}
+  .visual{height:410px}
+  .vc1{inset:0 0 auto 0;height:210px}
+  .vc1 h3{font-size:24px}
+  .vc2{width:215px;bottom:132px}
+  .vc3{width:205px}
+  .deps{gap:12px}
+  .dep{padding:18px}
+  .dep h3{font-size:17px}
+  .dep p{font-size:14px}
+  .dep .btn{padding:9px 12px;font-size:14px;align-self:stretch}
+  .ofs,.docs,.br{grid-template-columns:1fr}
+  .doc{flex-wrap:wrap}
+  .doc .btn{margin-inline-start:0;flex:1 1 100%}
+  .bcard{padding:26px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="demo"><b>نموذج تجريبي مقترح</b> لموقع مجمع بلسم، بمحتوى من إعلاناتكم الحالية</div>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="مجمع بلسم">
+      <span class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 4v16M4 12h16"/><circle cx="12" cy="12" r="9"/></svg></span>
+      <span><b>مجمع بلسم الطبي</b><small>BALSAM COMPLEX · قدامك العافية</small></span>
+    </a>
+    <nav class="links">
+      <a href="#deps">الأقسام</a>
+      <a href="#offers">العروض</a>
+      <a href="#docs">أطباؤنا</a>
+      <a href="#branches">فروعنا</a>
+    </nav>
+    <span class="er"><i></i> الطوارئ 24 ساعة</span>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="seglbl">اختر الفرع:</span>
+      <span class="seg" role="group" aria-label="الفرع">
+        <button type="button" data-br="ruh" aria-pressed="true">الرياض</button>
+        <button type="button" data-br="dmm" aria-pressed="false">الدمام</button>
+      </span>
+      <h1>صحتك غايتنا…<br><em>واطمئنانك هديتنا</em></h1>
+      <p class="lead">مجمع طبي متكامل في الرياض والدمام: طوارئ على مدار الساعة، أطفال، باطنة، مخ وأعصاب، قلب، وأسنان.</p>
+      <div class="cta">
+        <a class="btn btn-b wa" data-msg="السلام عليكم، أبغى أحجز موعد">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg>
+          احجز موعدك على الواتساب
+        </a>
+        <a class="btn btn-o tel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2.1Z"/></svg> اتصل <span class="telnum"></span></a>
+      </div>
+      <div class="trust">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>طوارئ 24 ساعة طوال الأسبوع</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>فرعين: الرياض والدمام</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>كشف مجاني للأطفال</span>
+      </div>
+    </div>
+
+    <div class="visual" aria-hidden="true">
+      <div class="vc vc1">
+        <span class="lbl">قسم الطوارئ</span>
+        <h3>مفتوح 24 ساعة</h3>
+        <p>طوال أيام الأسبوع، لأن الطوارئ ما تعرف وقت.</p>
+        <svg class="ecg" viewBox="0 0 400 50" preserveAspectRatio="none"><path d="M0 30h120l14-22 16 40 14-34 10 16h96l10-12 10 12h110"/></svg>
+      </div>
+      <div class="vc vc2">
+        <span class="tag g">كشف مجاني</span>
+        <h4>عيادة الأطفال</h4>
+        <p>كل سبت وأحد في فرع الرياض</p>
+      </div>
+      <div class="vc vc3">
+        <span class="tag b">جديد في الدمام</span>
+        <h4>قسم المخ والأعصاب</h4>
+        <p>كشف مجاني بمناسبة الافتتاح</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="deps">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">أقسامنا</span>
+      <h2>رعاية متكاملة لك ولعائلتك</h2>
+      <p>اختر القسم واحجز مباشرة على الواتساب، والرسالة توصل للفرع الصحيح.</p>
+    </div>
+    <div class="deps" id="deplist"></div>
+  </div>
+</section>
+
+<section class="offers" id="offers">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">عروض هذا الشهر</span>
+      <h2>اطمئن على صحتك… والكشف علينا</h2>
+    </div>
+    <div class="ofs">
+      <div class="of hero-of">
+        <span class="tag g">الرياض · السبت والأحد</span>
+        <h3>كشف مجاني في عيادة الأطفال</h3>
+        <p>سعال، فقدان شهية، تعب سريع، أو عطش مستمر؟ الفحص مع فريق قسم الأطفال يساعدك تعرفين السبب.</p>
+        <div class="free">مجانًا</div>
+        <a class="btn btn-b wa" data-b="ruh" data-msg="السلام عليكم، أبغى أحجز الكشف المجاني في عيادة الأطفال (السبت أو الأحد)">احجز الكشف المجاني</a>
+      </div>
+      <div class="of">
+        <span class="tag b">الدمام · عرض الافتتاح</span>
+        <h3>كشف مجاني في قسم المخ والأعصاب</h3>
+        <p>افتتحنا قسم المخ والأعصاب بجاهزية طبية متكاملة وخبرة متخصصة.</p>
+        <div class="free">مجانًا</div>
+        <a class="btn btn-n wa" data-b="dmm" data-msg="السلام عليكم، أبغى أحجز الكشف المجاني في قسم المخ والأعصاب">احجز الكشف المجاني</a>
+      </div>
+      <div class="of">
+        <span class="tag b">الرياض · الأسنان</span>
+        <h3>تلبيسات الزيركون، تنظيف وتبييض</h3>
+        <p>ابتسامة أكثر تناسقًا وإشراقًا مع باقات الأسنان.</p>
+        <div class="meta"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>عروض لفترة محدودة</div>
+        <a class="btn btn-o wa" data-b="ruh" data-msg="السلام عليكم، أبغى أستفسر عن عروض الأسنان (الزيركون / التنظيف / التبييض)" style="margin-top:18px">اسأل عن عروض الأسنان</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="docs">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">أطباؤنا</span>
+      <h2>خبرة تنضم… وثقة تكتمل</h2>
+    </div>
+    <div class="docs">
+      <div class="doc">
+        <span class="av">ر</span>
+        <div><h4>د. ريهام عبد الرحمن</h4><p>استشارية الطب الباطني · خبرة 11 سنة<br>السكري، الضغط، الغدة الدرقية والجهاز الهضمي · الرياض</p></div>
+        <a class="btn btn-b wa" data-b="ruh" data-msg="السلام عليكم، أبغى أحجز موعد مع د. ريهام عبد الرحمن (الباطنة)">احجز موعد</a>
+      </div>
+      <div class="doc">
+        <span class="av">أ</span>
+        <div><h4>د. أحمد زاهر</h4><p>المخ والأعصاب · خبرة 8 سنوات<br>متابعة دقيقة لمختلف الحالات · الدمام</p></div>
+        <a class="btn btn-b wa" data-b="dmm" data-msg="السلام عليكم، أبغى أحجز موعد مع د. أحمد زاهر (المخ والأعصاب)">احجز موعد</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="branches">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">فروعنا</span>
+      <h2>قريبين منك في الرياض والدمام</h2>
+    </div>
+    <div class="br">
+      <div class="bcard r">
+        <h3>فرع الرياض</h3>
+        <p>للحجز والاستفسار بالاتصال أو الواتساب.</p>
+        <div class="chips"><span>الطوارئ 24 ساعة</span><span>الأطفال</span><span>الباطنة</span><span>الأسنان</span></div>
+        <div class="acts">
+          <a class="btn btn-b wa" data-b="ruh" data-msg="السلام عليكم، أبغى أحجز موعد في فرع الرياض">واتساب</a>
+          <a class="btn btn-o" href="tel:920009899"><span class="num">9200 09899</span></a>
+          <a class="btn btn-o" target="_blank" rel="noopener" href="https://g.co/kgs/xfjASVQ">الموقع على الخريطة</a>
+        </div>
+      </div>
+      <div class="bcard">
+        <h3>فرع الدمام</h3>
+        <p>للحجز والاستفسار بالاتصال أو الواتساب.</p>
+        <div class="chips"><span>المخ والأعصاب</span><span>القلب والإيكو</span><span>الأطفال صباحًا ومساءً</span></div>
+        <div class="acts">
+          <a class="btn btn-n wa" data-b="dmm" data-msg="السلام عليكم، أبغى أحجز موعد في فرع الدمام">واتساب</a>
+          <a class="btn btn-o" href="tel:+966138434090"><span class="num">013 843 4090</span></a>
+          <a class="btn btn-o" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=%D9%85%D8%AC%D9%85%D8%B9%20%D8%A8%D9%84%D8%B3%D9%85%20%D8%A7%D9%84%D8%AF%D9%85%D8%A7%D9%85">الموقع على الخريطة</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 مجمع بلسم الطبي · قدامك العافية</span>
+    <span>نموذج مقترح من تصميم فارس الزهيري</span>
+  </div>
+</footer>
+
+<div class="bar">
+  <a class="btn btn-b wa" data-b="ruh" data-msg="السلام عليكم، أبغى أحجز موعد في فرع الرياض">حجز الرياض</a>
+  <a class="btn btn-n wa" data-b="dmm" data-msg="السلام عليكم، أبغى أحجز موعد في فرع الدمام">حجز الدمام</a>
+</div>
+
+<script>
+const BR = {
+  ruh: { name: "الرياض", wa: "966920009899", tel: "920009899", show: "9200 09899" },
+  dmm: { name: "الدمام", wa: "966138434090", tel: "+966138434090", show: "013 843 4090" }
+};
+const I = {
+  er:'<path d="M3 12h4l2-5 4 10 2-5h6"/>',
+  kid:'<circle cx="12" cy="7" r="3"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/><path d="M9 7h.01M15 7h.01"/>',
+  int:'<path d="M4 4v6a6 6 0 0 0 12 0V4"/><path d="M10 16v2a4 4 0 0 0 8 0v-3"/><circle cx="18" cy="13" r="2"/>',
+  neu:'<path d="M9 3a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3h1V3z"/><path d="M15 3a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3h-1V3z"/>',
+  hrt:'<path d="M12 21s-7-4.4-9.3-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.3 6c-2.3 4.6-9.3 9-9.3 9Z"/><path d="M5 12h4l1.5-2 2 4 1.5-2H19"/>',
+  tth:'<path d="M7 3c-2.5 0-4 2-4 4.5 0 2 1 3.5 1.5 5.5.6 2.5.8 8 2.8 8 1.7 0 1.6-5 3.2-5h3c1.6 0 1.5 5 3.2 5 2 0 2.2-5.5 2.8-8 .5-2 1.5-3.5 1.5-5.5C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3Z"/>'
+};
+const DEPS = [
+  { i:"er",  t:"الطوارئ", d:"مستعدين لاستقبالكم على مدار 24 ساعة طوال أيام الأسبوع.", b:"ruh", red:true, tag:"24 ساعة" },
+  { i:"kid", t:"عيادة الأطفال", d:"تشخيص وعلاج أمراض الجهاز التنفسي، متابعة النمو، فقر الدم وضعف الشهية.", b:"both", tag:"كشف مجاني" },
+  { i:"int", t:"الطب الباطني", d:"السكري، الضغط، الغدة الدرقية، والجهاز الهضمي بنظرة شاملة.", b:"ruh" },
+  { i:"neu", t:"المخ والأعصاب", d:"قسم جديد بجاهزية طبية متكاملة وخبرة متخصصة.", b:"dmm", tag:"جديد" },
+  { i:"hrt", t:"القلب", d:"فحص وإيكو القلب للاطمئنان على صحة قلبك.", b:"dmm" },
+  { i:"tth", t:"الأسنان", d:"تلبيسات الزيركون، التنظيف، والتبييض.", b:"ruh" }
+];
+let cur = "ruh";
+const pin = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+document.getElementById("deplist").innerHTML = DEPS.map(x => {
+  const where = x.b === "both" ? "الرياض والدمام" : BR[x.b].name;
+  const tag = x.tag ? ' <span class="tag ' + (x.tag === "جديد" ? "b" : "g") + '">' + x.tag + '</span>' : "";
+  return '<div class="dep' + (x.red ? ' red' : '') + '">' +
+    '<div class="di"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + I[x.i] + '</svg></div>' +
+    '<h3>' + x.t + tag + '</h3><p>' + x.d + '</p>' +
+    '<span class="where">' + pin + where + '</span>' +
+    '<a class="btn btn-o wa"' + (x.b === "both" ? '' : ' data-b="' + x.b + '"') + ' data-msg="السلام عليكم، ' + (x.red ? 'أبغى أتواصل مع قسم الطوارئ' : 'أبغى أحجز موعد في ' + x.t) + '">' + (x.red ? 'تواصل معنا' : 'احجز موعد') + '</a>' +
+  '</div>';
+}).join("");
+
+function wire(){
+  document.querySelectorAll("a.wa").forEach(a => {
+    const b = BR[a.dataset.b || cur];
+    let msg = a.dataset.msg;
+    if (!a.dataset.b) msg += " (فرع " + b.name + ")";
+    a.href = "https://wa.me/" + b.wa + "?text=" + encodeURIComponent(msg);
+    a.target = "_blank"; a.rel = "noopener";
+  });
+  document.querySelectorAll("a.tel").forEach(a => { a.href = "tel:" + BR[cur].tel; a.querySelector(".telnum").textContent = BR[cur].show; });
+}
+document.querySelectorAll(".seg button").forEach(btn => btn.addEventListener("click", () => {
+  cur = btn.dataset.br;
+  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === btn));
+  wire();
+}));
+wire();
+</script>
+</body>
+</html>

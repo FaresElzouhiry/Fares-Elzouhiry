@@ -2,9 +2,9 @@
 
 **Websites from another dimension.** A one-page portfolio that is a flight through a tunnel, built on a 3D engine written from scratch in WebGL2. Scrolling flies a camera forward through rings of light; every project's real screen floats in space, swings to the front and turns toward you as you arrive, then the camera flies past it to the next. A 4D tesseract waits at the entrance and a ringed planet at the end. The page opens with a short intro animation and has ten stops: an intro, eight projects grouped by kind (websites, apps, a presentation, 3D modeling and a game) and a contact screen.
 
-- **Live site:** https://fareselzouhiry.github.io/Fares-Elzouhiry/
+- **Live site:** https://fareselzouhiry.com/
 - **Repository:** https://github.com/FaresElzouhiry/Fares-Elzouhiry
-- **Languages:** English (default) and Arabic, switched with the button in the top bar. A link can open the Arabic version directly: `…/Fares-Elzouhiry/?lang=ar`.
+- **Languages:** English (default) and Arabic, switched with the button in the top bar. A link can open the Arabic version directly: `https://fareselzouhiry.com/?lang=ar`.
 
 ![Link preview](img/og.jpg)
 
@@ -53,7 +53,7 @@ While you are at a stop, the next projects can already be seen hanging further d
 | **Sport Barbecue** *(presentation)* — a 27-slide sponsor deck for Riyadh 2027 set in a 3D night stadium (model 3), in Arabic and English | [Live](https://fareselzouhiry.github.io/web/models/3/) · [Code](https://github.com/FaresElzouhiry/web) |
 | **MHC Coalline** *(3D modeling)* — six 3D worlds for a charcoal maker, modeled in code and running live in the browser | [Live](https://fareselzouhiry.github.io/MHC-Coalline/) · [Code](https://github.com/FaresElzouhiry/MHC-Coalline) |
 | **BBQ Fest in 3D** *(3D modeling)* — the whole festival modeled in 3D (133 booths, stage, food trucks, palms, balloon), by day, sunset or night, and you can walk inside it | [Live](https://fareselzouhiry.github.io/bbq-fest/map-3d.html) |
-| **Pizza Spin** *(game)* — a first-person cooking duel; one player with the keyboard, or two players with controllers; one HTML file, no libraries | [Play](https://fareselzouhiry.github.io/Fares-Elzouhiry/play/) |
+| **Pizza Spin** *(game)* — a first-person cooking duel; one player with the keyboard, or two players with controllers; one HTML file, no libraries | [Play](https://fareselzouhiry.com/play/) |
 
 The dashboard screenshots use **sample data**: they were taken locally with the attendance API answered by a small script, so nothing reached the real server, and the QR code in them points to this portfolio.
 

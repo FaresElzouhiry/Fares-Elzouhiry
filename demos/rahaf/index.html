@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>رهف سمايل | عيادة أسنان في حي النهضة، الرياض</title>
+<meta name="description" content="نموذج مقترح لموقع رهف سمايل: تجميل الأسنان، تركيبات الزيركون، تقويم، زراعة وتبييض في حي النهضة بالرياض.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#4a1f73; --violet:#7b47c0; --violet-2:#9b6fd6; --lilac:#f3ecfb; --lilac-2:#e7dbf6;
+  --ink:#1d1330; --muted:#6b5f7d; --line:#e6def0; --bg:#fcfaff; --card:#ffffff;
+  --mint:#e3f4ef; --teal:#1f8a72; --teal-d:#166a57;
+  --r:20px; --shadow:0 18px 50px -24px rgba(74,31,115,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.7;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,.brand b{font-family:"Readex Pro","IBM Plex Sans Arabic",sans-serif;line-height:1.3}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 22px;border-radius:999px;font-weight:600;font-size:16px;transition:transform .15s,box-shadow .15s,background .15s;cursor:pointer;border:0;font-family:inherit}
+.btn:hover{transform:translateY(-2px)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-t{background:var(--teal);color:#fff;box-shadow:0 12px 30px -12px rgba(31,138,114,.7)}
+.btn-t:hover{background:var(--teal-d)}
+.btn-p{background:var(--violet);color:#fff;box-shadow:0 12px 30px -12px rgba(123,71,192,.8)}
+.btn-p:hover{background:var(--plum)}
+.btn-o{background:#fff;color:var(--plum);border:1.5px solid var(--lilac-2)}
+
+.demo{background:var(--ink);color:#d9cdea;font-size:13px;text-align:center;padding:7px 12px}
+.demo b{color:#fff;font-weight:600}
+
+header{position:sticky;top:0;z-index:20;background:rgba(252,250,255,.88);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:70px;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(140deg,var(--violet-2),var(--plum));display:grid;place-items:center;color:#fff;box-shadow:var(--shadow)}
+.brand b{display:block;font-size:19px;color:var(--plum)}
+.brand small{display:block;font-size:12px;color:var(--muted);margin-top:-2px}
+.links{display:flex;gap:26px;font-weight:500;color:var(--muted)}
+.links a:hover{color:var(--plum)}
+.nav .btn{padding:11px 18px;font-size:15px}
+
+.hero{position:relative;overflow:hidden;padding:64px 0 72px}
+.hero:before{content:"";position:absolute;inset:-30% -10% auto auto;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle,rgba(155,111,214,.26),transparent 65%)}
+.hero:after{content:"";position:absolute;bottom:-260px;left:-160px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(31,138,114,.16),transparent 65%)}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);padding:6px 14px;border-radius:999px;font-size:14px;color:var(--plum);font-weight:500}
+.pill i{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.18)}
+.hero h1{font-size:clamp(34px,5vw,56px);margin:18px 0 16px}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--violet),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{font-size:19px;color:var(--muted);max-width:540px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 26px}
+.trust{display:flex;flex-wrap:wrap;gap:22px;color:var(--muted);font-size:15px}
+.trust span{display:flex;align-items:center;gap:8px}
+.trust svg{width:18px;height:18px;color:var(--violet)}
+
+.visual{position:relative;height:440px}
+.vcard{position:absolute;background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px}
+.v1{inset:0 0 auto 40px;height:300px;background:linear-gradient(160deg,#fff 0%,var(--lilac) 100%);overflow:hidden}
+.v1 .smile{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:250px}
+.v1 h4{font-size:15px;color:var(--plum)}
+.v1 p{font-size:13px;color:var(--muted)}
+.v2{bottom:30px;right:0;width:260px}
+.tag{font-size:12px;color:var(--teal);background:var(--mint);padding:3px 10px;border-radius:999px;font-weight:600}
+.v2 h4{margin:10px 0 2px;font-size:17px}
+.v2 .price{font-family:"Readex Pro";font-size:32px;color:var(--plum);font-weight:700}
+.v2 .price small{font-size:15px;color:var(--muted);font-weight:500}
+.v3{bottom:0;left:0;width:230px;display:flex;gap:12px;align-items:center}
+.v3 .ic{width:46px;height:46px;border-radius:14px;background:var(--mint);display:grid;place-items:center;color:var(--teal)}
+.v3 b{display:block;font-size:15px}
+.v3 small{color:var(--muted);font-size:13px}
+
+section{padding:84px 0;scroll-margin-top:70px}
+.head{max-width:620px;margin-bottom:40px}
+.eyebrow{font-size:14px;font-weight:600;color:var(--violet);letter-spacing:.02em}
+.head h2{font-size:clamp(28px,3.6vw,40px);margin:8px 0 10px}
+.head p{color:var(--muted);font-size:17px}
+
+.svcs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.svc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;transition:transform .2s,box-shadow .2s}
+.svc:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.svc .si{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;margin-bottom:16px;background:var(--mint);color:var(--teal)}
+.svc:nth-child(even) .si{background:var(--lilac);color:var(--violet)}
+.svc h3{font-size:20px;margin-bottom:4px}
+.svc p{color:var(--muted);font-size:15px}
+
+.offer-sec{background:linear-gradient(180deg,var(--bg),var(--lilac) 55%,var(--bg))}
+.feature{display:grid;grid-template-columns:1fr 1fr;border-radius:32px;overflow:hidden;background:var(--plum);color:#fff;box-shadow:var(--shadow)}
+.feature .l{padding:44px;position:relative}
+.feature .l:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;left:-140px;bottom:-200px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 65%)}
+.feature .tag{background:rgba(255,255,255,.14);color:#e9dcff}
+.feature h2{font-size:clamp(28px,3.4vw,38px);margin:16px 0 8px}
+.feature p{color:#dccdf0;font-size:17px}
+.big{font-family:"Readex Pro";font-weight:700;font-size:64px;line-height:1;margin:26px 0 6px}
+.big small{font-size:20px;font-weight:500;color:#dccdf0}
+.feature .l .btn{margin-top:26px;position:relative;z-index:1}
+.feature .r{background:#fff;color:var(--ink);padding:44px;display:grid;gap:14px;align-content:center}
+.feat{display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:16px;background:var(--bg);border:1px solid var(--line)}
+.feat .fi{width:40px;height:40px;border-radius:12px;background:var(--mint);color:var(--teal);display:grid;place-items:center;flex:none}
+.feat b{display:block;font-size:16px}
+.feat small{color:var(--muted);font-size:14px}
+
+.why{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.w{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.w .wi{width:48px;height:48px;border-radius:14px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;margin-bottom:14px}
+.w h4{font-size:18px;margin-bottom:4px}
+.w p{color:var(--muted);font-size:15px}
+
+.visit{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+.vbox{background:var(--teal);color:#fff;border-radius:28px;padding:38px;position:relative;overflow:hidden}
+.vbox:after{content:"";position:absolute;width:340px;height:340px;border-radius:50%;left:-120px;bottom:-160px;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 65%)}
+.vbox h2{font-size:32px;margin-bottom:10px}
+.vbox p{color:#d3efe7}
+.rows{margin:26px 0;display:grid;gap:14px;position:relative;z-index:1}
+.row{display:flex;gap:14px;align-items:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);padding:14px 16px;border-radius:16px}
+.row svg{width:22px;height:22px;flex:none;color:#c9f0e3}
+.row b{display:block;font-weight:600}
+.row small{color:#c6e9de;font-size:14px}
+.row a{direction:ltr;unicode-bidi:embed}
+.vbox .btn{position:relative;z-index:1}
+.map{border-radius:28px;border:1px solid var(--line);background:
+  repeating-linear-gradient(0deg,transparent 0 46px,#ece4f6 46px 48px),
+  repeating-linear-gradient(90deg,transparent 0 46px,#ece4f6 46px 48px),#f8f4fd;
+  position:relative;min-height:360px;overflow:hidden;display:flex;align-items:flex-end;padding:22px}
+.map .road{position:absolute;background:#fff;box-shadow:0 0 0 1px #e2d6f1}
+.map .r1{height:26px;left:-10%;right:-10%;top:42%;transform:rotate(-8deg)}
+.map .r2{width:22px;top:-10%;bottom:-10%;left:38%;transform:rotate(12deg)}
+.map .r1:after{content:"طريق الأمير بندر";position:absolute;right:16%;top:3px;font-size:12px;color:var(--muted)}
+.pin{position:absolute;left:40%;top:30%;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center}
+.pin .dot{width:54px;height:54px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--teal);display:grid;place-items:center;box-shadow:0 14px 30px -10px rgba(31,138,114,.8)}
+.pin .dot svg{transform:rotate(45deg);color:#fff}
+.pin .lbl{margin-top:10px;background:#fff;padding:6px 12px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 6px 18px -8px rgba(0,0,0,.25);white-space:nowrap}
+.map .btn{position:relative;z-index:2}
+
+footer{border-top:1px solid var(--line);padding:30px 0 110px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+.bar{position:fixed;inset:auto 12px 12px 12px;z-index:30;display:none;gap:8px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);padding:8px;border-radius:20px;box-shadow:0 18px 40px -16px rgba(29,19,48,.45);border:1px solid var(--line)}
+.bar .btn{padding:13px 10px;font-size:15px}
+.bar .btn-t{flex:2}.bar .btn-o{flex:1}
+
+@media (max-width:920px){
+  .hero .wrap{grid-template-columns:1fr}
+  .visual{height:380px;max-width:460px;width:100%;margin:0 auto}
+  .why{grid-template-columns:1fr 1fr}
+  .svcs{grid-template-columns:1fr 1fr}
+  .feature{grid-template-columns:1fr}
+  .links{display:none}
+}
+@media (max-width:720px){
+  .hero{padding:36px 0 48px}
+  .hero p.lead{font-size:17px}
+  .cta .btn{flex:1 1 100%}
+  .visit{grid-template-columns:1fr}
+  section{padding:60px 0}
+  .nav .btn{display:none}
+  .bar{display:flex}
+  .visual{height:340px}
+  .v1{inset:0 0 auto 0;height:250px}
+  .v1 .smile{width:200px}
+  .v2{width:220px;bottom:20px}
+  .v2 .price{font-size:26px}
+  .v3{width:200px}
+  .svcs{gap:12px}
+  .svc{padding:18px}
+  .svc h3{font-size:17px}
+  .svc p{font-size:14px}
+  .feature .l,.feature .r{padding:28px}
+  .big{font-size:52px}
+  .vbox{padding:28px}
+}
+@media (max-width:420px){ .why{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div class="demo"><b>نموذج تجريبي مقترح</b> لموقع رهف سمايل، بمحتوى وعروض من إعلاناتكم الحالية</div>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="رهف سمايل">
+      <span class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 2 1 3.5 1.5 5.5.6 2.5.8 8 2.8 8 1.7 0 1.6-5 3.2-5h3c1.6 0 1.5 5 3.2 5 2 0 2.2-5.5 2.8-8 .5-2 1.5-3.5 1.5-5.5C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3Z"/></svg></span>
+      <span><b>رهف سمايل</b><small>عيادة أسنان · مجمع عيادات رهف الصحة الطبي</small></span>
+    </a>
+    <nav class="links">
+      <a href="#services">خدماتنا</a>
+      <a href="#offer">العرض</a>
+      <a href="#why">ليش رهف</a>
+      <a href="#visit">موقعنا</a>
+    </nav>
+    <a class="btn btn-t wa" data-msg="السلام عليكم، أبغى أحجز موعد">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg>
+      احجز موعدك
+    </a>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="pill"><i></i> الرياض · حي النهضة · طريق الأمير بندر</span>
+      <h1>ابتسامتك غايتنا…<br><em>وثقتك أولويتنا</em></h1>
+      <p class="lead">عناية متكاملة بالأسنان بأحدث التقنيات: تجميل الأسنان، تركيبات الزيركون، تقويم، زراعة وتبييض، على يد أفضل الاستشاريين.</p>
+      <div class="cta">
+        <a class="btn btn-t wa" data-msg="السلام عليكم، أبغى أحجز موعد في عيادة الأسنان">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg>
+          احجز موعدك على الواتساب
+        </a>
+        <a class="btn btn-o" href="#offer">شوف عرض الزيركون</a>
+      </div>
+      <div class="trust">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>أفضل الاستشاريين</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>أحدث الأجهزة</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>حي النهضة، الرياض</span>
+      </div>
+    </div>
+
+    <div class="visual" aria-hidden="true">
+      <div class="vcard v1">
+        <h4>تركيبات الزيركون</h4>
+        <p>مظهر طبيعي · قوة ومتانة · تناسق مع أسنانك</p>
+        <svg class="smile" viewBox="0 0 260 130" fill="none">
+          <path d="M10 30c40 70 200 70 240 0" stroke="#d9c4f0" stroke-width="16" stroke-linecap="round"/>
+          <path d="M28 40c36 52 168 52 204 0" fill="#fff" stroke="#e7dbf6" stroke-width="2"/>
+          <g fill="#fff" stroke="#e1d3f2" stroke-width="2">
+            <rect x="58" y="44" width="26" height="30" rx="9"/><rect x="86" y="46" width="28" height="36" rx="10"/>
+            <rect x="116" y="47" width="28" height="38" rx="10"/><rect x="146" y="46" width="28" height="36" rx="10"/>
+            <rect x="176" y="44" width="26" height="30" rx="9"/>
+          </g>
+          <g fill="#9b6fd6"><path d="M206 18l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/><path d="M44 10l2 4.5 4.5 2-4.5 2L44 23l-2-4.5L37.5 16.5 42 14.5z" opacity=".6"/></g>
+        </svg>
+      </div>
+      <div class="vcard v2">
+        <span class="tag">عرض خاص</span>
+        <h4>تركيبة زيركون</h4>
+        <div class="price">275 <small>ريال · تبدأ من</small></div>
+      </div>
+      <div class="vcard v3">
+        <span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></span>
+        <span><b>تبييض الأسنان</b><small>ابتسامة أفتح من أول جلسة</small></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">خدماتنا</span>
+      <h2>كل اللي تحتاجه لابتسامتك في عيادة وحدة</h2>
+      <p>اختر الخدمة واحجز مباشرة، وفريقنا يرد عليك على الواتساب.</p>
+    </div>
+    <div class="svcs">
+      <a class="svc wa" data-msg="السلام عليكم، أبغى أستفسر عن تركيبات الزيركون"><div class="si"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 2 1 3.5 1.5 5.5.6 2.5.8 8 2.8 8 1.7 0 1.6-5 3.2-5h3c1.6 0 1.5 5 3.2 5 2 0 2.2-5.5 2.8-8 .5-2 1.5-3.5 1.5-5.5C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3Z"/></svg></div><h3>تركيبات الزيركون</h3><p>مظهر طبيعي وقوة ومتانة عالية.</p></a>
+      <a class="svc wa" data-msg="السلام عليكم، أبغى أستفسر عن ابتسامة هوليود"><div class="si"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10c2 6 14 6 16 0"/><path d="M8 9.5v2M12 10v2.5M16 9.5v2"/></svg></div><h3>ابتسامة هوليود</h3><p>تجميل الأسنان بابتسامة متناسقة.</p></a>
+      <a class="svc wa" data-msg="السلام عليكم، أبغى أستفسر عن التقويم"><div class="si"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="9" width="4" height="6" rx="1"/><rect x="10" y="9" width="4" height="6" rx="1"/><rect x="17" y="9" width="4" height="6" rx="1"/><path d="M2 12h20"/></svg></div><h3>التقويم</h3><p>أسنان مرتبة ومظهر طبيعي.</p></a>
+      <a class="svc wa" data-msg="السلام عليكم، أبغى أستفسر عن زراعة الأسنان"><div class="si"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l-1 6H9z"/><path d="M10 9v4M14 9v4M9 13h6l-1 8h-4z"/></svg></div><h3>زراعة الأسنان</h3><p>حل ثابت يرجّع لك ابتسامتك.</p></a>
+      <a class="svc wa" data-msg="السلام عليكم، أبغى أستفسر عن تبييض الأسنان"><div class="si"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></div><h3>تبييض الأسنان</h3><p>ابتسامة أفتح وأنظف.</p></a>
+      <a class="svc wa" data-msg="السلام عليكم، أبغى أحجز تنظيف أسنان"><div class="si"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 14 10M14 10l3-3 3 3-3 3z"/><path d="M6 14l4 4"/></svg></div><h3>تنظيف الأسنان</h3><p>عناية دورية تحمي أسنانك ولثتك.</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="offer-sec" id="offer">
+  <div class="wrap">
+    <div class="feature">
+      <div class="l">
+        <span class="tag">عرض خاص · لفترة محدودة</span>
+        <h2>ابتسامة أجمل تبدأ من هنا</h2>
+        <p>تركيبات الزيركون بأحدث التقنيات وعلى يد أفضل الاستشاريين، عشان تحصل على ابتسامة تجمع بين الجمال والجودة.</p>
+        <div class="big">275 <small>ريال · تبدأ من</small></div>
+        <a class="btn btn-o wa" data-msg="السلام عليكم، أبغى أحجز عرض تركيبة الزيركون (تبدأ من 275 ريال)">احجز العرض الآن</a>
+      </div>
+      <div class="r">
+        <div class="feat"><span class="fi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span><span><b>مظهر طبيعي</b><small>لون وشكل قريب من أسنانك الطبيعية</small></span></div>
+        <div class="feat"><span class="fi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span><span><b>قوة ومتانة عالية</b><small>تركيبات تعيش معك سنين</small></span></div>
+        <div class="feat"><span class="fi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span><span><b>تناسق جميل</b><small>متناسقة مع باقي أسنانك</small></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">ليش رهف سمايل؟</span>
+      <h2>عناية تستاهلها، وتجربة مريحة من أول رسالة</h2>
+    </div>
+    <div class="why">
+      <div class="w"><div class="wi"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div><h4>أفضل الاستشاريين</h4><p>نخبة من استشاريي الأسنان.</p></div>
+      <div class="w"><div class="wi"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h4>أحدث الأجهزة</h4><p>تقنيات حديثة لنتائج أدق وأسرع.</p></div>
+      <div class="w"><div class="wi"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 2 1 3.5 1.5 5.5.6 2.5.8 8 2.8 8 1.7 0 1.6-5 3.2-5h3c1.6 0 1.5 5 3.2 5 2 0 2.2-5.5 2.8-8 .5-2 1.5-3.5 1.5-5.5C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3Z"/></svg></div><h4>عيادة أسنان متكاملة</h4><p>من التنظيف للزراعة في مكان واحد.</p></div>
+      <div class="w"><div class="wi"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h4>حجز بثواني</h4><p>رسالة واتساب وحدة، ونأكد موعدك على طول.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="visit">
+  <div class="wrap visit">
+    <div class="vbox">
+      <h2>زورنا في حي النهضة</h2>
+      <p>قريبين منك على طريق الأمير بندر.</p>
+      <div class="rows">
+        <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg><span><b>العنوان</b><small>الرياض، حي النهضة، طريق الأمير بندر</small></span></div>
+        <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2.1Z"/></svg><span><b>للحجز والاستفسار</b><small><a href="tel:+966511825003">051 182 5003</a></small></span></div>
+      </div>
+      <a class="btn btn-o wa" data-msg="السلام عليكم، أبغى أستفسر عن الحجز">تواصل معنا على الواتساب</a>
+    </div>
+    <div class="map">
+      <div class="road r1"></div><div class="road r2"></div>
+      <div class="pin"><div class="dot"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 2 1 3.5 1.5 5.5.6 2.5.8 8 2.8 8 1.7 0 1.6-5 3.2-5h3c1.6 0 1.5 5 3.2 5 2 0 2.2-5.5 2.8-8 .5-2 1.5-3.5 1.5-5.5C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3Z"/></svg></div><div class="lbl">رهف سمايل</div></div>
+      <a class="btn btn-t" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=%D8%B1%D9%87%D9%81%20%D8%B3%D9%85%D8%A7%D9%8A%D9%84%20%D8%AD%D9%8A%20%D8%A7%D9%84%D9%86%D9%87%D8%B6%D8%A9%20%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6">افتح الموقع في خرائط جوجل</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 رهف سمايل · مجمع عيادات رهف الصحة الطبي · الرياض</span>
+    <span>نموذج مقترح من تصميم فارس الزهيري</span>
+  </div>
+</footer>
+
+<div class="bar">
+  <a class="btn btn-t wa" data-msg="السلام عليكم، أبغى أحجز موعد في عيادة الأسنان">احجز على الواتساب</a>
+  <a class="btn btn-o" href="tel:+966511825003">اتصل</a>
+</div>
+
+<script>
+const PHONE = "966511825003";
+document.querySelectorAll("a.wa").forEach(a => {
+  a.href = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(a.dataset.msg);
+  a.target = "_blank"; a.rel = "noopener";
+});
+</script>
+</body>
+</html>
