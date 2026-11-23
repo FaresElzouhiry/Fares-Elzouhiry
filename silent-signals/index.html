@@ -1,0 +1,1395 @@
+<meta charset="utf-8">
+<title>Silent Signals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500..900&family=Cairo:wght@400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&text=沈黙間目顔手声時日本ありがとう相槌&display=swap">
+<style>
+/* Layout: a fixed 1920×1080 stage (1080×1920 on portrait screens) scaled to the screen like a keynote; every scene is split by one seam, Japan left, Egypt right; advanced only by clicker or keys */
+:root {
+  --ink: #0A0C11;
+  --ink-2: #12151D;
+  --card: #171B25;
+  --paper: #F3EEE5;
+  --soft: #C3C7D2;
+  --mute: #8D93A2;
+  --line: #2A303D;
+  --jp: #F0563A;          /* shu vermilion */
+  --jp-deep: #B8341E;
+  --eg: #5E8BFF;          /* faience lapis */
+  --eg-deep: #2D55C8;
+  --gold: #E9B460;
+  --display: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  --body: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+  --kanji: 'Noto Sans JP', 'Yu Gothic', 'Hiragino Sans', 'Meiryo', sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: #050608; color: var(--paper); overflow: hidden;
+  font-family: var(--body);
+  padding-left: max(0px, env(safe-area-inset-left, 0px));
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, p { margin: 0; }
+
+/* ---------- Stage ---------- */
+#viewport { position: fixed; inset: 0; overflow: hidden; background: #050608; }
+#stage {
+  position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px;
+  transform-origin: center center; transform: translate(-50%, -50%) scale(0.5); background: var(--ink); overflow: hidden;
+  cursor: none;
+}
+#stage.cursor { cursor: default; }
+.portrait #stage { width: 1080px; height: 1920px; }
+.grain { position: absolute; inset: 0; z-index: 40; pointer-events: none; opacity: 0.07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+/* ---------- Slides ---------- */
+.slide {
+  position: absolute; inset: 0; padding: 104px 128px 112px;
+  display: flex; flex-direction: column; gap: 40px;
+  opacity: 0; visibility: hidden; transition: opacity 0.7s ease, visibility 0s linear 0.7s;
+  background: var(--ink); isolation: isolate;
+}
+.slide.active { opacity: 1; visibility: visible; transition: opacity 0.7s ease; z-index: 2; }
+.portrait .slide { padding: 120px 80px 130px; gap: 44px; }
+.slide.center { justify-content: center; }
+
+.a { opacity: 1; }
+.slide.active .a { animation: rise 0.9s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--d, 0) * 130ms + 200ms); }
+.slide.active .af { animation: fadeIn 1.2s ease both; animation-delay: calc(var(--d, 0) * 130ms + 100ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity: 0; } }
+
+.step { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(.2,.8,.2,1); }
+.step.shown { opacity: 1; transform: none; }
+
+/* Kicker + titles */
+.kick { display: flex; align-items: center; gap: 22px; font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mute); }
+.kick .num { color: var(--paper); font-weight: 800; font-variant-numeric: tabular-nums; }
+.kick .bar { width: 64px; height: 2px; background: linear-gradient(90deg, var(--jp), var(--eg)); }
+.title { font-family: var(--display); font-weight: 800; font-size: 96px; line-height: 1.02; letter-spacing: -0.035em; max-width: 1300px; text-wrap: balance; }
+.portrait .title { font-size: 84px; }
+.title .jp, .jp-t { color: var(--jp); }
+.title .eg, .eg-t { color: var(--eg); }
+.cite { position: absolute; left: 128px; bottom: 52px; font-size: 22px; color: var(--mute); letter-spacing: 0.01em; z-index: 5; }
+.portrait .cite { left: 80px; right: 80px; bottom: 60px; }
+
+/* Watermark glyphs */
+.wm { position: absolute; z-index: 0; pointer-events: none; line-height: 1; font-weight: 900; user-select: none; }
+.wm.jp { font-family: var(--kanji); color: rgba(240, 86, 58, 0.06); }
+.wm.eg { font-family: var(--body); color: rgba(94, 139, 255, 0.06); }
+.wm { z-index: -1; }
+
+/* Split with seam */
+.split { flex: 1; display: grid; grid-template-columns: 1fr 2px 1fr; gap: 72px; min-height: 0; }
+.seam { background: linear-gradient(var(--jp), var(--eg)); opacity: 0.7; transform-origin: top; }
+.slide.active .seam { animation: grow 1.2s cubic-bezier(.2,.8,.2,1) 0.3s both; }
+@keyframes grow { from { transform: scaleY(0); } }
+.portrait .split { grid-template-columns: 1fr; grid-template-rows: 1fr 2px 1fr; gap: 48px; }
+.portrait .seam { transform-origin: left; }
+.portrait .slide.active .seam { animation-name: growX; }
+@keyframes growX { from { transform: scaleX(0); } }
+.half { display: flex; flex-direction: column; gap: 26px; min-width: 0; min-height: 0; }
+.mid .half { justify-content: center; }
+.mid .split { padding-bottom: 40px; }
+.tag { display: flex; align-items: baseline; gap: 18px; font-family: var(--display); font-weight: 800; font-size: 30px; letter-spacing: 0.18em; text-transform: uppercase; }
+.half.jp .tag { color: var(--jp); }
+.half.eg .tag { color: var(--eg); }
+.tag .nat { font-size: 30px; letter-spacing: 0; text-transform: none; opacity: 0.85; }
+.tag .nat.k { font-family: var(--kanji); }
+.big { font-family: var(--display); font-weight: 700; font-size: 50px; line-height: 1.12; letter-spacing: -0.02em; text-wrap: balance; }
+.portrait .big { font-size: 46px; }
+.body { font-size: 32px; line-height: 1.45; color: var(--soft); max-width: 760px; }
+.body b { color: var(--paper); font-weight: 700; }
+.list { display: flex; flex-direction: column; gap: 16px; }
+.list p { font-size: 31px; line-height: 1.4; color: var(--soft); padding-left: 34px; position: relative; }
+.list p::before { content: ""; position: absolute; left: 0; top: 0.58em; width: 12px; height: 12px; transform: rotate(45deg); }
+.jp .list p::before { background: var(--jp); }
+.eg .list p::before { background: var(--eg); }
+.list p b { color: var(--paper); }
+
+/* ---------- Plates (drawn scenes) ---------- */
+.bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.plate { position: absolute; inset: 0; width: 100%; height: 100%; }
+.slide.active .kb { animation: kb 16s ease-out both; }
+@keyframes kb { from { transform: scale(1.08); } to { transform: scale(1); } }
+.shade-b { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,12,17,0) 30%, rgba(10,12,17,0.55) 62%, rgba(10,12,17,0.96) 100%); }
+.shade-l { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,12,17,0.95) 0%, rgba(10,12,17,0.72) 40%, rgba(10,12,17,0.1) 75%); }
+.fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* ---------- Cover ---------- */
+.cover { padding: 0; }
+.cover .halves { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; }
+.portrait .cover .halves { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+.cover .hv { position: relative; overflow: hidden; }
+.cover .hv .plate { position: absolute; inset: 0; }
+.slide.cover.active .hv.l { animation: inL 1.4s cubic-bezier(.2,.8,.2,1) both; }
+.slide.cover.active .hv.r { animation: inR 1.4s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes inL { from { transform: translateX(-12%); opacity: 0; } }
+@keyframes inR { from { transform: translateX(12%); opacity: 0; } }
+.portrait .slide.cover.active .hv.l { animation-name: inT; }
+.portrait .slide.cover.active .hv.r { animation-name: inB; }
+@keyframes inT { from { transform: translateY(-10%); opacity: 0; } }
+@keyframes inB { from { transform: translateY(10%); opacity: 0; } }
+.cover .veil { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 55%, rgba(10,12,17,0.82), rgba(10,12,17,0.25) 70%, rgba(10,12,17,0) 100%); }
+.cover .seamline { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: linear-gradient(var(--jp), var(--eg)); z-index: 3; }
+.portrait .cover .seamline { left: 0; right: 0; top: 50%; bottom: auto; width: auto; height: 2px; margin: -1px 0 0; }
+.cover-inner { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 30px; padding: 0 120px; }
+.cover .eyebrow { font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--soft); }
+.cover h1 { font-family: var(--display); font-weight: 900; font-size: 210px; line-height: 0.9; letter-spacing: -0.05em; text-shadow: 0 10px 60px rgba(0,0,0,0.5); }
+.portrait .cover h1 { font-size: 170px; }
+.cover h1 .w1 { color: var(--paper); }
+.cover h1 .w2 { background: linear-gradient(90deg, var(--jp), var(--gold) 50%, var(--eg)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cover .sub { font-size: 38px; color: var(--paper); opacity: 0.92; }
+.cover .names { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 34px; font-family: var(--display); font-weight: 600; font-size: 24px; letter-spacing: 0.06em; color: var(--soft); margin-top: 26px; max-width: 1400px; }
+.cover .names span::before { content: "◆"; font-size: 12px; margin-right: 12px; vertical-align: 4px; color: var(--gold); }
+.cover .hint { position: absolute; bottom: 44px; left: 64px; text-align: left; z-index: 6; font-size: 20px; color: rgba(243,238,229,0.55); letter-spacing: 0.08em; }
+.hint kbd { font-family: var(--display); font-weight: 700; font-size: 16px; border: 1.5px solid rgba(243,238,229,0.4); border-radius: 6px; padding: 1px 8px; margin: 0 4px; }
+
+/* ---------- Hook ---------- */
+.hook .split { gap: 96px; }
+.gnum { font-family: var(--display); font-weight: 900; font-size: 220px; line-height: 0.8; letter-spacing: -0.06em; }
+.half.jp .gnum { color: var(--jp); }
+.half.eg .gnum { color: var(--eg); }
+.gdesc { font-size: 40px; line-height: 1.3; color: var(--paper); max-width: 720px; }
+.reveal { margin-top: auto; padding-top: 30px; border-top: 2px solid var(--line); }
+.reveal .lbl { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--mute); }
+.reveal .ans { font-family: var(--display); font-weight: 800; font-size: 72px; letter-spacing: -0.03em; line-height: 1.05; margin-top: 8px; }
+.half.jp .ans { color: var(--jp); }
+.half.eg .ans { color: var(--eg); }
+.reveal .sm { font-size: 28px; color: var(--soft); margin-top: 6px; }
+.portrait .gnum { font-size: 150px; }
+.portrait .reveal .ans { font-size: 60px; }
+
+/* ---------- Framework map ---------- */
+.fw { flex: 1; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 80px; align-items: center; min-height: 0; }
+.portrait .fw { grid-template-columns: 1fr; gap: 56px; align-items: start; }
+.map { position: relative; width: 100%; height: 540px; }
+.map .plane { position: absolute; inset: 0 0 56px 70px; border-left: 2px solid var(--line); border-bottom: 2px solid var(--line); }
+.map .plane::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 2px dashed var(--line); }
+.map .plane::after { content: ""; position: absolute; top: 50%; left: 0; right: 0; border-top: 2px dashed var(--line); }
+.map .ylab { position: absolute; left: 0; font-size: 22px; color: var(--mute); font-family: var(--display); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); }
+.map .xlab { position: absolute; bottom: 0; font-size: 22px; color: var(--mute); font-family: var(--display); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.pt { position: absolute; left: calc(70px + (100% - 70px) * 0.5); top: calc((100% - 56px) * 0.5); width: 0; height: 0; transition: left 1.1s cubic-bezier(.2,.8,.2,1), top 1.1s cubic-bezier(.2,.8,.2,1); }
+.pt i { position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; border-radius: 50%; }
+.pt.jp i { background: var(--jp); box-shadow: 0 0 0 14px rgba(240,86,58,0.18), 0 0 60px rgba(240,86,58,0.6); }
+.pt.eg i { background: var(--eg); box-shadow: 0 0 0 14px rgba(94,139,255,0.18), 0 0 60px rgba(94,139,255,0.6); }
+.pt span { position: absolute; top: -18px; left: 40px; white-space: nowrap; font-family: var(--display); font-weight: 800; font-size: 34px; }
+.pt.jp span { color: var(--jp); }
+.pt.eg span { color: var(--eg); }
+.pt.eg { top: calc((100% - 56px) * 0.5 - 50px); }
+.pt.jp { top: calc((100% - 56px) * 0.5 + 50px); }
+.slide[data-at="1"] .pt.jp, .slide[data-at="2"] .pt.jp { left: calc(70px + (100% - 70px) * 0.82); }
+.slide[data-at="1"] .pt.eg, .slide[data-at="2"] .pt.eg { left: calc(70px + (100% - 70px) * 0.74); }
+.slide[data-at="2"] .pt.eg { top: calc((100% - 56px) * 0.17); }
+.slide[data-at="2"] .pt.jp { top: calc((100% - 56px) * 0.83); }
+.fw-text { display: flex; flex-direction: column; gap: 44px; }
+.fw-item .k { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); }
+.fw-item .big { margin-top: 10px; }
+.fw-item .body { margin-top: 10px; }
+
+/* ---------- Eyes ---------- */
+.eye { width: 560px; max-width: 100%; height: 230px; }
+.eye .white { fill: #F3EEE5; }
+.eye .lid { fill: none; stroke: var(--paper); stroke-width: 6; }
+.eye .iris-jp { fill: var(--jp-deep); }
+.eye .iris-eg { fill: var(--eg-deep); }
+.eye .pupil { fill: #0A0C11; }
+.eye .glint { fill: #fff; opacity: 0.9; }
+.eye .lash { fill: var(--ink); }
+.irisg { transform-box: view-box; transform-origin: 280px 115px; }
+.slide.active .irisg.down { animation: lookDown 2.2s cubic-bezier(.4,0,.2,1) 0.8s both; }
+.slide.active .irisg.steady { animation: lookSteady 2.2s cubic-bezier(.4,0,.2,1) 0.8s both; }
+@keyframes lookDown { 0% { transform: translate(0, 0); } 35% { transform: translate(0, 0); } 100% { transform: translate(-26px, 34px); } }
+@keyframes lookSteady { 0% { transform: translate(-60px, 0); } 45% { transform: translate(-60px, 0); } 100% { transform: translate(0, 0); } }
+.lidtop { transform-box: view-box; transform-origin: 280px 20px; }
+.slide.active .lidtop.lower { animation: lidLower 2.2s cubic-bezier(.4,0,.2,1) 0.8s both; }
+@keyframes lidLower { 0%, 35% { transform: translateY(-70px); } 100% { transform: translateY(0); } }
+.lidtop.lower { transform: translateY(0); }
+.lidtop.open { transform: translateY(-70px); }
+
+/* ---------- Face (emoticons) ---------- */
+.emo { font-family: var(--display); font-weight: 900; font-size: 200px; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; }
+.emo .hl { position: relative; }
+.half.jp .emo .hl { color: var(--jp); }
+.half.eg .emo .hl { color: var(--eg); }
+.emo .dim { color: rgba(243,238,229,0.22); }
+.portrait .emo { font-size: 150px; }
+.emo-cap { font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mute); }
+
+/* ---------- Space ---------- */
+.dist { position: relative; height: 300px; }
+.dist svg { position: absolute; bottom: 0; height: 260px; width: 120px; transition: transform 1.6s cubic-bezier(.2,.8,.2,1); }
+.dist .p1 { left: 50%; margin-left: -130px; }
+.dist .p2 { left: 50%; margin-left: 10px; }
+.slide.active .dist.far .p1 { animation: apartL 1.8s cubic-bezier(.2,.8,.2,1) 0.9s both; }
+.slide.active .dist.far .p2 { animation: apartR 1.8s cubic-bezier(.2,.8,.2,1) 0.9s both; }
+.dist.far .p1 { transform: translateX(-200px); }
+.dist.far .p2 { transform: translateX(200px); }
+@keyframes apartL { from { transform: translateX(0); } to { transform: translateX(-200px); } }
+@keyframes apartR { from { transform: translateX(0); } to { transform: translateX(200px); } }
+.slide.active .dist.near .p1 { animation: nearL 1.8s cubic-bezier(.2,.8,.2,1) 0.9s both; }
+.slide.active .dist.near .p2 { animation: nearR 1.8s cubic-bezier(.2,.8,.2,1) 0.9s both; }
+.dist.near .p1 { transform: translateX(18px); }
+.dist.near .p2 { transform: translateX(-18px); }
+.dist.near .meas { bottom: 272px; }
+@keyframes nearL { from { transform: translateX(-200px); } to { transform: translateX(18px); } }
+@keyframes nearR { from { transform: translateX(200px); } to { transform: translateX(-18px); } }
+.dist .gap { position: absolute; left: 50%; bottom: 130px; height: 0; border-top: 3px dashed var(--mute); transform: translateX(-50%); transition: width 1.6s; }
+.dist.far .gap { width: 380px; }
+.dist.near .gap { width: 0; }
+.dist .meas { position: absolute; left: 0; right: 0; bottom: 146px; text-align: center; font-family: var(--display); font-weight: 800; font-size: 24px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mute); }
+.fig-body { fill: currentColor; }
+.half.jp .dist { color: var(--jp); }
+.half.eg .dist { color: var(--eg); }
+.fact { display: flex; gap: 26px; align-items: center; padding: 26px 34px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); font-size: 30px; color: var(--soft); }
+.fact b { color: var(--gold); font-family: var(--display); font-size: 22px; letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
+
+/* ---------- Touch ---------- */
+.meter { display: flex; flex-direction: column; gap: 12px; }
+.meter .row { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: center; font-size: 28px; color: var(--soft); }
+.meter .track { height: 14px; border-radius: 7px; background: var(--line); overflow: hidden; }
+.meter .fill { height: 100%; border-radius: 7px; transform-origin: left; }
+.half.jp .fill { background: var(--jp); }
+.half.eg .fill { background: var(--eg); }
+.slide.active .meter .fill { animation: fillX 1.4s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--d, 0) * 150ms + 700ms); }
+@keyframes fillX { from { transform: scaleX(0); } }
+.meter-note { font-size: 22px; color: var(--mute); }
+
+/* ---------- Voice ---------- */
+.wave { height: 220px; display: flex; align-items: center; gap: 7px; }
+.wave i { flex: 1; border-radius: 6px; height: calc(var(--h) * 1%); min-height: 6px; transform-origin: center; }
+.half.jp .wave i { background: var(--jp); }
+.half.eg .wave i { background: var(--eg); }
+.slide.active .wave i { animation: pulse 1.6s ease-in-out infinite alternate; animation-delay: calc(var(--k) * -97ms); }
+@keyframes pulse { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
+.wave i.s { opacity: 0.25; height: 6px; }
+.slide.active .wave i.s { animation: none; }
+.said { display: flex; flex-wrap: wrap; gap: 12px; }
+.said span { font-size: 28px; padding: 6px 22px; border-radius: 999px; border: 2px solid; }
+.half.jp .said span { border-color: rgba(240,86,58,0.5); color: var(--paper); }
+.half.eg .said span { border-color: rgba(94,139,255,0.5); color: var(--paper); }
+
+/* ---------- Time ---------- */
+.clockrow { display: flex; gap: 40px; align-items: center; }
+.clock { width: 260px; height: 260px; flex: none; }
+.clock .face { fill: var(--card); stroke: var(--line); stroke-width: 4; }
+.clock .tick { stroke: var(--mute); stroke-width: 4; stroke-linecap: round; }
+.clock .hand { stroke: var(--paper); stroke-linecap: round; transform-box: view-box; transform-origin: 130px 130px; transform: rotate(var(--r)); }
+.slide.active .clock .hand { animation: spin 2s cubic-bezier(.3,.8,.2,1) 0.6s both; }
+@keyframes spin { from { transform: rotate(calc(var(--r) - 360deg)); } }
+.clock .arc { fill: none; stroke-width: 22; opacity: 0.4; }
+.clockcap .t { font-family: var(--display); font-weight: 900; font-size: 84px; letter-spacing: -0.03em; line-height: 1; }
+.half.jp .clockcap .t { color: var(--jp); }
+.half.eg .clockcap .t { color: var(--eg); }
+.clockcap .s { font-size: 28px; color: var(--soft); margin-top: 8px; }
+.portrait .clock { width: 200px; height: 200px; }
+.portrait .clockcap .t { font-size: 70px; }
+
+/* ---------- Why ---------- */
+.why-quote { font-family: var(--display); font-weight: 800; font-size: min(118px, calc(var(--sw, 1920) * 0.05px)); margin-top: 30px; line-height: 1.02; letter-spacing: -0.04em; }
+.portrait .why-quote { font-size: 84px; }
+.why-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; margin-top: auto; }
+.portrait .why-grid { grid-template-columns: 1fr; gap: 28px; }
+.wcard { padding: 34px 38px; border-radius: 22px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px; }
+.wcard.jp { border-top: 6px solid var(--jp); }
+.wcard.eg { border-top: 6px solid var(--eg); }
+.wcard.both { border-top: 6px solid var(--gold); }
+.wcard h3 { font-family: var(--display); font-weight: 800; font-size: 36px; letter-spacing: -0.01em; }
+.wcard p { font-size: 28px; line-height: 1.42; color: var(--soft); }
+
+/* ---------- Collide ---------- */
+.cases { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; min-height: 0; }
+.portrait .cases { grid-template-columns: 1fr; gap: 26px; }
+.case { padding: 38px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 18px; }
+.portrait .case { padding: 30px 34px; gap: 12px; }
+.case .dir { font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: 0.1em; white-space: nowrap; text-transform: uppercase; }
+.case .scn { font-size: 32px; line-height: 1.38; color: var(--paper); }
+.case .mis { font-size: 30px; color: var(--mute); font-style: italic; }
+.case .mis::before { content: "Misread  "; font-style: normal; font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mute); }
+.case .better { margin-top: auto; padding-top: 22px; border-top: 2px solid var(--line); }
+.portrait .case .better { padding-top: 14px; }
+.case .better .l { font-family: var(--display); font-weight: 800; font-size: 18px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); }
+.case .better p { font-family: var(--display); font-weight: 700; font-size: 32px; line-height: 1.22; margin-top: 8px; }
+.portrait .case .scn { font-size: 30px; }
+.portrait .case .better p { font-size: 30px; }
+
+/* ---------- D-I-E ---------- */
+.die { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; min-height: 0; border-top: 2px solid var(--line); }
+.portrait .die { grid-template-columns: 1fr; }
+.die > div { padding: 46px 48px 0 0; display: flex; flex-direction: column; gap: 14px; }
+.die > div + div { padding-left: 48px; border-left: 2px solid var(--line); }
+.portrait .die > div { padding: 34px 0; }
+.portrait .die > div + div { padding-left: 0; border-left: 0; border-top: 2px solid var(--line); }
+.die .L { font-family: var(--display); font-weight: 900; font-size: 190px; line-height: 0.8; letter-spacing: -0.05em; }
+.portrait .die .L { font-size: 120px; }
+.die h3 { font-family: var(--display); font-weight: 800; font-size: 44px; }
+.die .ex { font-size: 32px; color: var(--paper); font-weight: 600; }
+.die .d { font-size: 28px; color: var(--soft); }
+
+/* ---------- Takeaways ---------- */
+.tks { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0; }
+.tk { display: grid; grid-template-columns: 180px 1fr; gap: 40px; align-items: baseline; padding: 40px 0; border-top: 2px solid var(--line); }
+.tk:last-child { border-bottom: 2px solid var(--line); }
+.portrait .tk { grid-template-columns: 1fr; gap: 10px; }
+.tk .n { font-family: var(--display); font-weight: 900; font-size: 80px; line-height: 0.9; letter-spacing: -0.04em; color: var(--line); }
+.tk h3 { font-family: var(--display); font-weight: 800; font-size: 70px; letter-spacing: -0.03em; line-height: 1.05; }
+.tk p { font-size: 34px; color: var(--soft); margin-top: 12px; }
+.portrait .tk h3 { font-size: 50px; }
+
+/* ---------- Thanks ---------- */
+.thanks h1 { font-size: 220px; }
+.portrait .thanks h1 { font-size: 160px; }
+.thx { display: flex; gap: 40px; font-size: 48px; font-weight: 700; }
+.thx .k { font-family: var(--kanji); }
+
+/* ---------- References ---------- */
+.refs { columns: 2; column-gap: 72px; }
+.portrait .refs { columns: 1; }
+.refs p { break-inside: avoid; font-size: 23px; line-height: 1.42; color: var(--soft); padding-left: 1.6em; text-indent: -1.6em; margin-bottom: 16px; }
+.portrait .refs p { font-size: 22px; }
+
+/* ---------- Chrome (outside the stage) ---------- */
+#prog { position: fixed; left: 0; bottom: 0; height: 3px; background: linear-gradient(90deg, var(--jp), var(--eg)); width: 0; z-index: 30; transition: width 0.5s ease; }
+#count { position: fixed; right: max(18px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 30; font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.16em; color: rgba(243,238,229,0.45); font-variant-numeric: tabular-nums; transition: opacity 0.4s; }
+#notes { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; max-height: 46vh; overflow-y: auto; background: rgba(18,21,29,0.97); border-top: 1px solid var(--line); padding: 18px max(20px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)); }
+#notes .in { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+#notes .who { font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); }
+#notes p { font-size: 17px; line-height: 1.6; color: var(--soft); }
+#notes p b { color: var(--paper); }
+#fsbtn { position: fixed; z-index: 55; top: calc(14px + env(safe-area-inset-top, 0px)); right: max(14px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; cursor: pointer;
+  background: rgba(18,21,29,0.85); color: var(--paper); border: 1px solid rgba(243,238,229,0.25);
+  font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.06em;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+#fsbtn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+#fsbtn.show, #fsbtn:focus-visible { opacity: 1; pointer-events: auto; }
+#fsbtn:hover { background: rgba(30,34,46,0.95); }
+#black { position: fixed; inset: 0; background: #000; z-index: 60; }
+/* ---------- Scenario slides: one situation, two reactions ---------- */
+.slide.sc { gap: 28px; }
+.sc .title { font-size: 74px; max-width: 1700px; }
+.portrait .sc .title { font-size: 62px; }
+.sit { display: block; font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+.lensp { margin-left: auto; padding: 6px 18px; border: 1.5px solid var(--line); border-radius: 999px; font-size: 18px; letter-spacing: 0.12em; color: var(--soft); white-space: nowrap; }
+.portrait .lensp { display: none; }
+.sc .half { gap: 18px; }
+.sc .big { font-size: 42px; }
+.sc .body { font-size: 29px; }
+.var { font-size: 24px; line-height: 1.4; color: var(--mute); padding-left: 18px; border-left: 3px solid var(--line); max-width: 760px; }
+.var b { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-right: 6px; }
+.sc .eye { width: 440px; height: 181px; }
+.facev { width: 180px; height: 180px; }
+.facev .skin { fill: var(--card); stroke-width: 6; }
+.half.jp .facev .skin { stroke: var(--jp); }
+.half.eg .facev .skin { stroke: var(--eg); }
+.facev .feat { fill: none; stroke: var(--paper); stroke-width: 7; stroke-linecap: round; }
+.facev .blush { fill: rgba(240, 86, 58, 0.35); }
+.facev .mouth-o { fill: var(--eg); stroke: var(--paper); stroke-width: 5; stroke-linejoin: round; transform-box: fill-box; transform-origin: center top; }
+.slide.active .facev .mouth-o { animation: laugh 0.5s ease-in-out 1s 4 alternate; }
+@keyframes laugh { from { transform: scaleY(1); } to { transform: scaleY(0.72); } }
+.seq { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.seq span { font-size: 27px; padding: 6px 20px; border-radius: 999px; border: 2px solid; color: var(--paper); }
+.half.jp .seq span { border-color: rgba(240, 86, 58, 0.55); }
+.half.eg .seq span { border-color: rgba(94, 139, 255, 0.55); }
+.seq i { font-style: normal; color: var(--mute); font-size: 26px; }
+.sc .clock { width: 220px; height: 220px; }
+.sc .split { flex: 0 1 auto; margin-block: auto; }
+.sc .dist { height: 280px; }
+.sc .dist svg { height: 220px; width: 102px; bottom: 44px; }
+.sc .dist .meas, .sc .dist.near .meas { bottom: 0; font-size: 20px; letter-spacing: 0.16em; }
+.sc .dist .gap { bottom: 150px; }
+.notes { display: none !important; }#wipe { position: absolute; inset: 0; z-index: 45; pointer-events: none; display: grid; grid-template-columns: 1fr 1fr; }
+.portrait #wipe { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+#wipe i { display: block; transform: translateX(-101%); }
+#wipe i + i { transform: translateX(101%); }
+#wipe i:first-child { background: linear-gradient(90deg, var(--jp-deep), var(--jp)); }
+#wipe i + i { background: linear-gradient(90deg, var(--eg), var(--eg-deep)); }
+#wipe.go i:first-child { animation: wipeL 0.95s cubic-bezier(.7,0,.3,1) both; }
+#wipe.go i + i { animation: wipeR 0.95s cubic-bezier(.7,0,.3,1) both; }
+@keyframes wipeL { 0% { transform: translateX(-101%); } 45%, 55% { transform: translateX(0); } 100% { transform: translateX(-101%); } }
+@keyframes wipeR { 0% { transform: translateX(101%); } 45%, 55% { transform: translateX(0); } 100% { transform: translateX(101%); } }
+.portrait #wipe i:first-child { transform: translateY(-101%); }
+.portrait #wipe i + i { transform: translateY(101%); }
+.portrait #wipe.go i:first-child { animation-name: wipeT; }
+.portrait #wipe.go i + i { animation-name: wipeB; }
+@keyframes wipeT { 0% { transform: translateY(-101%); } 45%, 55% { transform: translateY(0); } 100% { transform: translateY(-101%); } }
+@keyframes wipeB { 0% { transform: translateY(101%); } 45%, 55% { transform: translateY(0); } 100% { transform: translateY(101%); } }
+/* ---------- Gestures (swipe the hand to change slides) ---------- */
+.gbtn { position: absolute; left: 64px; bottom: 96px; z-index: 7; display: flex; align-items: center; gap: 12px; padding: 12px 22px 12px 18px; border-radius: 999px; cursor: pointer;
+  background: rgba(18,21,29,0.72); color: var(--paper); border: 1.5px solid rgba(243,238,229,0.3);
+  font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: 0.04em; }
+.gbtn:hover { background: rgba(30,34,46,0.92); border-color: rgba(243,238,229,0.55); }
+.gbtn:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.gbtn svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.gbtn i { width: 10px; height: 10px; border-radius: 50%; background: var(--mute); flex: none; }
+.gbtn[data-state="loading"] i { background: var(--gold); animation: gblink 0.9s ease-in-out infinite alternate; }
+.gbtn[data-state="on"] i, .gbtn[data-state="paused"] i { background: #3DDC97; }
+.gbtn[data-state="error"] { border-color: var(--jp); }
+.gbtn[data-state="error"] i { background: var(--jp); }
+@keyframes gblink { to { opacity: 0.25; } }
+.portrait .gbtn { left: 80px; bottom: 110px; }
+#gstat { position: fixed; left: max(18px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 30; display: flex; align-items: center; gap: 8px;
+  font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(243,238,229,0.45); }
+#gstat[hidden] { display: none; }
+#gstat i { width: 8px; height: 8px; border-radius: 50%; background: rgba(61,220,151,0.4); transition: background 0.2s, box-shadow 0.2s; }
+#gstat.hand i { background: #3DDC97; }
+#gstat.paused i { background: var(--mute); }
+#gstat.swipe i { box-shadow: 0 0 0 6px rgba(61,220,151,0.35); }
+#gcam { position: fixed; z-index: 52; right: max(18px, env(safe-area-inset-right, 0px)); bottom: calc(36px + env(safe-area-inset-bottom, 0px));
+  width: 280px; aspect-ratio: 4 / 3; border-radius: 14px; overflow: hidden; background: #000;
+  border: 1px solid rgba(243,238,229,0.25); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+#gcam[hidden] { display: none; }
+#gcam video, #gcam canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+#gcam video { transform: scaleX(-1); }
+#gcam .gcam-tip { position: absolute; left: 10px; bottom: 7px; font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(243,238,229,0.75); text-shadow: 0 1px 4px #000; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<!-- Reusable drawn scenes -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="jpSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B0E24"/><stop offset="0.45" stop-color="#2B1736"/><stop offset="0.72" stop-color="#8E2F33"/><stop offset="0.9" stop-color="#E0603B"/><stop offset="1" stop-color="#F5A25D"/></linearGradient>
+    <radialGradient id="jpGlow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FF7A4D" stop-opacity="0.55"/><stop offset="1" stop-color="#FF7A4D" stop-opacity="0"/></radialGradient>
+    <linearGradient id="jpMist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F5A25D" stop-opacity="0"/><stop offset="0.5" stop-color="#E9855A" stop-opacity="0.35"/><stop offset="1" stop-color="#0A0C11" stop-opacity="0"/></linearGradient>
+    <linearGradient id="egSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0A1030"/><stop offset="0.4" stop-color="#2A2450"/><stop offset="0.68" stop-color="#B9663A"/><stop offset="0.86" stop-color="#F0B25E"/><stop offset="1" stop-color="#F9D58A"/></linearGradient>
+    <radialGradient id="egGlow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFE2A0" stop-opacity="0.8"/><stop offset="1" stop-color="#FFE2A0" stop-opacity="0"/></radialGradient>
+    <symbol id="japan" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+      <rect width="1920" height="1080" fill="url(#jpSky)"/>
+      <circle cx="1210" cy="590" r="420" fill="url(#jpGlow)"/>
+      <circle cx="1210" cy="590" r="210" fill="#EF4B30"/>
+      <path d="M0 770 L210 705 L420 748 L640 672 L860 728 L1080 690 L1330 748 L1560 700 L1760 742 L1920 712 V1080 H0Z" fill="#3A1A31" opacity="0.8"/>
+      <path d="M540 880 L930 470 Q960 448 990 470 L1380 880 Z" fill="#1C1126"/>
+      <path d="M868 536 L930 470 Q960 448 990 470 L1052 536 L1022 524 L996 552 L962 522 L932 556 L902 526 Z" fill="#F3EEE5" opacity="0.92"/>
+      <rect y="760" width="1920" height="200" fill="url(#jpMist)"/>
+      <path d="M0 930 Q480 862 960 912 T1920 890 V1080 H0Z" fill="#0A0C11"/>
+      <g fill="#0A0C11">
+        <path d="M200 520 Q420 492 640 520 L652 494 Q420 452 188 494 Z"/>
+        <rect x="222" y="532" width="408" height="22"/>
+        <rect x="262" y="520" width="30" height="460"/>
+        <rect x="560" y="520" width="30" height="460"/>
+        <rect x="232" y="604" width="388" height="24"/>
+        <rect x="414" y="552" width="24" height="54"/>
+      </g>
+    </symbol>
+    <symbol id="egypt" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+      <rect width="1920" height="1080" fill="url(#egSky)"/>
+      <circle cx="640" cy="660" r="380" fill="url(#egGlow)"/>
+      <circle cx="640" cy="660" r="150" fill="#FFE1A1"/>
+      <polygon points="520,840 700,640 880,840" fill="#9A5F34"/>
+      <polygon points="700,640 880,840 700,840" fill="#5A3420"/>
+      <polygon points="840,840 1190,410 1540,840" fill="#B9773F"/>
+      <polygon points="1190,410 1540,840 1190,840" fill="#6B3D24"/>
+      <polygon points="1420,840 1640,560 1860,840" fill="#A96B39"/>
+      <polygon points="1640,560 1860,840 1640,840" fill="#5E3521"/>
+      <path d="M0 850 Q420 790 860 846 T1920 826 V1080 H0Z" fill="#3A2418"/>
+      <path d="M0 930 Q560 868 1100 922 T1920 900 V1080 H0Z" fill="#0A0C11"/>
+    </symbol>
+    <symbol id="person" viewBox="0 0 120 260">
+      <circle cx="60" cy="34" r="30"/>
+      <path d="M14 260 V118 Q14 78 60 78 Q106 78 106 118 V260 Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="viewport">
+<div id="stage" role="region" aria-roledescription="presentation" aria-label="Silent Signals">
+
+<!-- 1 · Cover -->
+<section class="slide cover" data-title="Silent Signals" data-fx="both">
+  <div class="halves">
+    <div class="hv l"><svg class="plate kb" aria-hidden="true"><use href="#japan"/></svg></div>
+    <div class="hv r"><svg class="plate kb" aria-hidden="true"><use href="#egypt"/></svg></div>
+  </div>
+  <canvas class="fx" aria-hidden="true"></canvas>
+  <div class="veil"></div>
+  <div class="seamline"></div>
+  <div class="cover-inner">
+    <p class="eyebrow a" style="--d:2">LRA 112 · Fundamentals of Communication · E-JUST</p>
+    <h1 class="a" style="--d:3"><span class="w1">Silent</span> <span class="w2">Signals</span></h1>
+    <p class="sub a" style="--d:4">Nonverbal communication in <span class="jp-t">Japan</span> and <span class="eg-t">Egypt</span></p>
+    <div class="names a" style="--d:5"><span>Yasmin</span><span>Tareq Khalil</span><span>Malak Abdelazem</span><span>Abdelrahman</span><span>Fares</span></div>
+  </div>
+  <p class="hint af" style="--d:10"><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>F</kbd> full screen &nbsp;·&nbsp; <kbd>N</kbd> notes</p>
+  <!-- GESTURES OFF: to bring the "Enable gestures" button back, remove the comment marks around the next line -->
+  <!-- <button class="gbtn af" id="gbtn" type="button" style="--d:10" data-state="off"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg><span>Enable gestures</span><i></i></button> -->
+  <aside class="notes" data-who="Speaker 1 · 15 seconds">
+    <p>Walk to the centre, pause two seconds, smile, look across the whole room before speaking.</p>
+    <p><b>For everyone (graded on delivery):</b> look at the whole room, not the screen; stand open, no hands in pockets; speak slowly with pauses; each person about one minute, total about five. Rehearse the handovers.</p>
+    <p>“Good morning. Before we said a single word, we already communicated: how we walked in, where we stand, how we look at you. Today we compare the silent language of two cultures that meet every day at E-JUST: <b>Japan</b> and <b>Egypt</b>.”</p>
+  </aside>
+</section>
+
+<!-- 2 · Hook -->
+<section class="slide hook" data-title="Guess the meaning" data-steps="2">
+  <header class="kick a" style="--d:0"><span class="num">01</span><span class="bar"></span><span>Warm-up · watch our hands</span></header>
+  <h2 class="title a" style="--d:1">Same hand. <span class="jp">Different</span> <span class="eg">meaning.</span></h2>
+  <div class="split">
+    <div class="half jp a" style="--d:2">
+      <div class="tag">Japan <span class="nat k">日本</span></div>
+      <p class="gdesc">Arm out, palm facing <b>down</b>, fingers flap toward you.</p>
+      <div class="reveal step" data-step="1"><p class="lbl">It means</p><p class="ans">“Come here.”</p><p class="sm">Many visitors read it as “go away”.</p></div>
+    </div>
+    <div class="seam"></div>
+    <div class="half eg a" style="--d:3">
+      <div class="tag">Egypt <span class="nat">مصر</span></div>
+      <p class="gdesc">Fingertips pinched together, pointing up; the hand bobs gently.</p>
+      <div class="reveal step" data-step="2"><p class="lbl">It means</p><p class="ans">“Wait a moment.”</p><p class="sm">شوية · shwaya: be patient.</p></div>
+    </div>
+  </div>
+  <p class="cite">Warm-up examples: everyday gestures in Japan and Egypt.</p>
+  <aside class="notes" data-who="Speaker 1 · 30 seconds">
+    <p>Do the Japanese gesture: arm out, palm down, fingers flapping toward you. Ask: “What does this mean?” Take one guess, then press → to reveal <b>“come here”</b>.</p>
+    <p>Do the Egyptian gesture: fingertips pinched, pointing up, small bobbing. The room will laugh; press → to reveal <b>“wait a moment”</b>.</p>
+    <p>“The same hand can say very different things. That is nonverbal communication: meaning without words.”</p>
+  </aside>
+</section>
+
+<!-- 3 · Framework -->
+<section class="slide" data-title="Two lenses" data-steps="2">
+  <header class="kick a" style="--d:0"><span class="num">02</span><span class="bar"></span><span>How we compare · Edward T. Hall</span></header>
+  <h2 class="title a" style="--d:1">Close in context. Far apart in contact.</h2>
+  <div class="fw">
+    <div class="map a" style="--d:2" role="img" aria-label="Japan and Egypt both sit on the high-context side. Egypt is a contact culture, Japan a non-contact culture.">
+      <div class="plane"></div>
+      <span class="ylab" style="top:0">Contact ↑</span>
+      <span class="xlab" style="left:70px">← Low context</span>
+      <span class="xlab" style="right:0">High context →</span>
+      <div class="pt eg"><i></i><span>Egypt</span></div>
+      <div class="pt jp"><i></i><span>Japan</span></div>
+    </div>
+    <div class="fw-text">
+      <div class="fw-item step" data-step="1"><p class="k">Lens 1 · Hall, 1976</p><p class="big">Both are <span class="eg-t">high</span>-<span class="jp-t">context</span>.</p><p class="body">Meaning lives in the setting, the relationship and the body, not only in the words.</p></div>
+      <div class="fw-item step" data-step="2"><p class="k">Lens 2 · Hall, 1966</p><p class="big"><span class="eg-t">Egypt</span> is a contact culture. <span class="jp-t">Japan</span> is not.</p><p class="body">How close people stand, how much they touch, how directly they look.</p></div>
+    </div>
+  </div>
+  <p class="cite">Hall (1966; 1976). Positions are qualitative.</p>
+  <aside class="notes" data-who="Speaker 1 · 25 seconds">
+    <p>Press → once: “Hall’s first lens: high- versus low-context. In both Japan and Egypt, much of the message is in the situation and the body, not the words. So both move to the right.”</p>
+    <p>Press → again: “His second lens splits them: Egypt is a <b>contact</b> culture; people stand close and touch. Japan is <b>non-contact</b>. Keep this map in mind; everything that follows comes from it.”</p>
+    <p>Hand over: “[Speaker 2] starts with the most powerful signal we have: our eyes.”</p>
+  </aside>
+</section>
+
+<!-- 4 · Eyes -->
+<section class="slide sc" data-title="Eye contact" data-wipe>
+  <header class="kick a" style="--d:0"><span class="num">03</span><span class="bar"></span><span>Eye contact</span><span class="lensp">Lens: high-context · hierarchy</span></header>
+  <h2 class="title a" style="--d:1"><span class="sit">Situation</span>A student talks to a professor.</h2>
+  <div class="split">
+    <div class="half jp a" style="--d:2">
+      <div class="tag">Japan <span class="nat k">日本</span></div>
+      <svg class="eye" viewBox="0 0 560 230" aria-label="An eye that lowers its gaze">
+        <defs><clipPath id="eyeA"><path d="M30 115 Q280 -40 530 115 Q280 270 30 115Z"/></clipPath></defs>
+        <g clip-path="url(#eyeA)">
+          <rect class="white" width="560" height="230"/>
+          <g class="irisg down"><circle class="iris-jp" cx="280" cy="115" r="70"/><circle class="pupil" cx="280" cy="115" r="30"/><circle class="glint" cx="300" cy="96" r="11"/></g>
+          <path class="lash lidtop lower" d="M-10 -200 H570 V58 Q280 150 -10 58 Z"/>
+        </g>
+        <path class="lid" d="M30 115 Q280 -40 530 115 Q280 270 30 115Z"/>
+      </svg>
+      <p class="big">Eyes lowered, little direct gaze.</p>
+      <p class="body">Long eye contact with a senior can feel <b>challenging</b>; lowering the eyes shows respect.</p>
+      <p class="var"><b>Varies:</b> students used to international classes often keep more eye contact.</p>
+    </div>
+    <div class="seam"></div>
+    <div class="half eg a" style="--d:3">
+      <div class="tag">Egypt <span class="nat">مصر</span></div>
+      <svg class="eye" viewBox="0 0 560 230" aria-label="An eye that holds steady eye contact">
+        <defs><clipPath id="eyeB"><path d="M30 115 Q280 -40 530 115 Q280 270 30 115Z"/></clipPath></defs>
+        <g clip-path="url(#eyeB)">
+          <rect class="white" width="560" height="230"/>
+          <g class="irisg steady"><circle class="iris-eg" cx="280" cy="115" r="70"/><circle class="pupil" cx="280" cy="115" r="30"/><circle class="glint" cx="300" cy="96" r="11"/></g>
+          <path class="lash lidtop open" d="M-10 -200 H570 V58 Q280 150 -10 58 Z"/>
+        </g>
+        <path class="lid" d="M30 115 Q280 -40 530 115 Q280 270 30 115Z"/>
+      </svg>
+      <p class="big">Steady, respectful eye contact.</p>
+      <p class="body">Looking at the professor shows <b>attention and honesty</b>; looking away can seem evasive.</p>
+      <p class="var"><b>Varies:</b> in conservative settings, men and women who are not family avoid long eye contact.</p>
+    </div>
+  </div>
+  <p class="cite">Japan: Morsbach (1973); Akechi et al. (2013) · Egypt: Hall (1966); Feghali (1997)</p>
+  <aside class="notes" data-who="Speaker 2 · 30 seconds">
+    <p>Make deliberate eye contact with three people in the room as you start.</p>
+    <p>“Same situation in both countries: a student is talking to a professor.”</p>
+    <p>“In Japan, the student usually lowers the eyes. Long direct eye contact with a senior can feel challenging. Morsbach describes this, and Akechi and colleagues found Japanese participants rated direct-gaze faces as less approachable.”</p>
+    <p>“In Egypt, the student looks at the professor. Steady eye contact means attention and honesty, and looking away can seem like hiding something.”</p>
+    <p>“Of course it varies: students in international classes, like here at E-JUST, adapt; and in conservative settings, men and women who are not family avoid long eye contact.”</p>
+  </aside>
+</section>
+
+<!-- 5 · Face -->
+<section class="slide sc" data-title="Facial expression">
+  <header class="kick a" style="--d:0"><span class="num">04</span><span class="bar"></span><span>Facial expression</span><span class="lensp">Lens: display rules</span></header>
+  <h2 class="title a" style="--d:1"><span class="sit">Situation</span>Something embarrassing happens in class.</h2>
+  <div class="split">
+    <div class="half jp a" style="--d:2">
+      <div class="tag">Japan <span class="nat k">日本</span></div>
+      <svg class="facev" viewBox="0 0 220 220" aria-label="A calm face with a small, closed smile">
+        <circle class="skin" cx="110" cy="110" r="96"/>
+        <path class="feat" d="M66 96 Q78 90 90 96 M130 96 Q142 90 154 96"/>
+        <path class="feat mouth-s" d="M88 146 Q110 156 132 146"/>
+        <circle class="blush" cx="64" cy="128" r="12"/><circle class="blush" cx="156" cy="128" r="12"/>
+      </svg>
+      <p class="big">A calm face, or a small nervous smile.</p>
+      <p class="body">Public <b>display rules</b> favour self-control; the smile hides the embarrassment, it does not mean joy.</p>
+      <p class="var"><b>Varies:</b> among close friends in private, faces are far more expressive.</p>
+    </div>
+    <div class="seam"></div>
+    <div class="half eg a" style="--d:3">
+      <div class="tag">Egypt <span class="nat">مصر</span></div>
+      <svg class="facev" viewBox="0 0 220 220" aria-label="A laughing face with an open mouth">
+        <circle class="skin" cx="110" cy="110" r="96"/>
+        <path class="feat" d="M62 92 Q78 76 94 92 M126 92 Q142 76 158 92"/>
+        <path class="mouth-o" d="M68 128 Q110 128 152 128 Q148 182 110 182 Q72 182 68 128 Z"/>
+      </svg>
+      <p class="big">Open laughter, and a joke about it.</p>
+      <p class="body">Showing the feeling openly signals <b>sincerity and warmth</b>; humour releases the tension.</p>
+      <p class="var"><b>Varies:</b> in formal settings or with elders, people keep a calmer face.</p>
+    </div>
+  </div>
+  <p class="cite">Japan: Morsbach (1973); Matsumoto &amp; Kudoh (1993) · Egypt: Feghali (1997)</p>
+  <aside class="notes" data-who="Speaker 2 · 30 seconds">
+    <p>Keep your own face calm for Japan, then laugh openly when you switch to Egypt.</p>
+    <p>“Same situation: something embarrassing happens in class, say a phone rings loudly.”</p>
+    <p>“In Japan, public display rules favour self-control. You keep a calm face or give a small nervous smile; that smile hides the embarrassment, it is not happiness. Matsumoto and Kudoh found Japanese and American observers read the same smile differently.”</p>
+    <p>“In Egypt, people usually laugh openly and make a joke about it. Showing the feeling openly is sincere and warm.”</p>
+    <p>“With close friends in private, Japanese faces are much more expressive; and in formal Egyptian settings, faces get calmer.”</p>
+    <p>Hand over: “[Speaker 3] takes us from the face to the space between us.”</p>
+  </aside>
+</section>
+
+<!-- 6 · Space -->
+<section class="slide sc" data-title="Personal space" data-wipe>
+  <header class="kick a" style="--d:0"><span class="num">05</span><span class="bar"></span><span>Personal space · proxemics</span><span class="lensp">Lens: contact vs non-contact</span></header>
+  <h2 class="title a" style="--d:1"><span class="sit">Situation</span>Two friends chat in a corridor.</h2>
+  <div class="split">
+    <div class="half jp a" style="--d:2">
+      <div class="tag">Japan <span class="nat k">日本</span></div>
+      <div class="dist far" aria-label="Two friends standing about an arm's length apart or more">
+        <span class="gap"></span><span class="meas">Arm’s length or more</span>
+        <svg class="p1" viewBox="0 0 120 260"><use href="#person" class="fig-body"/></svg>
+        <svg class="p2" viewBox="0 0 120 260"><use href="#person" class="fig-body"/></svg>
+      </div>
+      <p class="big">They keep space between them.</p>
+      <p class="body">Distance is <b>politeness</b>, even between friends.</p>
+      <p class="var"><b>Varies:</b> packed rush-hour trains force closeness, so people go still and silent instead.</p>
+    </div>
+    <div class="seam"></div>
+    <div class="half eg a" style="--d:3">
+      <div class="tag">Egypt <span class="nat">مصر</span></div>
+      <div class="dist near" aria-label="Two friends standing close together">
+        <span class="meas">Close, often touching</span>
+        <svg class="p1" viewBox="0 0 120 260"><use href="#person" class="fig-body"/></svg>
+        <svg class="p2" viewBox="0 0 120 260"><use href="#person" class="fig-body"/></svg>
+      </div>
+      <p class="big">They stand close.</p>
+      <p class="body">Closeness is <b>warmth</b>; stepping back can feel cold.</p>
+      <p class="var"><b>Varies:</b> between a man and a woman who are not family, the distance grows.</p>
+    </div>
+  </div>
+  <p class="cite">Japan: Hall (1966); Morsbach (1973) · Egypt: Hall (1966); Feghali (1997)</p>
+  <aside class="notes" data-who="Speaker 3 · 30 seconds">
+    <p>Step toward the front row for Egypt, then step back for Japan.</p>
+    <p>“Same situation: two friends chatting in a corridor.”</p>
+    <p>“In Japan, a non-contact culture, they keep space between them, about an arm’s length or more. Distance is politeness, even between friends. On packed trains, where distance is impossible, people go still and silent instead.”</p>
+    <p>“In Egypt, a contact culture, friends stand close and often touch. Hall described this for Arab cultures. If you step back, it can feel cold. But between a man and a woman who are not family, the distance grows.”</p>
+  </aside>
+</section>
+
+<!-- 7 · Touch -->
+<section class="slide sc" data-title="Touch">
+  <header class="kick a" style="--d:0"><span class="num">06</span><span class="bar"></span><span>Touch · haptics</span><span class="lensp">Lens: contact vs non-contact</span></header>
+  <h2 class="title a" style="--d:1"><span class="sit">Situation</span>You meet a same-gender friend after a long time.</h2>
+  <div class="split">
+    <div class="half jp a" style="--d:2">
+      <div class="tag">Japan <span class="nat k">日本</span></div>
+      <div class="seq"><span>Smile</span><i>→</i><span>Nod</span><i>→</i><span>Words</span></div>
+      <div class="meter" aria-label="Amount of touch in this greeting in Japan: low">
+        <div class="row"><span>Touch in public</span><div class="track"><div class="fill" style="width:12%; --d:0"></div></div></div>
+      </div>
+      <p class="big">Warm words, almost no touch.</p>
+      <p class="body">Touch is kept for <b>private</b> life; a public hug can feel awkward.</p>
+      <p class="var"><b>Varies:</b> younger Japanese hug close friends more than older generations.</p>
+    </div>
+    <div class="seam"></div>
+    <div class="half eg a" style="--d:3">
+      <div class="tag">Egypt <span class="nat">مصر</span></div>
+      <div class="seq"><span>Long handshake</span><i>→</i><span>Hug</span><i>→</i><span>Cheek kisses</span></div>
+      <div class="meter" aria-label="Amount of touch in this greeting in Egypt: high">
+        <div class="row"><span>Touch in public</span><div class="track"><div class="fill" style="width:90%; --d:0"></div></div></div>
+      </div>
+      <p class="big">A hug and kisses on the cheeks.</p>
+      <p class="body">Touch <b>proves</b> the friendship; a cold handshake would feel distant.</p>
+      <p class="var"><b>Varies:</b> across genders, many prefer a hand on the heart to a handshake.</p>
+    </div>
+  </div>
+  <p class="cite">Japan: Morsbach (1973) · Egypt: Hall (1966); Feghali (1997). Bars are illustrative.</p>
+  <aside class="notes" data-who="Speaker 3 · 30 seconds">
+    <p>“Same situation: you meet a friend of the same gender after a long time.”</p>
+    <p>“In Japan, you smile, nod and say warm words, with almost no touch. Touch belongs to private life, and a hug in public can feel awkward. Younger people hug close friends more than their parents did.”</p>
+    <p>“In Egypt, it is a long handshake, a hug and kisses on both cheeks. The touch proves the friendship. But across genders many people prefer a hand on the heart instead of a handshake.”</p>
+    <p>Hand over: “[Speaker 4] turns from what we see to what we hear.”</p>
+  </aside>
+</section>
+
+<!-- 8 · Voice -->
+<section class="slide sc" data-title="Voice and silence" data-wipe>
+  <header class="kick a" style="--d:0"><span class="num">07</span><span class="bar"></span><span>Voice and silence · paralanguage</span><span class="lensp">Lens: high-context · harmony</span></header>
+  <h2 class="title a" style="--d:1"><span class="sit">Situation</span>Someone suggests an idea in a group meeting.</h2>
+  <div class="split">
+    <div class="half jp a" style="--d:2">
+      <div class="tag">Japan <span class="nat k">日本</span></div>
+      <div class="wave" id="waveJp" aria-label="A quiet voice pattern with long pauses"></div>
+      <div class="said"><span>hai</span><span>sō desu ne</span><span>(silence)</span></div>
+      <p class="big">Pauses, nods, soft replies.</p>
+      <p class="body">Silence (<span style="font-family:var(--kanji)">間</span> <i>ma</i>) means <b>careful thought</b>; “hai” means “I’m listening”, not always “I agree”.</p>
+      <p class="var"><b>Varies:</b> Osaka (Kansai) speech is famously livelier than Tokyo’s.</p>
+    </div>
+    <div class="seam"></div>
+    <div class="half eg a" style="--d:3">
+      <div class="tag">Egypt <span class="nat">مصر</span></div>
+      <div class="wave" id="waveEg" aria-label="A lively voice pattern with few pauses"></div>
+      <div class="said"><span>aywa</span><span>tamam</span><span>“bas esma3…”</span></div>
+      <p class="big">Quick replies, raised voices.</p>
+      <p class="body">A strong voice and repetition mean <b>involvement</b>, not anger; long silence feels awkward.</p>
+      <p class="var"><b>Varies:</b> with elders or in formal meetings, voices drop.</p>
+    </div>
+  </div>
+  <p class="cite">Japan: Lebra (1976); Morsbach (1973) · Egypt: Feghali (1997). Waveforms are illustrative.</p>
+  <aside class="notes" data-who="Speaker 4 · 35 seconds">
+    <p>Try this: stop talking for three full seconds while looking at the audience. Then: “Did that feel uncomfortable? That is the difference.”</p>
+    <p>“Same situation: someone suggests an idea in a group meeting.”</p>
+    <p>“In Japan, people pause, nod and answer softly. Silence, ma, means careful thought, and ‘hai’ or ‘sō desu ne’ means ‘I’m listening’, not necessarily ‘I agree’. Lebra and Morsbach both describe this. In Osaka, though, people are known to be livelier.”</p>
+    <p>“In Egypt, replies come fast and voices rise. Feghali explains that a strong voice and repetition show involvement and sincerity, not anger; a long silence feels awkward. With elders or in formal meetings, voices drop.”</p>
+  </aside>
+</section>
+
+<!-- 9 · Time -->
+<section class="slide sc" data-title="Time">
+  <header class="kick a" style="--d:0"><span class="num">08</span><span class="bar"></span><span>Time · chronemics</span><span class="lensp">Lens: monochronic vs polychronic</span></header>
+  <h2 class="title a" style="--d:1"><span class="sit">Situation</span>A group meeting at university, set for 10:00.</h2>
+  <div class="split">
+    <div class="half jp a" style="--d:2">
+      <div class="tag">Japan <span class="nat k">日本</span></div>
+      <div class="clockrow">
+        <svg class="clock" viewBox="0 0 260 260" aria-label="Clock at 9:52">
+          <circle class="face" cx="130" cy="130" r="122"/>
+          <g class="ticks"></g>
+          <line class="hand" x1="130" y1="130" x2="130" y2="66" stroke-width="10" style="--r:296deg"/>
+          <line class="hand" x1="130" y1="130" x2="130" y2="34" stroke-width="6" style="--r:312deg; stroke: var(--jp)"/>
+          <circle cx="130" cy="130" r="10" fill="#F3EEE5"/>
+        </svg>
+        <div class="clockcap"><p class="t">9:52</p><p class="s">Early is on time.</p></div>
+      </div>
+      <p class="body"><b>Monochronic:</b> one task, one schedule; being late wastes others’ time.</p>
+      <p class="var"><b>Varies:</b> Hall notes Japanese time is more flexible inside close relationships.</p>
+    </div>
+    <div class="seam"></div>
+    <div class="half eg a" style="--d:3">
+      <div class="tag">Egypt <span class="nat">مصر</span></div>
+      <div class="clockrow">
+        <svg class="clock" viewBox="0 0 260 260" aria-label="Clock at 10:10, with a band from 10:00 to 10:15">
+          <circle class="face" cx="130" cy="130" r="122"/>
+          <path class="arc" d="M130 30 A100 100 0 0 1 230 130" style="stroke: var(--eg)"/>
+          <g class="ticks"></g>
+          <line class="hand" x1="130" y1="130" x2="130" y2="66" stroke-width="10" style="--r:305deg"/>
+          <line class="hand" x1="130" y1="130" x2="130" y2="34" stroke-width="6" style="--r:60deg; stroke: var(--eg)"/>
+          <circle cx="130" cy="130" r="10" fill="#F3EEE5"/>
+        </svg>
+        <div class="clockcap"><p class="t">10:10</p><p class="s">A few minutes late is normal.</p></div>
+      </div>
+      <p class="body"><b>Polychronic:</b> people and conversations come first; the schedule flexes.</p>
+      <p class="var"><b>Varies:</b> exams, flights and official meetings start exactly on time.</p>
+    </div>
+  </div>
+  <p class="cite">Japan: Hall (1983) · Egypt: Hall (1983); Feghali (1997)</p>
+  <aside class="notes" data-who="Speaker 4 · 30 seconds">
+    <p>“Same situation: a group meeting at university, set for 10:00.”</p>
+    <p>“In Japan, people arrive around 9:52. Hall calls this monochronic time: one task, one schedule, and being late wastes other people’s time. Interestingly, Hall also notes Japanese time becomes more flexible inside close relationships.”</p>
+    <p>“In Egypt, arriving at 10:10 is normal among students. Time is more polychronic: if you meet someone on the way, you stop and talk, and the schedule flexes. But exams, flights and official meetings start exactly on time.”</p>
+  </aside>
+</section>
+
+<!-- 10 · Why -->
+<section class="slide" data-title="Why they differ">
+  <header class="kick a" style="--d:0"><span class="num">09</span><span class="bar"></span><span>Why the differences exist</span></header>
+  <p class="why-quote a" style="--d:1"><span class="jp-t">Japan</span> says more with <span class="jp-t">less</span>.<br><span class="eg-t">Egypt</span> says more with <span class="eg-t">more</span>.</p>
+  <div class="why-grid">
+    <div class="wcard jp a" style="--d:3"><h3 class="jp-t">Harmony and hierarchy</h3><p><i>Wa</i>, group harmony, and clear senior–junior roles reward restraint and indirect “no”s.</p></div>
+    <div class="wcard eg a" style="--d:4"><h3 class="eg-t">Hospitality and closeness</h3><p>Relationships come first; warmth is shown through touch, closeness and voice (Feghali, 1997).</p></div>
+    <div class="wcard both a" style="--d:5"><h3 style="color:var(--gold)">Shared roots</h3><p>Both lean collectivist and are high-context (Hall, 1976; Hofstede et al., 2010). Same goal, opposite tools.</p></div>
+  </div>
+  <p class="cite">Hall (1976); Feghali (1997); Hofstede et al. (2010).</p>
+  <aside class="notes" data-who="Speaker 4 · 30 seconds">
+    <p>“So why are they so different? In Japan, <b>wa</b>, group harmony, and clear hierarchy reward self-control. Strong emotion, touch or a direct ‘no’ could disturb harmony, so meaning moves into silence and small signals.”</p>
+    <p>“In Egypt, hospitality and relationships are central, so warmth is shown openly through closeness, touch and voice.”</p>
+    <p>“Both are collectivist and high-context. They share the same goal, keeping relationships strong, but use opposite tools. Japan says more with less; Egypt says more with more.”</p>
+    <p>Hand over: “[Speaker 5] shows what happens when these styles meet.”</p>
+  </aside>
+</section>
+
+<!-- 11 · Collide -->
+<section class="slide" data-title="When signals collide" data-steps="3" data-wipe>
+  <header class="kick a" style="--d:0"><span class="num">10</span><span class="bar"></span><span>At E-JUST · the risk of misreading</span></header>
+  <h2 class="title a" style="--d:1">When signals collide</h2>
+  <div class="cases">
+    <div class="case a" style="--d:2">
+      <p class="dir"><span class="eg-t">Egyptian act</span> → <span class="jp-t">Japanese read</span></p>
+      <p class="scn">A student stands close and touches the professor’s arm. The professor steps back.</p>
+      <p class="mis">“The professor is cold.”</p>
+      <div class="better step" data-step="1"><p class="l">Better read</p><p>Restoring comfortable distance, not rejecting the student.</p></div>
+    </div>
+    <div class="case a" style="--d:3">
+      <p class="dir"><span class="jp-t">Japanese act</span> → <span class="eg-t">Egyptian read</span></p>
+      <p class="scn">A teammate stays silent for several seconds after a new idea.</p>
+      <p class="mis">“They hate the idea.”</p>
+      <div class="better step" data-step="2"><p class="l">Better read</p><p>Thinking it through. Give time, then ask directly.</p></div>
+    </div>
+    <div class="case a" style="--d:4">
+      <p class="dir"><span class="eg-t">Egyptian act</span> → <span class="jp-t">Japanese read</span></p>
+      <p class="scn">A teammate speaks loudly and repeats the same point three times.</p>
+      <p class="mis">“They are angry.”</p>
+      <div class="better step" data-step="3"><p class="l">Better read</p><p>They care and want to be believed.</p></div>
+    </div>
+  </div>
+  <p class="cite">Scenarios built from Hall (1966), Lebra (1976) and Feghali (1997).</p>
+  <aside class="notes" data-who="Speaker 5 · 40 seconds">
+    <p>For each case: read the situation and the misread, pause, then press → to reveal the better read.</p>
+    <p>“One: an Egyptian student, being friendly, stands close and touches a Japanese professor’s arm. The professor steps back. The student thinks: ‘my professor is cold.’” → “In fact the professor is just restoring a comfortable distance.”</p>
+    <p>“Two: a Japanese teammate stays silent after a new idea. ‘They hate it.’” → “More likely they are thinking carefully.”</p>
+    <p>“Three: an Egyptian teammate repeats a point loudly. ‘They are angry.’” → “No, they care.”</p>
+    <p>“The behaviour was the same; the meaning came from the observer’s own culture.”</p>
+  </aside>
+</section>
+
+<!-- 12 · D-I-E -->
+<section class="slide" data-title="Tendencies, not rules">
+  <header class="kick a" style="--d:0"><span class="num">11</span><span class="bar"></span><span>Avoiding stereotypes</span></header>
+  <h2 class="title a" style="--d:1">Tendencies, not rules.</h2>
+  <div class="die">
+    <div class="a" style="--d:2"><span class="L jp-t">D</span><h3>Describe</h3><p class="ex">“She looked down while I spoke.”</p><p class="d">Only what you saw. No judgment yet.</p></div>
+    <div class="a" style="--d:3"><span class="L" style="color:var(--gold)">I</span><h3>Interpret</h3><p class="ex">Respect? Shyness? Tiredness?</p><p class="d">List several meanings for this context.</p></div>
+    <div class="a" style="--d:4"><span class="L eg-t">E</span><h3>Evaluate</h3><p class="ex">Not sure? Ask her.</p><p class="d">Is my judgment fair, or just my culture?</p></div>
+  </div>
+  <p class="cite">Regional, generational and personal differences exist inside both cultures.</p>
+  <aside class="notes" data-who="Speaker 5 · 25 seconds">
+    <p>Slow down; this is the most important message.</p>
+    <p>“Everything we showed is a tendency, not a rule. Not every Japanese person is quiet, not every Egyptian is loud; Osaka differs from Tokyo, and Upper Egypt from Cairo. So before judging a signal, use D-I-E: <b>describe</b> what you saw, <b>interpret</b> several possible meanings, then <b>evaluate</b> fairly. And when you’re not sure, ask.”</p>
+  </aside>
+</section>
+
+<!-- 13 · Takeaways -->
+<section class="slide" data-title="Three things to remember">
+  <header class="kick a" style="--d:0"><span class="num">12</span><span class="bar"></span><span>Conclusion</span></header>
+  <div class="tks">
+    <div class="tk a" style="--d:1"><span class="n">01</span><div><h3>Both are high-context.</h3><p>Meaning lives in the body, the setting and the relationship.</p></div></div>
+    <div class="tk a" style="--d:2"><span class="n">02</span><div><h3><span class="jp-t">Restraint</span> vs <span class="eg-t">warmth</span>.</h3><p>Japan speaks through distance and silence; Egypt through closeness and expression.</p></div></div>
+    <div class="tk a" style="--d:3"><span class="n">03</span><div><h3>Describe before you judge.</h3><p>And when in doubt, ask.</p></div></div>
+  </div>
+  <aside class="notes" data-who="Speaker 5 · 20 seconds">
+    <p>Return to the centre. Strong eye contact, slow pace.</p>
+    <p>“Three things to remember. One: both cultures are high-context. Two: Japan speaks through restraint, Egypt through warmth. Three: describe before you judge, and when in doubt, ask. At E-JUST we live between these two cultures every day; reading each other’s silent signals is part of being good engineers and good colleagues.”</p>
+  </aside>
+</section>
+
+<!-- 14 · Thanks -->
+<section class="slide cover thanks" data-title="Thank you" data-fx="both">
+  <div class="halves">
+    <div class="hv l"><svg class="plate kb" aria-hidden="true"><use href="#japan"/></svg></div>
+    <div class="hv r"><svg class="plate kb" aria-hidden="true"><use href="#egypt"/></svg></div>
+  </div>
+  <canvas class="fx" aria-hidden="true"></canvas>
+  <div class="veil"></div>
+  <div class="seamline"></div>
+  <div class="cover-inner">
+    <p class="eyebrow a" style="--d:1">Questions and answers</p>
+    <h1 class="a" style="--d:2"><span class="w1">Thank</span> <span class="w2">you</span></h1>
+    <div class="thx a" style="--d:3"><span class="k jp-t">ありがとう</span><span class="eg-t">شكراً</span></div>
+  </div>
+  <aside class="notes" data-who="All five · Q&amp;A">
+    <p>Stand in a line with open posture. Whoever answers steps forward slightly, listens to the whole question, pauses, then answers.</p>
+    <p><b>Isn’t this stereotyping?</b> These are research-based tendencies, not rules; that’s why we showed D-I-E and variation inside each culture.</p>
+    <p><b>Why are both high-context if they look so different?</b> High-context is about where meaning lives: in the situation, not the words. Japan relies on silence and restraint, Egypt on expressiveness.</p>
+    <p><b>How should an Egyptian greet a Japanese professor?</b> A light handshake if one is offered, moderate eye contact, a little more distance than usual.</p>
+    <p><b>Is silence always positive in Japan?</b> No: it can mean thought, respect or polite disagreement. A gentle follow-up question tells the difference.</p>
+  </aside>
+</section>
+
+<!-- 15 · References -->
+<section class="slide" data-title="References">
+  <header class="kick a" style="--d:0"><span class="num">—</span><span class="bar"></span><span>Sources · APA 7th edition</span></header>
+  <h2 class="title a" style="--d:1">References</h2>
+  <div class="refs a" style="--d:2">
+    <p>Akechi, H., Senju, A., Uibo, H., Kikuchi, Y., Hasegawa, T., &amp; Hietanen, J. K. (2013). Attention to eye contact in the West and East: Autonomic responses and evaluative ratings. <i>PLoS ONE, 8</i>(3), e59312.</p>
+    <p>Feghali, E. (1997). Arab cultural communication patterns. <i>International Journal of Intercultural Relations, 21</i>(3), 345–378.</p>
+    <p>Hall, E. T. (1966). <i>The hidden dimension</i>. Doubleday.</p>
+    <p>Hall, E. T. (1976). <i>Beyond culture</i>. Anchor Press/Doubleday.</p>
+    <p>Hall, E. T. (1983). <i>The dance of life: The other dimension of time</i>. Anchor Press/Doubleday.</p>
+    <p>Hofstede, G., Hofstede, G. J., &amp; Minkov, M. (2010). <i>Cultures and organizations: Software of the mind</i> (3rd ed.). McGraw-Hill.</p>
+    <p>Lebra, T. S. (1976). <i>Japanese patterns of behavior</i>. University of Hawaii Press.</p>
+    <p>Matsumoto, D., &amp; Kudoh, T. (1993). American–Japanese cultural differences in attributions of personality based on smiles. <i>Journal of Nonverbal Behavior, 17</i>(4), 231–243.</p>
+    <p>Morsbach, H. (1973). Aspects of nonverbal communication in Japan. <i>The Journal of Nervous and Mental Disease, 157</i>(4), 262–277.</p>
+  </div>
+  <aside class="notes" data-who="Backup slide">
+    <p>Not presented. Show only if asked about sources.</p>
+  </aside>
+</section>
+
+<div id="wipe" aria-hidden="true"><i></i><i></i></div>
+<div class="grain" aria-hidden="true"></div>
+</div>
+</div>
+
+<div id="prog" aria-hidden="true"></div>
+<div id="count" aria-live="polite"></div>
+<!-- GESTURES OFF: the status dot and the camera window
+<div id="gstat" hidden><i></i><span>Gestures</span></div>
+<div id="gcam" hidden><canvas></canvas><span class="gcam-tip">V hides this · G pauses</span></div>
+-->
+<div id="notes" hidden><div class="in"><p class="who" id="notesWho"></p><div id="notesBody"></div></div></div>
+<button id="fsbtn" type="button" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button>
+<div id="black" hidden></div>
+
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
+  const stage = document.getElementById('stage');
+  const slides = Array.from(stage.querySelectorAll('.slide'));
+  const pad = n => String(n).padStart(2, '0');
+  let idx = 0;
+
+  /* ---- fit the stage to the screen ---- */
+  function fit() {
+    const vp = document.getElementById('viewport');
+    const w = vp.clientWidth || innerWidth, h = vp.clientHeight || innerHeight;
+    const portrait = h > w * 1.15;
+    root.classList.toggle('portrait', portrait);
+    let W, H;
+    if (portrait) { W = 1080; H = Math.round(Math.min(2340, Math.max(1600, 1080 * h / w))); }
+    else { H = 1080; W = Math.round(Math.min(2400, Math.max(1600, 1080 * w / h))); }
+    stage.style.width = W + 'px'; stage.style.height = H + 'px'; stage.style.setProperty('--sw', W);
+    const s = Math.min(w / W, h / H);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  addEventListener('resize', fit);
+  try { new ResizeObserver(fit).observe(document.getElementById('viewport')); } catch (e) {}
+  fit();
+
+  /* ---- clock ticks + waveforms (built once) ---- */
+  document.querySelectorAll('.clock .ticks').forEach(g => {
+    let html = '';
+    for (let i = 0; i < 12; i++) {
+      const a = i * 30 * Math.PI / 180, r1 = i % 3 === 0 ? 92 : 102, r2 = 112;
+      html += '<line class="tick" x1="' + (130 + r1 * Math.sin(a)).toFixed(1) + '" y1="' + (130 - r1 * Math.cos(a)).toFixed(1) + '" x2="' + (130 + r2 * Math.sin(a)).toFixed(1) + '" y2="' + (130 - r2 * Math.cos(a)).toFixed(1) + '"/>';
+    }
+    g.innerHTML = html;
+  });
+  function buildWave(el, pattern) {
+    let html = '';
+    pattern.forEach((h, k) => { html += h === 0 ? '<i class="s"></i>' : '<i style="--h:' + h + ';--k:' + k + '"></i>'; });
+    el.innerHTML = html;
+  }
+  const jpPat = [22,30,26,18,0,0,0,0,0,0,24,34,28,20,0,0,0,0,0,0,0,18,26,32,24,16,0,0,0,0,0,0,20,28,22,0,0,0,0,0];
+  const egPat = [55,78,64,92,70,85,60,96,74,88,66,100,72,58,90,80,62,94,76,84,68,98,70,86,60,92,78,66,88,74,96,64,82,70,90,58,86,76,94,80];
+  buildWave(document.getElementById('waveJp'), jpPat);
+  buildWave(document.getElementById('waveEg'), egPat);
+
+  /* ---- steps ---- */
+  function maxStep(s) { return +(s.dataset.steps || 0); }
+  function setStep(s, at) {
+    s.dataset.at = at;
+    s.querySelectorAll('.step').forEach(el => el.classList.toggle('shown', +el.dataset.step <= at));
+  }
+
+  /* ---- navigation ---- */
+  function show(i, at) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    const prev = slides[idx];
+    if (prev && prev !== slides[i]) prev.classList.remove('active');
+    idx = i;
+    const s = slides[i];
+    setStep(s, at === 'max' ? maxStep(s) : (at || 0));
+    s.classList.remove('active'); void s.offsetWidth; s.classList.add('active');
+    document.getElementById('prog').style.width = ((i + 1) / slides.length * 100) + '%';
+    document.getElementById('count').textContent = pad(i + 1) + ' / ' + pad(slides.length);
+    try { history.replaceState(null, '', '#s' + (i + 1)); } catch (e) {}
+    fillNotes();
+    runFx();
+  }
+  let busy = false;
+  const wipe = document.getElementById('wipe');
+  function next() {
+    if (busy) return;
+    const s = slides[idx], at = +(s.dataset.at || 0);
+    if (at < maxStep(s)) { setStep(s, at + 1); return; }
+    if (idx >= slides.length - 1) return;
+    const t = slides[idx + 1];
+    if (t.hasAttribute('data-wipe') && !reduce) {
+      busy = true;
+      wipe.classList.remove('go'); void wipe.offsetWidth; wipe.classList.add('go');
+      setTimeout(() => show(idx + 1), 430);
+      setTimeout(() => { wipe.classList.remove('go'); busy = false; }, 960);
+    } else show(idx + 1);
+  }
+  function prev() {
+    if (busy) return;
+    const s = slides[idx], at = +(s.dataset.at || 0);
+    if (at > 0) setStep(s, at - 1); else if (idx > 0) show(idx - 1, 'max');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const k = e.key;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); prev(); }
+    else if (k === 'Home') show(0);
+    else if (k === 'End') show(slides.length - 2);
+    else if (k === 'n' || k === 'N') toggleNotes();
+    else if (k === 'f' || k === 'F') toggleFs();
+    else if (k === 'b' || k === 'B' || k === '.') { const b = document.getElementById('black'); b.hidden = !b.hidden; }
+  });
+  /* click the right half = next, the left half = previous */
+  stage.addEventListener('click', e => {
+    const r = stage.getBoundingClientRect();
+    if (e.clientX < r.left + r.width / 2) prev(); else next();
+  });
+  let tx = null, ty = null;
+  stage.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  stage.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { dx < 0 ? next() : prev(); }
+    tx = null;
+  });
+  document.getElementById('black').addEventListener('click', e => { e.currentTarget.hidden = true; });
+
+  /* hide the cursor until the mouse moves */
+  let ct = 0;
+  const fsbtn = document.getElementById('fsbtn');
+  function showChrome() { stage.classList.add('cursor'); fsbtn.classList.add('show'); clearTimeout(ct); ct = setTimeout(() => { stage.classList.remove('cursor'); if (document.activeElement !== fsbtn) fsbtn.classList.remove('show'); }, 2200); }
+  addEventListener('mousemove', showChrome);
+  fsbtn.addEventListener('click', e => { e.stopPropagation(); toggleFs(); fsbtn.blur(); });
+  document.addEventListener('fullscreenchange', () => {
+    const on = !!document.fullscreenElement;
+    fsbtn.querySelector('span').textContent = on ? 'Exit full screen' : 'Full screen';
+    setTimeout(fit, 60);
+  });
+
+  /* ---- notes ---- */
+  const notes = document.getElementById('notes');
+  function fillNotes() {
+    if (notes.hidden) return;
+    const n = slides[idx].querySelector('.notes');
+    document.getElementById('notesWho').textContent = n ? n.dataset.who : '';
+    document.getElementById('notesBody').innerHTML = n ? n.innerHTML : '';
+  }
+  function toggleNotes() { notes.hidden = !notes.hidden; fillNotes(); }
+
+  /* ---- full screen ---- */
+  function toggleFs() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else {
+        const req = root.requestFullscreen || root.webkitRequestFullscreen;
+        const p = req && req.call(root);
+        if (p && p.catch) p.catch(() => { fsbtn.querySelector('span').textContent = 'Not allowed here: open the page in its own tab'; fsbtn.classList.add('show'); });
+      }
+    } catch (e) {}
+  }
+
+  /* ---- petals (Japan) and desert dust (Egypt) on the cover and closing ---- */
+  let raf = 0, parts = [], ctx = null, cv = null;
+  function runFx() {
+    cancelAnimationFrame(raf);
+    const s = slides[idx];
+    if (reduce || !s.dataset.fx) { if (ctx) ctx.clearRect(0, 0, cv.width, cv.height); return; }
+    cv = s.querySelector('canvas.fx');
+    const portrait = root.classList.contains('portrait');
+    cv.width = Math.round(stage.offsetWidth / 2); cv.height = Math.round(stage.offsetHeight / 2);
+    ctx = cv.getContext('2d');
+    parts = [];
+    for (let i = 0; i < 46; i++) parts.push(spawn(i < 26, true));
+    let last = performance.now();
+    const loop = now => {
+      const dt = Math.min(50, now - last) / 16.7; last = now;
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      for (const p of parts) {
+        p.x += p.vx * dt; p.y += p.vy * dt; p.a += p.va * dt; p.t += 0.02 * dt;
+        if (p.petal) {
+          p.x += Math.sin(p.t) * 0.25 * dt;
+          if (p.y > cv.height + 10 || p.x > edge(p, true) + 30) Object.assign(p, spawn(true, false));
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.scale(1, Math.abs(Math.cos(p.t * 1.3)) * 0.7 + 0.3);
+          ctx.fillStyle = 'rgba(255,183,178,' + p.o + ')';
+          ctx.beginPath(); ctx.ellipse(0, 0, p.r, p.r * 0.62, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+        } else {
+          if (p.y < -10 || p.x < edge(p, false) - 30) Object.assign(p, spawn(false, false));
+          ctx.fillStyle = 'rgba(255,214,150,' + (p.o * (0.6 + 0.4 * Math.sin(p.t * 3))) + ')';
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+  }
+  function edge(p, petal) { const portrait = root.classList.contains('portrait'); return portrait ? cv.width : (petal ? cv.width * 0.5 : cv.width * 0.5); }
+  function spawn(petal, anywhere) {
+    const portrait = root.classList.contains('portrait');
+    const W = cv.width, H = cv.height;
+    if (petal) {
+      return { petal: true, x: Math.random() * (portrait ? W : W * 0.5), y: anywhere ? Math.random() * (portrait ? H * 0.5 : H) : -10,
+        vx: 0.15 + Math.random() * 0.35, vy: 0.35 + Math.random() * 0.5, a: Math.random() * 6, va: (Math.random() - 0.5) * 0.04, t: Math.random() * 6,
+        r: 3 + Math.random() * 4, o: 0.45 + Math.random() * 0.4 };
+    }
+    return { petal: false, x: portrait ? Math.random() * W : W * 0.5 + Math.random() * W * 0.5, y: anywhere ? (portrait ? H * 0.5 + Math.random() * H * 0.5 : Math.random() * H) : H + 5,
+      vx: -(0.1 + Math.random() * 0.3), vy: -(0.12 + Math.random() * 0.3), a: 0, va: 0, t: Math.random() * 6,
+      r: 0.8 + Math.random() * 1.8, o: 0.35 + Math.random() * 0.45 };
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else runFx(); });
+
+  /* let the gesture script below move the slides */
+  window.deck = { next, prev };
+
+  /* ---- start ---- */
+  const m = /^#s(\d+)$/.exec(location.hash);
+  show(m ? (+m[1] - 1) : 0);
+})();
+</script>
+
+<!-- GESTURES OFF (start): the whole gesture script is switched off.
+     To bring gestures back: delete this line and the "GESTURES OFF (end)" line at the very bottom,
+     and remove the comment marks around the button (cover slide) and around #gstat / #gcam.
+<script>
+/* ---- Gestures: point your thumb to change slides ----
+   Click "Enable gestures" on the cover, allow the camera, then close your hand
+   and point your THUMB sideways and hold it for half a second:
+     thumb to your LEFT  = next slide
+     thumb to your RIGHT = previous slide
+   Lower the hand (or relax it) before the next one.
+   A small camera window shows what the camera sees (V hides / shows it).
+   Press G to pause / resume gestures (for Q&A). Click the button again to turn them off. */
+(function () {
+  const MP_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+  const MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+
+  /* What counts as "thumb pointing". Sizes are compared with the palm size, so it works near or far. */
+  const POSE = {
+    hold: 500,         // keep the thumb pointing this long (ms) before the slide changes
+    grace: 200,        // the camera may lose the pose for this long without restarting the count
+    release: 250,      // after a slide change, relax the hand this long before the next one
+    maxTilt: 0.6,      // thumb must be sideways: its up/down part at most 60% of its sideways part (about 30°)
+    thumbOut: 0.6,     // thumb tip at least this far from the index knuckle (× palm size)
+    nextIsLeft: true,  // thumb to the speaker's left = next slide
+  };
+  const BONES = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+
+  const btn = document.getElementById('gbtn');
+  const label = btn.querySelector('span');
+  const stat = document.getElementById('gstat');
+  const statText = stat.querySelector('span');
+  const cam = document.getElementById('gcam');
+  const canvas = cam.querySelector('canvas');
+  const ctx = canvas.getContext('2d');
+  let state = 'off';
+  let stream = null, video = null, landmarker = null, raf = 0, lastTime = -1;
+  let flashT = 0, banner = '', bannerUntil = 0, camWanted = true;
+  let cand = null, candSince = 0, candLast = -1e9, armed = true, prog = 0;
+
+  function setState(s, text) {
+    state = s;
+    btn.dataset.state = s;
+    label.textContent = text || {
+      off: 'Enable gestures',
+      loading: 'Starting camera…',
+      on: 'Gestures on · click to turn off',
+      paused: 'Gestures paused · press G',
+    }[s];
+    stat.hidden = !(s === 'on' || s === 'paused');
+    stat.classList.toggle('paused', s === 'paused');
+    statText.textContent = s === 'paused' ? 'Gestures paused' : 'Gestures';
+    if (s !== 'on') stat.classList.remove('hand');
+    cam.hidden = !(video && camWanted && s !== 'off' && s !== 'error');
+    resetPose();
+  }
+  function resetPose() { cand = null; candLast = -1e9; armed = true; prog = 0; }
+
+  /* Is this hand a closed fist with the thumb pointing sideways? Returns 'left', 'right' or null.
+     lm = the 21 hand points from MediaPipe, A = camera width / height. */
+  function thumbPose(lm, A) {
+    const P = i => ({ x: (1 - lm[i].x) * A, y: lm[i].y });   // mirrored, so "left" is the speaker's left
+    const d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    const wrist = P(0), palm = d(wrist, P(9));
+    if (palm < 1e-3) return null;
+    /* the four fingers are folded: each fingertip is closer to the wrist than its middle knuckle */
+    let folded = 0;
+    for (const [tip, knuckle] of [[8, 6], [12, 10], [16, 14], [20, 18]]) if (d(P(tip), wrist) < d(P(knuckle), wrist)) folded++;
+    if (folded < 3 || d(P(8), wrist) >= d(P(6), wrist)) return null;   // index finger must be folded
+    /* the thumb sticks out and is fairly straight */
+    const t2 = P(2), t3 = P(3), t4 = P(4);
+    if (d(t4, P(5)) < POSE.thumbOut * palm) return null;
+    if (d(t4, wrist) < d(t3, wrist)) return null;
+    /* and it points sideways, not up or down */
+    const vx = t4.x - t2.x, vy = t4.y - t2.y;
+    if (Math.abs(vy) > Math.abs(vx) * POSE.maxTilt) return null;
+    return vx < 0 ? 'left' : 'right';
+  }
+
+  /* Hold-to-confirm: the same pose for POSE.hold ms fires once; then the hand must relax first. */
+  function feed(t, pose) {
+    if (pose) {
+      if (pose !== cand || t - candLast > POSE.grace) { cand = pose; candSince = t; }
+      candLast = t;
+    } else if (t - candLast > POSE.grace) cand = null;
+    if (!armed) {
+      prog = 0;
+      if (!cand && t - candLast > POSE.release) armed = true;
+      return null;
+    }
+    if (!cand) { prog = 0; return null; }
+    prog = Math.min(1, (t - candSince) / POSE.hold);
+    if (prog < 1) return null;
+    armed = false; prog = 0;
+    return (cand === 'left') === POSE.nextIsLeft ? 'next' : 'prev';
+  }
+
+  /* the small camera window: mirrored video + hand dots + a ring that fills while you hold */
+  function draw(lm, now) {
+    if (cam.hidden) return;
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    if (lm) {
+      ctx.strokeStyle = 'rgba(61,220,151,0.85)'; ctx.lineWidth = 3;
+      for (const [a, b] of BONES) {
+        ctx.beginPath(); ctx.moveTo((1 - lm[a].x) * W, lm[a].y * H); ctx.lineTo((1 - lm[b].x) * W, lm[b].y * H); ctx.stroke();
+      }
+      ctx.fillStyle = '#3DDC97';
+      for (const q of lm) { ctx.beginPath(); ctx.arc((1 - q.x) * W, q.y * H, 5, 0, Math.PI * 2); ctx.fill(); }
+      if (cand && armed) {
+        const pts = [lm[0], lm[5], lm[9], lm[17]];
+        const cx = (1 - pts.reduce((s, q) => s + q.x, 0) / 4) * W, cy = pts.reduce((s, q) => s + q.y, 0) / 4 * H;
+        ctx.lineWidth = 10; ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(0,0,0,0.45)'; ctx.beginPath(); ctx.arc(cx, cy, 70, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = '#E9B460'; ctx.beginPath(); ctx.arc(cx, cy, 70, -Math.PI / 2, -Math.PI / 2 + prog * Math.PI * 2); ctx.stroke();
+      }
+    }
+    ctx.font = '700 22px Montserrat, Arial, sans-serif'; ctx.textBaseline = 'top';
+    const goesNext = (cand === 'left') === POSE.nextIsLeft;
+    const tag = state === 'paused' ? 'PAUSED (G)'
+      : state === 'loading' ? 'LOADING HAND MODEL…'
+      : !lm ? 'NO HAND'
+      : !armed ? 'DONE · RELAX YOUR HAND'
+      : cand ? (goesNext ? 'NEXT… HOLD' : 'BACK… HOLD')
+      : 'HAND ✓';
+    ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(10, 10, ctx.measureText(tag).width + 20, 34);
+    ctx.fillStyle = lm && state === 'on' ? (cand && armed ? '#E9B460' : '#3DDC97') : '#F3EEE5'; ctx.fillText(tag, 20, 16);
+    if (now < bannerUntil) {
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0, H / 2 - 50, W, 100);
+      ctx.fillStyle = '#E9B460'; ctx.font = '800 60px Montserrat, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(banner, W / 2, H / 2); ctx.textAlign = 'left';
+    }
+  }
+
+  function loop() {
+    raf = requestAnimationFrame(loop);
+    if (!video || video.readyState < 2) return;
+    const now = performance.now();
+    if (state !== 'on' || !landmarker) { draw(null, now); return; }
+    if (video.currentTime === lastTime) return;
+    lastTime = video.currentTime;
+    const res = landmarker.detectForVideo(video, now);
+    const lm = res.landmarks && res.landmarks[0];
+    stat.classList.toggle('hand', !!lm);
+    const pose = lm ? thumbPose(lm, canvas.width / canvas.height) : null;
+    const dir = feed(now, pose);
+    if (dir && window.deck) {
+      window.deck[dir]();
+      banner = dir === 'next' ? 'NEXT ▶' : '◀ BACK';
+      bannerUntil = now + 700;
+      stat.classList.add('swipe');
+      clearTimeout(flashT);
+      flashT = setTimeout(() => stat.classList.remove('swipe'), 400);
+    }
+    draw(lm, now);
+  }
+
+  async function start() {
+    setState('loading');
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw { name: 'NoSupport' };
+      stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' }, audio: false });
+      if (state !== 'loading') { stop(); return; }   // turned off while the browser was asking
+      video = document.createElement('video');
+      video.muted = true; video.playsInline = true; video.srcObject = stream;
+      cam.insertBefore(video, canvas);
+      await video.play();
+      canvas.width = video.videoWidth || 640; canvas.height = video.videoHeight || 480;
+      setState('loading', 'Loading hand model…');   // the camera window shows up now
+      cancelAnimationFrame(raf); loop();
+      if (!landmarker) {
+        const { FilesetResolver, HandLandmarker } = await import(MP_URL + '/vision_bundle.mjs');
+        const files = await FilesetResolver.forVisionTasks(MP_URL + '/wasm');
+        const opts = delegate => ({
+          baseOptions: { modelAssetPath: MODEL, delegate },
+          runningMode: 'VIDEO', numHands: 1,
+          minHandDetectionConfidence: 0.5, minHandPresenceConfidence: 0.5, minTrackingConfidence: 0.5,
+        });
+        try { landmarker = await HandLandmarker.createFromOptions(files, opts('GPU')); }
+        catch (e) { landmarker = await HandLandmarker.createFromOptions(files, opts('CPU')); }
+      }
+      if (state !== 'loading') return;
+      lastTime = -1;
+      setState('on');
+    } catch (e) {
+      if (state !== 'loading') return;   // the speaker turned it off while it was starting
+      stop();
+      const n = e && e.name;
+      console.error('Gestures could not start:', e);
+      setState('error',
+        n === 'NotAllowedError' ? 'Camera blocked · allow it in the address bar, then click again' :
+        n === 'NotFoundError' || n === 'OverconstrainedError' ? 'No camera found on this laptop' :
+        n === 'NotReadableError' ? 'Camera is busy in another app · close it, then click again' :
+        n === 'NoSupport' ? 'This browser cannot use the camera here (needs https)' :
+        'Could not load the hand model · check the internet, then click again');
+    }
+  }
+
+  function stop() {
+    cancelAnimationFrame(raf);
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = null;
+    if (video) video.remove();
+    video = null;
+    setState('off');
+  }
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();   // don't let the click also change the slide
+    btn.blur();
+    if (state === 'on' || state === 'paused' || state === 'loading') stop();
+    else start();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === 'g' || e.key === 'G') {
+      if (state === 'on') setState('paused');
+      else if (state === 'paused') setState('on');
+    } else if (e.key === 'v' || e.key === 'V') {
+      camWanted = !camWanted;
+      setState(state, state === 'loading' ? label.textContent : undefined);
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => { if (document.hidden) resetPose(); });
+})();
+</script>
+GESTURES OFF (end) -->
