@@ -513,17 +513,6 @@ html.gl .zone { display: none; }
   html.gl .fade { transition: opacity .3s; transform: none; }
   .o-logo *, .o-name, .o-cats li, .o-bar::after, .o-skip { animation-duration: .01s !important; animation-delay: 0s !important; }
 }
-
-/* the note for visitors who typed the old address (fareselzouhiry.com redirects here with ?from=fareselzouhiry) */
-.moved { position: fixed; z-index: 60; top: calc(env(safe-area-inset-top, 0px) + 64px); left: 50%; translate: -50% -12px; width: max-content; max-width: min(560px, calc(100vw - 28px)); display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 16px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent); background: rgb(10 12 22 / .88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--fg); font-size: .9rem; line-height: 1.45; box-shadow: 0 10px 40px rgb(0 0 0 / .45); opacity: 0; transition: opacity .5s var(--ease), translate .5s var(--ease); }
-.moved[hidden] { display: none; }
-.moved.show { opacity: 1; translate: -50% 0; }
-html[dir="rtl"] .moved { padding: 10px 16px 10px 10px; }
-.moved b { color: var(--acc); font-weight: 500; white-space: nowrap; }
-.moved s { color: var(--fg3); white-space: nowrap; }
-.moved button { flex: none; width: 30px; height: 30px; border: 0; border-radius: 8px; background: rgb(255 255 255 / .06); color: var(--fg2); font: inherit; font-size: 1.1rem; line-height: 1; cursor: pointer; }
-.moved button:hover { background: rgb(255 255 255 / .12); color: var(--fg); }
-@media (prefers-reduced-motion: reduce) { .moved { transition: opacity .2s; translate: -50% 0; } }
 </style>
 </head>
 <body>
@@ -560,10 +549,6 @@ html[dir="rtl"] .moved { padding: 10px 16px 10px 10px; }
     <button class="lang" type="button" id="lang" aria-label="Switch language"><span class="en" lang="ar">عربي</span><span class="ar" lang="en">EN</span></button>
   </nav>
 </header>
-<div class="moved" id="moved" role="status" hidden>
-  <p style="margin:0"><span class="en"><s>fareselzouhiry.com</s> is now <b>faress.dev</b> — same site, new address.</span><span class="ar">أصبح <s dir="ltr">fareselzouhiry.com</s> الآن <b dir="ltr">faress.dev</b> — الموقع نفسه بعنوان جديد.</span></p>
-  <button type="button" id="moved-x" aria-label="Close">×</button>
-</div>
 <div class="hud bl mono" aria-hidden="true"><i class="live"></i><span id="status">Loading</span></div>
 <!-- the depth list: every stop along the tunnel, grouped by kind of work -->
 <nav class="depth mono" id="dots" aria-label="Sections">
@@ -899,23 +884,6 @@ html[dir="rtl"] .moved { padding: 10px 16px 10px 10px; }
   var browserAr = [].concat(navigator.languages || [], navigator.language || '')[0];
   setLang(asked || saved || (/^ar\b/i.test(browserAr || '') ? 'ar' : 'en'), false);
   document.getElementById('lang').addEventListener('click', function () { setLang(root.dataset.lang === 'ar' ? 'en' : 'ar', true); });
-
-  /* the old address sends visitors here with ?from=fareselzouhiry: tell them once, then tidy the address bar */
-  if (/[?&]from=fareselzouhiry\b/.test(location.search)) {
-    var moved = document.getElementById('moved'), movedT;
-    var rest = location.search.replace(/[?&]from=fareselzouhiry\b[^&]*/, '').replace(/^&/, '?');
-    try { history.replaceState(history.state, '', location.pathname + (rest === '?' ? '' : rest) + location.hash); } catch (e) {}
-    var hideMoved = function () { moved.classList.remove('show'); clearTimeout(movedT); setTimeout(function () { moved.hidden = true; }, 600); };
-    var showMoved = function () {
-      moved.hidden = false;
-      requestAnimationFrame(function () { requestAnimationFrame(function () { moved.classList.add('show'); }); });
-      movedT = setTimeout(hideMoved, 12000);
-    };
-    document.getElementById('moved-x').addEventListener('click', hideMoved);
-    // wait for the opening to clear so the note is not hidden behind it
-    if (!root.classList.contains('opening')) showMoved();
-    else new MutationObserver(function (m, o) { if (!root.classList.contains('opening')) { o.disconnect(); showMoved(); } }).observe(root, { attributes: true, attributeFilter: ['class'] });
-  }
 
   /* copy the email */
   var copy = document.getElementById('copy');
