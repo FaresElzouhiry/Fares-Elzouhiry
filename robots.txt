@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.fareselzouhiry.com/sitemap.xml
+Sitemap: https://faress.dev/sitemap.xml
