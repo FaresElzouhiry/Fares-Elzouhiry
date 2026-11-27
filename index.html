@@ -15,7 +15,7 @@
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
- {"@type":"Person","@id":"https://faress.dev/#me","name":"Fares Elzouhiry","givenName":"Fares","familyName":"Elzouhiry","alternateName":["فارس الزهيري","Fares El Zouhiry","Fares El-Zouhiry","Elzouhiry","الزهيري"],"jobTitle":"Front-end developer","url":"https://faress.dev/","email":"mailto:fares@fareselzouhiry.com","image":"https://faress.dev/img/og.jpg","sameAs":["https://www.linkedin.com/in/fareselzouhiry/","https://github.com/FaresElzouhiry","https://www.instagram.com/faress_ae/"],"knowsAbout":["HTML","CSS","JavaScript","Three.js","WebGL","Progressive Web Apps"]}
+ {"@type":"Person","@id":"https://faress.dev/#me","name":"Fares Elzouhiry","givenName":"Fares","familyName":"Elzouhiry","alternateName":["فارس الزهيري","Fares El Zouhiry","Fares El-Zouhiry","Elzouhiry","الزهيري"],"jobTitle":"Front-end developer","url":"https://faress.dev/","email":"mailto:fares@faress.dev","image":"https://faress.dev/img/og.jpg","sameAs":["https://www.linkedin.com/in/fareselzouhiry/","https://github.com/FaresElzouhiry","https://www.instagram.com/faress_ae/"],"knowsAbout":["HTML","CSS","JavaScript","Three.js","WebGL","Progressive Web Apps"]}
 ]}
 </script>
 <meta property="og:type" content="website">
@@ -213,7 +213,7 @@ html[data-lang="ar"] .stack b { letter-spacing: 0; text-transform: none; font-si
 html[data-lang="ar"] .contact h2 { letter-spacing: 0; line-height: 1.25; }
 .mail { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 28px; padding: 6px; padding-inline-start: 18px; border-radius: 999px; border: 1px solid rgb(255 255 255 / .16); background: rgb(255 255 255 / .04); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); max-width: 100%; }
 .mail a { font-size: clamp(1rem, 2.4vw, 1.25rem); text-decoration: none; overflow-wrap: anywhere; }
-.mail button { border: 0; border-radius: 999px; padding: 11px 18px; background: var(--fg); color: #05060a; font-weight: 500; cursor: pointer; }
+.mail .send { border-radius: 999px; padding: 11px 18px; background: var(--fg); color: #05060a; font-size: inherit; font-weight: 500; line-height: normal; }
 .contact .acts { justify-content: center; }
 
 /* words fade in when their section arrives (3D mode only) */
@@ -842,7 +842,7 @@ html.gl .zone { display: none; }
     <h2 class="fade"><span class="en scr">Let's build something out of this world.</span><span class="ar">لنبنِ شيئًا من عالم آخر.</span></h2>
     <p class="about fade"><span class="en">I'm a front-end developer. I design and build websites, web apps and 3D experiences by hand, in English and Arabic. Available for freelance projects and full-time roles.</span><span class="ar">أنا مطوّر واجهات أمامية. أصمّم وأبرمج المواقع وتطبيقات الويب والتجارب ثلاثية الأبعاد بيدي، بالعربية والإنجليزية. متاح لمشاريع حرة ولوظائف بدوام كامل.</span></p>
     <p class="skills mono fade ltr">HTML · CSS · JavaScript · Three.js · WebGL2 · PWA · Google Apps Script · Git</p>
-    <div class="mail fade"><a class="ltr" href="mailto:fares@fareselzouhiry.com" id="email">fares@fareselzouhiry.com</a><button type="button" id="copy"><span class="en">Copy</span><span class="ar">نسخ</span></button></div>
+    <div class="mail fade"><a class="ltr" href="mailto:fares@faress.dev" id="email">fares@faress.dev</a><a class="send" href="mailto:fares@faress.dev"><span class="en">Send</span><span class="ar">أرسل</span></a></div>
     <div class="acts fade"><a href="https://www.linkedin.com/in/fareselzouhiry/" target="_blank" rel="me noopener"><span class="ltr">linkedin.com/in/fareselzouhiry</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a href="https://github.com/FaresElzouhiry" target="_blank" rel="me noopener"><span class="ltr">github.com/FaresElzouhiry</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a href="https://www.instagram.com/faress_ae/" target="_blank" rel="me noopener"><span class="ltr">instagram.com/faress_ae</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>
   </section>
 </main>
@@ -884,14 +884,6 @@ html.gl .zone { display: none; }
   var browserAr = [].concat(navigator.languages || [], navigator.language || '')[0];
   setLang(asked || saved || (/^ar\b/i.test(browserAr || '') ? 'ar' : 'en'), false);
   document.getElementById('lang').addEventListener('click', function () { setLang(root.dataset.lang === 'ar' ? 'en' : 'ar', true); });
-
-  /* copy the email */
-  var copy = document.getElementById('copy');
-  copy.addEventListener('click', function () {
-    var label = copy.innerHTML, mail = document.getElementById('email').textContent;
-    function done() { copy.innerHTML = '<span class="en">Copied ✓</span><span class="ar">تم النسخ ✓</span>'; setTimeout(function () { copy.innerHTML = label; }, 1600); }
-    try { navigator.clipboard.writeText(mail).then(done, function () { location.href = 'mailto:' + mail; }); } catch (e) { location.href = 'mailto:' + mail; }
-  });
 
   /* titles decode from noise when their section arrives */
   var GLYPHS = '▓▒░<>/\\|_#*+=01∆∑Ω';

@@ -112,7 +112,7 @@ Then open http://localhost:8765
 | Where a screen waits and where it comes to | `place()` in the engine |
 | A project's picture | `img/stage/<name>.jpg` (2000×1250) and `img/stage/m-<name>.jpg` (1200×1500, for phones). Captured at double density so they stay sharp on retina screens; gallery pictures are 2400 wide |
 | Gallery pictures and captions | `GAL` in the script; each picture needs a copy in `img/` and in `img/xs/` |
-| Email | Search for `fares@fareselzouhiry.com` |
+| Email | Search for `fares@faress.dev` |
 
 ## Publishing
 
